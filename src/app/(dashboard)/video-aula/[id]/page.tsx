@@ -1,78 +1,93 @@
-import { Header } from '@/components/layout/header'
-import { Card, CardContent } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { ArrowLeft, Download, BookOpen, CheckCircle } from 'lucide-react'
 import Link from 'next/link'
+import { ArrowLeft, Clock, Lock } from 'lucide-react'
+import { use } from 'react'
 
-export default function VideoAulaPage({ params }: { params: { id: string } }) {
+const playlist = [
+  { id: '1', title: 'Intro', duration: '12:30', status: 'done' },
+  { id: '2', title: 'How to preview a text', duration: '15:45', status: 'done' },
+  { id: '3', title: 'Skim and Scan', duration: '18:20', status: 'current' },
+  { id: '4', title: 'Annotate', duration: '14:10', status: 'locked' },
+  { id: '5', title: 'Find the Outline', duration: '11:55', status: 'locked' },
+]
+
+export default function VideoAulaPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params)
+  const current = playlist.find(l => l.id === id) || playlist[0]
+
   return (
-    <div>
-      <Header title="Vídeo Aula" />
-      <div className="p-6">
-        <Link href="/trilha-de-aulas" className="inline-flex items-center gap-2 text-sm text-[#657585] hover:text-[#1B2232] mb-6">
-          <ArrowLeft size={16} /> Voltar para trilha
+    <div className="max-w-[1400px] mx-auto px-6 py-8">
+      <div className="flex items-center gap-3 mb-6">
+        <Link href="/trilha-de-aulas" className="text-[#65758b] hover:text-[#1b2232]">
+          <ArrowLeft size={18} />
         </Link>
+        <div>
+          <p className="text-sm text-[#65758b]">Aulas</p>
+          <p className="text-xs text-[#65758b]">Volte para todas as vídeo aulas</p>
+        </div>
+      </div>
 
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-          {/* Video player */}
-          <div className="xl:col-span-2 space-y-4">
-            <div className="bg-black rounded-2xl overflow-hidden aspect-video flex items-center justify-center">
-              <div className="text-center">
-                <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <BookOpen size={28} className="text-white" />
-                </div>
-                <p className="text-white/70 text-sm">Vídeo não disponível neste ambiente</p>
-                <p className="text-white/40 text-xs mt-1">Configure a URL do vídeo no Supabase</p>
-              </div>
+      <div className="flex gap-6">
+        {/* Video player */}
+        <div className="flex-1">
+          <div className="flex items-center gap-2 mb-4">
+            <div className="w-8 h-8 rounded-lg bg-[#f3f5f7] flex items-center justify-center text-sm">📺</div>
+            <div>
+              <p className="font-bold text-[#1b2232]">Critical Reading</p>
+              <p className="text-xs text-[#65758b]">{current.title}</p>
             </div>
-
-            <Card>
-              <CardContent className="p-6">
-                <h2 className="text-xl font-bold text-[#1B2232] mb-2">Math — Álgebra Básica</h2>
-                <p className="text-[#657585] text-sm leading-relaxed mb-4">
-                  Nesta aula você vai aprender sobre equações, inequações e funções lineares, tópicos fundamentais para a seção de matemática do SAT.
-                </p>
-                <div className="flex gap-3">
-                  <Button>
-                    <CheckCircle size={16} /> Marcar como concluída
-                  </Button>
-                  <Button variant="outline">
-                    <Download size={16} /> Material de apoio
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
           </div>
 
-          {/* Sidebar */}
-          <div className="space-y-4">
-            <Card>
-              <CardContent className="p-5">
-                <h3 className="font-bold text-[#1B2232] mb-3">Próximas aulas</h3>
-                <div className="space-y-2">
-                  {['Math — Geometria', 'Reading Avançado', 'Simulado Completo 1'].map((title, i) => (
-                    <div key={i} className="flex items-center gap-3 py-2 border-b border-[#EDEFF3] last:border-0">
-                      <div className="w-7 h-7 rounded-lg bg-[#F3F5F7] flex items-center justify-center text-xs font-bold text-[#657585]">
-                        {i + 4}
-                      </div>
-                      <p className="text-sm text-[#1B2232]">{title}</p>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+          {/* Video */}
+          <div className="bg-[#f3f5f7] rounded-2xl aspect-video flex items-center justify-center mb-4 relative overflow-hidden border border-[#e1e7ef]">
+            <button className="w-16 h-16 rounded-full border-2 border-[#1b2232] flex items-center justify-center hover:bg-white/50 transition-colors">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="#1b2232">
+                <polygon points="5 3 19 12 5 21 5 3" />
+              </svg>
+            </button>
+          </div>
 
-            <Card>
-              <CardContent className="p-5">
-                <h3 className="font-bold text-[#1B2232] mb-3">Dúvidas?</h3>
-                <p className="text-sm text-[#657585] mb-3">
-                  Converse com nossos assistentes IA para tirar dúvidas sobre o conteúdo.
-                </p>
-                <Link href="/assistentes-ia">
-                  <Button variant="outline" className="w-full">Falar com assistente</Button>
+          {/* Lesson info */}
+          <div className="bg-[#0057b8]/10 text-[#0057b8] text-xs font-medium px-3 py-1 rounded-full w-fit mb-2">Critical Reading</div>
+          <h2 className="text-xl font-bold text-[#1b2232] mb-1">{current.title}</h2>
+          <p className="text-sm text-[#65758b]">Resumo da aula</p>
+        </div>
+
+        {/* Playlist */}
+        <div className="w-80 shrink-0">
+          <div className="bg-white rounded-2xl border border-[#e1e7ef] overflow-hidden">
+            <div className="p-4 border-b border-[#e1e7ef]">
+              <p className="font-bold text-[#1b2232]">Critical Reading</p>
+              <p className="text-xs text-[#65758b]">2 de 13 aulas concluídas</p>
+            </div>
+            <div className="divide-y divide-[#f3f5f7]">
+              {playlist.map((lesson) => (
+                <Link
+                  key={lesson.id}
+                  href={`/video-aula/${lesson.id}`}
+                  className={`flex items-center gap-3 px-4 py-3 hover:bg-[#f3f5f7] transition-colors ${lesson.status === 'locked' ? 'opacity-60 pointer-events-none' : ''} ${lesson.id === id ? 'bg-[#f3f5f7]' : ''}`}
+                >
+                  <div className="shrink-0">
+                    {lesson.id === id ? (
+                      <div className="w-7 h-7 rounded-full bg-[#0057b8] flex items-center justify-center">
+                        <div className="w-3 h-3 rounded-full border-2 border-white" />
+                      </div>
+                    ) : lesson.status === 'locked' ? (
+                      <div className="w-7 h-7 rounded-full bg-[#f3f5f7] flex items-center justify-center">
+                        <Lock size={12} className="text-[#65758b]" />
+                      </div>
+                    ) : (
+                      <div className="w-7 h-7 rounded-full border-2 border-[#65758b] flex items-center justify-center">
+                        <div className="w-2.5 h-2.5 rounded-full bg-[#65758b]" />
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-[#1b2232] truncate">{lesson.title}</p>
+                    <p className="text-xs text-[#65758b] flex items-center gap-1"><Clock size={10} /> {lesson.duration}</p>
+                  </div>
                 </Link>
-              </CardContent>
-            </Card>
+              ))}
+            </div>
           </div>
         </div>
       </div>

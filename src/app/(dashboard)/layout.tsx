@@ -1,4 +1,5 @@
-import { Sidebar } from '@/components/layout/sidebar'
+import { Navbar } from '@/components/layout/navbar'
+import { Footer } from '@/components/layout/footer'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 
@@ -13,11 +14,12 @@ export default async function DashboardLayout({
   if (!user) redirect('/login')
 
   return (
-    <div className="flex min-h-screen bg-[#F3F5F7]">
-      <Sidebar />
-      <main className="flex-1 ml-64 min-h-screen">
+    <div className="min-h-screen bg-[#f3f5f7] flex flex-col">
+      <Navbar />
+      <main className="flex-1">
         {children}
       </main>
+      <Footer />
     </div>
   )
 }

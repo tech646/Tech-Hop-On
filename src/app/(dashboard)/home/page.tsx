@@ -1,152 +1,125 @@
 import { createClient } from '@/lib/supabase/server'
-import { Header } from '@/components/layout/header'
-import { Card, CardContent } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
 import Link from 'next/link'
-import { BookOpen, Calculator, Brain, Bot, ArrowRight, TrendingUp, Clock, Award } from 'lucide-react'
+import { ArrowRight, BookOpen, Calculator, Brain, Sparkles } from 'lucide-react'
 
 const journeyCards = [
   {
-    href: '/trilha-de-aulas',
     title: 'Aulas',
-    description: 'Acompanhe sua trilha de aprendizado personalizada',
+    description: 'Acesse as vídeo aulas',
+    href: '/trilha-de-aulas',
     icon: BookOpen,
-    color: '#0057B8',
-    bg: 'rgba(0,87,184,0.08)',
+    iconBg: 'bg-[#008db8]/10',
+    iconColor: 'text-[#008db8]',
+    imageBg: 'bg-gradient-to-br from-blue-100 to-blue-200',
   },
   {
-    href: '/math-classes',
     title: 'Math Classes',
-    description: 'Pratique matemática com exercícios focados no SAT',
+    description: 'Clique e agende!',
+    href: '/math-classes',
     icon: Calculator,
-    color: '#FF9500',
-    bg: 'rgba(255,149,0,0.08)',
+    iconBg: 'bg-[#ff9500]/10',
+    iconColor: 'text-[#ff9500]',
+    imageBg: 'bg-gradient-to-br from-orange-100 to-orange-200',
   },
   {
-    href: '/practicing',
     title: 'Praticando',
-    description: 'Simulados e exercícios para fixar o conteúdo',
+    description: 'Pratique o SAT',
+    href: '/practicing',
     icon: Brain,
-    color: '#EF467C',
-    bg: 'rgba(239,70,124,0.08)',
+    iconBg: 'bg-[#ef467c]/10',
+    iconColor: 'text-[#ef467c]',
+    imageBg: 'bg-gradient-to-br from-pink-100 to-pink-200',
   },
   {
-    href: '/assistentes-ia',
     title: 'Assistentes IA',
-    description: 'Tire dúvidas com nossos assistentes especializados',
-    icon: Bot,
-    color: '#FFCB22',
-    bg: 'rgba(255,203,34,0.08)',
+    description: 'Tire suas dúvidas agora',
+    href: '/assistentes-ia',
+    icon: Sparkles,
+    iconBg: 'bg-[#ffcb22]/10',
+    iconColor: 'text-[#ffcb22]',
+    imageBg: 'bg-gradient-to-br from-yellow-100 to-yellow-200',
   },
 ]
 
 export default async function HomePage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-
-  const [{ data: profile }, { data: stats }] = await Promise.all([
-    supabase.from('profiles').select('*').eq('id', user!.id).single(),
-    supabase.from('user_stats').select('*').eq('user_id', user!.id).single(),
-  ])
-
-  const firstName = profile?.full_name?.split(' ')[0] ?? 'Estudante'
+  const firstName = user?.user_metadata?.full_name?.split(' ')[0] || user?.email?.split('@')[0] || 'aluno'
 
   return (
-    <div>
-      <Header title="Home" subtitle="Bem-vindo de volta!" />
-      <div className="p-6 space-y-6">
-
-        {/* Hero Banner */}
-        <div className="relative bg-gradient-to-r from-[#1B2232] to-[#0057B8] rounded-2xl overflow-hidden p-8">
-          <div className="absolute inset-0 opacity-10" style={{
-            backgroundImage: 'radial-gradient(circle at 70% 50%, #78B4E3 0%, transparent 60%)'
-          }} />
-          <div className="relative z-10">
-            <p className="text-white/70 text-sm font-medium mb-1">Olá, {firstName}! 👋</p>
-            <h2 className="text-3xl font-bold text-white mb-2">Welcome back!</h2>
-            <p className="text-white/75 text-lg mb-6">
-              Continue de onde parou. Você está indo muito bem!
-            </p>
-            <Link href="/diagnostico">
-              <Button className="bg-white text-[#0057B8] hover:bg-white/90 font-bold">
-                Continuar estudando <ArrowRight size={16} />
-              </Button>
+    <div className="max-w-[1400px] mx-auto px-6 py-8">
+      {/* Hero banner */}
+      <div className="bg-[#1f2c47] rounded-2xl overflow-hidden relative mb-8 h-[384px]">
+        <div className="absolute inset-0 p-12 flex flex-col justify-center">
+          <div className="inline-flex items-center bg-white/15 backdrop-blur-sm rounded-full px-4 py-1.5 mb-4 w-fit">
+            <span className="text-white text-xs font-bold uppercase tracking-wider">Boas-vindas ao futuro</span>
+          </div>
+          <h1 className="text-5xl font-bold text-white mb-4">Welcome back!</h1>
+          <p className="text-white/75 text-lg leading-relaxed mb-8 max-w-md">
+            Seu sonho de estudar fora está 12% mais próximo hoje. Vamos continuar sua jornada!
+          </p>
+          <div className="flex gap-4">
+            <Link href="/trilha-de-aulas" className="bg-white text-[#1b2232] font-bold text-sm px-6 h-11 rounded-full flex items-center hover:bg-white/90 transition-colors shadow-sm">
+              Continuar Aula
+            </Link>
+            <Link href="/math-classes" className="bg-white/0 border border-white/20 text-[#1b2232] font-bold text-sm px-6 h-11 rounded-full flex items-center hover:bg-white/10 transition-colors">
+              Marcar Math Class
             </Link>
           </div>
         </div>
+        {/* Illustration placeholder */}
+        <div className="absolute right-0 bottom-0 w-[438px] h-[255px] flex items-center justify-center">
+          <div className="text-8xl">🎓</div>
+        </div>
+      </div>
 
-        {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {[
-            { label: 'Aulas Concluídas', value: stats?.aulas_concluidas ?? 0, icon: Award, color: '#0057B8' },
-            { label: 'Horas de Estudo', value: `${stats?.horas_de_estudo ?? 0}h`, icon: Clock, color: '#37B0DD' },
-            { label: 'Último Teste SAT', value: stats?.ultimo_sat_score ?? '—', icon: TrendingUp, color: '#FFCB22' },
-          ].map(({ label, value, icon: Icon, color }) => (
-            <Card key={label}>
-              <CardContent className="flex items-center gap-4 py-5">
-                <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: `${color}15` }}>
-                  <Icon size={22} style={{ color }} />
+      {/* Stats */}
+      <div className="grid grid-cols-3 gap-4 mb-8">
+        {[
+          { label: 'Aulas Concluídas', value: '24', icon: BookOpen, color: 'bg-[#0057b8]/10' },
+          { label: 'Horas de Estudo', value: '48h', icon: Brain, color: 'bg-[#ff9500]/10' },
+          { label: 'Último Teste SAT', value: '900', icon: Sparkles, color: 'bg-[#1f4435]/10' },
+        ].map(({ label, value, icon: Icon, color }) => (
+          <div key={label} className="bg-white rounded-xl p-5 flex items-center gap-4">
+            <div className={`${color} rounded-xl w-12 h-12 flex items-center justify-center shrink-0`}>
+              <Icon size={24} className="text-[#1b2232]" />
+            </div>
+            <div>
+              <p className="text-xs font-bold text-[#65758b] uppercase tracking-wider mb-1">{label}</p>
+              <p className="text-2xl font-bold text-[#1b2232]">{value}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Journey section */}
+      <div>
+        <h2 className="text-2xl font-bold text-[#1b2232] mb-1">Sua Jornada</h2>
+        <p className="text-[#65758b] mb-5">Tudo o que você precisa para alcançar o topo</p>
+
+        <div className="grid grid-cols-4 gap-4">
+          {journeyCards.map(({ title, description, href, icon: Icon, iconBg, iconColor, imageBg }) => (
+            <Link key={href} href={href} className="bg-white rounded-xl overflow-hidden group hover:shadow-md transition-shadow">
+              {/* Image area */}
+              <div className={`${imageBg} h-48 flex items-center justify-center`}>
+                <div className="text-6xl opacity-60">
+                  {title === 'Aulas' ? '🎬' : title === 'Math Classes' ? '📐' : title === 'Praticando' ? '📝' : '🤖'}
                 </div>
-                <div>
-                  <p className="text-2xl font-bold text-[#1B2232]">{value}</p>
-                  <p className="text-sm text-[#657585]">{label}</p>
+              </div>
+              {/* Content */}
+              <div className="p-4">
+                <div className={`${iconBg} w-9 h-9 rounded-xl flex items-center justify-center mb-3`}>
+                  <Icon size={18} className={iconColor} />
                 </div>
-              </CardContent>
-            </Card>
+                <p className="font-bold text-[#1b2232] text-base mb-1">{title}</p>
+                <p className="text-[#65758b] text-sm mb-3">{description}</p>
+                <span className="text-[#0057b8] font-bold text-sm flex items-center gap-1 group-hover:gap-2 transition-all">
+                  Começar agora <ArrowRight size={14} />
+                </span>
+              </div>
+            </Link>
           ))}
         </div>
-
-        {/* Sua Jornada */}
-        <div>
-          <h3 className="text-lg font-bold text-[#1B2232] mb-4">Sua Jornada</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
-            {journeyCards.map(({ href, title, description, icon: Icon, color, bg }) => (
-              <Link key={href} href={href}>
-                <Card className="hover:shadow-md transition-shadow cursor-pointer group">
-                  <CardContent className="p-5">
-                    <div
-                      className="w-12 h-12 rounded-xl flex items-center justify-center mb-4"
-                      style={{ background: bg }}
-                    >
-                      <Icon size={22} style={{ color }} />
-                    </div>
-                    <h4 className="text-base font-bold text-[#1B2232] mb-1">{title}</h4>
-                    <p className="text-sm text-[#657585] mb-4 leading-relaxed">{description}</p>
-                    <span
-                      className="inline-flex items-center gap-1 text-sm font-semibold group-hover:gap-2 transition-all"
-                      style={{ color }}
-                    >
-                      Começar agora <ArrowRight size={14} />
-                    </span>
-                  </CardContent>
-                </Card>
-              </Link>
-            ))}
-          </div>
-        </div>
-
-        {/* Quick links */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Card>
-            <CardContent className="p-5">
-              <h4 className="font-bold text-[#1B2232] mb-3">Próximo Agendamento</h4>
-              <p className="text-sm text-[#657585] mb-4">Nenhum agendamento próximo.</p>
-              <Link href="/agendamentos">
-                <Button variant="outline" size="sm">Ver agendamentos</Button>
-              </Link>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-5">
-              <h4 className="font-bold text-[#1B2232] mb-3">Diagnóstico SAT</h4>
-              <p className="text-sm text-[#657585] mb-4">Descubra seu nível atual e receba um plano personalizado.</p>
-              <Link href="/diagnostico">
-                <Button size="sm">Fazer diagnóstico</Button>
-              </Link>
-            </CardContent>
-          </Card>
-        </div>
-
       </div>
     </div>
   )

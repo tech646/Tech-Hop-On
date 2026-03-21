@@ -1,216 +1,142 @@
 'use client'
 
 import { useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
-import { Header } from '@/components/layout/header'
-import { Card, CardContent } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { ArrowRight, ArrowLeft, CheckCircle } from 'lucide-react'
+import Link from 'next/link'
+import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 
-const steps = [
+const questions = [
   {
-    step: 1,
-    title: 'Objetivo',
-    question: 'Qual é o seu objetivo principal?',
+    id: 1,
+    question: 'How would you define your knowledge regarding the application process for universities abroad?',
     options: [
-      'Entrar em uma universidade americana',
-      'Melhorar meu inglês acadêmico',
-      'Conseguir uma bolsa de estudos',
-      'Transferência de universidade',
-    ],
+      "I don't know anything about it, help me!",
+      "I kind of know some things, but I have many doubts!",
+      "I'm a pro! I just need someone to tutor me along the way.",
+    ]
   },
   {
-    step: 2,
-    title: 'Nível de Inglês',
-    question: 'Como você avalia seu nível de inglês atual?',
-    options: ['Iniciante', 'Básico', 'Intermediário', 'Avançado'],
+    id: 2,
+    question: 'What is your current English proficiency level?',
+    options: ['Beginner (A1-A2)', 'Intermediate (B1-B2)', 'Advanced (C1-C2)']
   },
   {
-    step: 3,
-    title: 'Matemática',
-    question: 'Como você se sente em relação à matemática?',
-    options: ['Preciso de muita ajuda', 'Tenho dificuldades em alguns tópicos', 'Me saio bem', 'Sou muito bom'],
+    id: 3,
+    question: 'When do you plan to start your studies abroad?',
+    options: ['In less than 1 year', 'In 1-2 years', 'In more than 2 years']
   },
   {
-    step: 4,
-    title: 'Tempo de Estudo',
-    question: 'Quantas horas por semana você pode dedicar aos estudos?',
-    options: ['Menos de 5 horas', '5 a 10 horas', '10 a 20 horas', 'Mais de 20 horas'],
+    id: 4,
+    question: 'What type of university are you interested in?',
+    options: ['Research universities (MIT, Stanford, Harvard)', 'Liberal arts colleges', 'I\'m not sure yet']
   },
   {
-    step: 5,
-    title: 'Prazo',
-    question: 'Quando você pretende fazer o SAT?',
-    options: ['Em menos de 3 meses', 'Em 3 a 6 meses', 'Em 6 a 12 meses', 'Ainda não sei'],
+    id: 5,
+    question: 'What is your main goal for studying abroad?',
+    options: ['Academic excellence and research', 'Career opportunities', 'Cultural experience and personal growth']
   },
   {
-    step: 6,
-    title: 'Experiência',
-    question: 'Você já fez algum teste SAT antes?',
-    options: ['Nunca fiz', 'Já fiz uma vez', 'Já fiz duas ou mais vezes', 'Estou retestando para melhorar'],
+    id: 6,
+    question: 'Have you taken the SAT or ACT before?',
+    options: ['Yes, I have a good score', 'Yes, but I want to improve', 'No, I haven\'t taken it yet']
   },
   {
-    step: 7,
-    title: 'Pontuação Alvo',
-    question: 'Qual pontuação você deseja atingir no SAT?',
-    options: ['1000 - 1100', '1100 - 1200', '1200 - 1350', '1350 - 1600'],
+    id: 7,
+    question: 'How would you rate your writing skills in English?',
+    options: ['I struggle with writing in English', 'I can write but need improvement', 'I write well in English']
   },
   {
-    step: 8,
-    title: 'Maior Desafio',
-    question: 'Qual é o seu maior desafio nos estudos?',
-    options: ['Falta de foco/concentração', 'Dificuldade com o conteúdo', 'Falta de tempo', 'Ansiedade em provas'],
+    id: 8,
+    question: 'What is your biggest challenge in the application process?',
+    options: ['Understanding requirements', 'Writing essays and personal statements', 'Financial planning and scholarships']
   },
   {
-    step: 9,
-    title: 'Estilo de Aprendizado',
-    question: 'Qual estilo de aprendizado funciona melhor para você?',
-    options: ['Vídeos e aulas visuais', 'Exercícios práticos', 'Leitura de materiais', 'Tutoriais interativos'],
+    id: 9,
+    question: 'How much time per week can you dedicate to studying?',
+    options: ['Less than 5 hours', '5-10 hours', 'More than 10 hours']
   },
 ]
 
 export default function DiagnosticoPage() {
-  const [currentStep, setCurrentStep] = useState(0)
-  const [answers, setAnswers] = useState<Record<number, string>>({})
-  const [completed, setCompleted] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const supabase = createClient()
   const router = useRouter()
+  const [current, setCurrent] = useState(0)
+  const [selected, setSelected] = useState<string | null>(null)
+  const [answers, setAnswers] = useState<string[]>([])
 
-  const step = steps[currentStep]
-  const progress = ((currentStep) / steps.length) * 100
-
-  function handleAnswer(answer: string) {
-    setAnswers(prev => ({ ...prev, [step.step]: answer }))
-  }
+  const q = questions[current]
+  const total = questions.length
+  const progress = ((current) / total) * 100
 
   function handleNext() {
-    if (currentStep < steps.length - 1) {
-      setCurrentStep(prev => prev + 1)
+    if (!selected) return
+    const newAnswers = [...answers, selected]
+    setAnswers(newAnswers)
+
+    if (current < total - 1) {
+      setCurrent(current + 1)
+      setSelected(null)
     } else {
-      handleComplete()
+      router.push('/home')
     }
   }
 
-  async function handleComplete() {
-    setLoading(true)
-    const { data: { user } } = await supabase.auth.getUser()
-    if (user) {
-      await supabase.from('diagnostic_results').upsert({
-        user_id: user.id,
-        step: 9,
-        answers,
-        completed_at: new Date().toISOString(),
-      })
+  function handleBack() {
+    if (current > 0) {
+      setCurrent(current - 1)
+      setSelected(answers[current - 1] || null)
+      setAnswers(answers.slice(0, -1))
+    } else {
+      router.back()
     }
-    setCompleted(true)
-    setLoading(false)
-  }
-
-  if (completed) {
-    return (
-      <div>
-        <Header title="Diagnóstico" />
-        <div className="p-6 flex items-center justify-center min-h-[60vh]">
-          <div className="text-center max-w-md">
-            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <CheckCircle size={40} className="text-green-600" />
-            </div>
-            <h2 className="text-2xl font-bold text-[#1B2232] mb-3">Diagnóstico concluído!</h2>
-            <p className="text-[#657585] mb-8">
-              Com base nas suas respostas, criamos um plano de estudos personalizado para você atingir sua meta no SAT.
-            </p>
-            <div className="flex gap-3 justify-center">
-              <Button onClick={() => router.push('/home')}>Ver meu plano</Button>
-              <Button variant="outline" onClick={() => router.push('/planos')}>Ver planos</Button>
-            </div>
-          </div>
-        </div>
-      </div>
-    )
   }
 
   return (
-    <div>
-      <Header title="Diagnóstico SAT" subtitle={`Etapa ${currentStep + 1} de ${steps.length}`} />
-      <div className="p-6">
-        <div className="max-w-2xl mx-auto">
+    <div className="max-w-[1400px] mx-auto px-6 py-8">
+      <button onClick={handleBack} className="flex items-center gap-1 text-sm text-[#65758b] hover:text-[#1b2232] mb-8">
+        <ArrowLeft size={14} /> Voltar
+      </button>
+
+      <div className="max-w-[680px] mx-auto">
+        <div className="bg-white rounded-2xl p-8 border border-[#e1e7ef]">
           {/* Progress */}
-          <div className="mb-8">
-            <div className="flex justify-between text-sm text-[#657585] mb-2">
-              <span>Progresso</span>
-              <span>{Math.round(progress)}%</span>
-            </div>
-            <div className="h-2 bg-[#EDEFF3] rounded-full overflow-hidden">
-              <div
-                className="h-full bg-[#0057B8] rounded-full transition-all duration-500"
-                style={{ width: `${progress}%` }}
-              />
-            </div>
-            <div className="flex justify-between mt-2">
-              {steps.map((s, i) => (
-                <div
-                  key={i}
-                  className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-colors ${
-                    i < currentStep
-                      ? 'bg-[#0057B8] text-white'
-                      : i === currentStep
-                      ? 'bg-[#0057B8] text-white ring-4 ring-[#0057B8]/20'
-                      : 'bg-[#EDEFF3] text-[#99A1AE]'
-                  }`}
-                >
-                  {i < currentStep ? '✓' : i + 1}
-                </div>
-              ))}
-            </div>
+          <p className="text-sm font-bold text-[#65758b] mb-2">Pergunta {current + 1}/{total}</p>
+          <div className="w-full h-1.5 bg-[#f3f5f7] rounded-full mb-6">
+            <div className="h-full bg-[#0057b8] rounded-full transition-all duration-300" style={{ width: `${progress}%` }} />
           </div>
 
-          {/* Question */}
-          <Card>
-            <CardContent className="p-8">
-              <div className="mb-2">
-                <span className="text-xs font-bold text-[#0057B8] uppercase tracking-wider">
-                  {step.title}
-                </span>
-              </div>
-              <h2 className="text-xl font-bold text-[#1B2232] mb-6">{step.question}</h2>
+          <h2 className="text-lg font-semibold text-[#1b2232] mb-6">{q.question}</h2>
 
-              <div className="space-y-3">
-                {step.options.map((option) => (
-                  <button
-                    key={option}
-                    onClick={() => handleAnswer(option)}
-                    className={`w-full text-left px-4 py-3.5 rounded-xl border-2 text-sm font-medium transition-all ${
-                      answers[step.step] === option
-                        ? 'border-[#0057B8] bg-[#0057B8]/5 text-[#0057B8]'
-                        : 'border-[#EDEFF3] text-[#1B2232] hover:border-[#0057B8]/30'
-                    }`}
-                  >
-                    {option}
-                  </button>
-                ))}
-              </div>
+          <div className="space-y-3 mb-8">
+            {q.options.map((opt) => (
+              <button
+                key={opt}
+                onClick={() => setSelected(opt)}
+                className={`w-full flex items-center gap-3 p-4 rounded-xl border-2 text-left text-sm transition-all ${
+                  selected === opt
+                    ? 'border-[#0057b8] bg-[#0057b8]/5 text-[#1b2232]'
+                    : 'border-[#e1e7ef] text-[#1b2232] hover:border-[#0057b8]/50'
+                }`}
+              >
+                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${selected === opt ? 'border-[#0057b8]' : 'border-[#e1e7ef]'}`}>
+                  {selected === opt && <div className="w-2.5 h-2.5 rounded-full bg-[#0057b8]" />}
+                </div>
+                {opt}
+              </button>
+            ))}
+          </div>
 
-              <div className="flex justify-between mt-8">
-                <Button
-                  variant="outline"
-                  onClick={() => setCurrentStep(prev => prev - 1)}
-                  disabled={currentStep === 0}
-                >
-                  <ArrowLeft size={16} /> Anterior
-                </Button>
-                <Button
-                  onClick={handleNext}
-                  disabled={!answers[step.step]}
-                  loading={loading}
-                >
-                  {currentStep === steps.length - 1 ? 'Concluir' : 'Próximo'}
-                  {currentStep < steps.length - 1 && <ArrowRight size={16} />}
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+          <div className="flex items-center justify-between">
+            <button onClick={handleBack} className="flex items-center gap-1 text-sm text-[#65758b] hover:text-[#1b2232]">
+              <ArrowLeft size={14} /> Voltar
+            </button>
+            <button
+              onClick={handleNext}
+              disabled={!selected}
+              className="flex items-center gap-2 bg-[#1f2c47] hover:bg-[#0057b8] disabled:opacity-50 text-white font-bold text-sm px-6 py-2.5 rounded-xl transition-colors"
+            >
+              {current === total - 1 ? 'Finalizar' : 'Próximo'} <ArrowRight size={14} />
+            </button>
+          </div>
         </div>
       </div>
     </div>

@@ -1,80 +1,95 @@
-import { Header } from '@/components/layout/header'
-import { Card, CardContent } from '@/components/ui/card'
-import { Target, Heart, Users, Award } from 'lucide-react'
+import Link from 'next/link'
+import { ArrowLeft } from 'lucide-react'
+
+const founders = [
+  {
+    name: 'Anelisa Macedo',
+    role: 'Founder',
+    aka: 'Also known as Mrs Brighta',
+    emoji: '👩‍🏫',
+    bio: '+35 anos no mercado de educação. Experiência com processos de admissão ultra-seletivos (nacionais e internacionais, incluindo bolsas de estudo). Atua no desenvolvimento de estratégias personalizadas para potencializar as chances de aprovação de estudantes em universidades de excelência. Mestre em Educação pela Harvard Graduate School of Education.',
+  },
+  {
+    name: 'Ana Paula Camargo',
+    role: 'Founder',
+    aka: 'Also known as Promptie',
+    emoji: '👩‍💻',
+    bio: 'Gestora de times de engenharia de AI, mestre em educação pela Tampere University (Finlândia), com mais de 20 anos de experiência em trilhas de aprendizagem e soluções em educação em meios digitais e gestão educacional e 3° setor.',
+  },
+]
+
+const testimonials = [
+  { name: 'Lucas F.', quote: '"A metodologia Hop On transformou meu sonho de estudar fora! Hoje estudo na NYU!"' },
+  { name: 'Lucas F.', quote: '"A metodologia Hop On transformou meu sonho de estudar fora! Hoje estudo na NYU!"' },
+  { name: 'Lucas F.', quote: '"A metodologia Hop On transformou meu sonho de estudar fora! Hoje estudo na NYU!"' },
+]
 
 export default function QuemSomosPage() {
   return (
-    <div>
-      <Header title="Quem Somos" />
-      <div className="p-6 max-w-4xl space-y-8">
+    <div className="max-w-[900px] mx-auto px-6 py-8">
+      <Link href="/home" className="flex items-center gap-1 text-sm text-[#65758b] hover:text-[#1b2232] mb-6 w-fit">
+        <ArrowLeft size={14} /> Voltar
+      </Link>
 
-        {/* Hero */}
-        <div className="bg-gradient-to-r from-[#1B2232] to-[#0057B8] rounded-2xl p-8 text-white">
-          <h2 className="text-3xl font-bold mb-4">Hop On Academy</h2>
-          <p className="text-white/80 text-lg leading-relaxed">
-            Somos uma plataforma de preparação para o SAT e ingresso em universidades internacionais, dedicada a tornar a educação de qualidade acessível a estudantes brasileiros.
-          </p>
+      <div className="flex items-center gap-2 mb-2">
+        <span className="text-2xl">💡</span>
+        <h1 className="text-3xl font-bold text-[#1b2232]">Quem somos</h1>
+      </div>
+      <p className="text-[#65758b] mb-8">Conheça a história por trás da Hop On.</p>
+
+      <div className="grid grid-cols-2 gap-5 mb-8">
+        {founders.map(f => (
+          <div key={f.name} className="bg-white rounded-2xl border border-[#e1e7ef] p-6 text-center">
+            <div className="text-5xl mb-3">{f.emoji}</div>
+            <h3 className="font-bold text-[#1b2232] text-lg">{f.name}</h3>
+            <p className="text-sm text-[#65758b]">{f.role}</p>
+            <p className="text-xs text-[#65758b] italic mb-4">{f.aka}</p>
+            <p className="text-sm text-[#1b2232]/80 leading-relaxed text-left">{f.bio}</p>
+          </div>
+        ))}
+      </div>
+
+      <div className="bg-white rounded-2xl border border-[#e1e7ef] p-8 text-center mb-8">
+        <h2 className="text-2xl font-bold text-[#1b2232] mb-4">Nossa Missão</h2>
+        <p className="text-[#65758b] leading-relaxed max-w-2xl mx-auto">
+          Garantir que cada aluno tenha acesso a uma preparação completa, personalizada e acessível, aumentando suas chances de aprovação e sucesso nos processos internacionais de candidatura para graduação e pós-graduação.
+        </p>
+      </div>
+
+      <div className="bg-white rounded-2xl border border-[#e1e7ef] p-8 text-center mb-8">
+        <Link href="/assistentes-ia" className="inline-flex items-center gap-1.5 text-xs text-[#0057b8] border border-[#0057b8]/20 bg-[#0057b8]/5 rounded-full px-3 py-1 mb-4">
+          ✨ Conheça nossos assistentes
+        </Link>
+        <h2 className="text-2xl font-bold text-[#1b2232] mb-4">Somos IA, mas sabemos muito!</h2>
+        <div className="flex items-center justify-center gap-3 mb-4 text-4xl">
+          <span>🦊</span><span>🐳</span><span>🦩</span>
         </div>
+        <p className="text-[#65758b] leading-relaxed max-w-xl mx-auto mb-2">
+          Nossos personagens são inteligências artificiais treinadas com uma base de conhecimento intensiva e especializada em estudar fora.
+        </p>
+        <p className="text-[#65758b] leading-relaxed max-w-xl mx-auto">
+          Combinamos o conhecimento e histórico das fundadoras, com tecnologia de ponta para oferecer a melhor experiência acadêmica para nossos alunos.
+        </p>
+      </div>
 
-        {/* Mission */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {[
-            {
-              icon: Target,
-              title: 'Nossa Missão',
-              text: 'Democratizar o acesso ao ensino superior internacional, preparando estudantes brasileiros com tecnologia de ponta e suporte personalizado.',
-              color: '#0057B8',
-            },
-            {
-              icon: Heart,
-              title: 'Nossos Valores',
-              text: 'Acreditamos que todo estudante merece a chance de chegar longe. Trabalhamos com dedicação, empatia e excelência.',
-              color: '#EF467C',
-            },
-            {
-              icon: Users,
-              title: 'Nossa Equipe',
-              text: 'Formada por educadores, engenheiros e estudantes que já passaram pelo processo de admissão internacional.',
-              color: '#37B0DD',
-            },
-            {
-              icon: Award,
-              title: 'Nossos Resultados',
-              text: 'Mais de 2.400 alunos preparados, 89% de taxa de aprovação e parcerias com as melhores universidades do mundo.',
-              color: '#FFCB22',
-            },
-          ].map(({ icon: Icon, title, text, color }) => (
-            <Card key={title}>
-              <CardContent className="p-6">
-                <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4" style={{ background: `${color}15` }}>
-                  <Icon size={22} style={{ color }} />
-                </div>
-                <h3 className="font-bold text-[#1B2232] mb-2">{title}</h3>
-                <p className="text-sm text-[#657585] leading-relaxed">{text}</p>
-              </CardContent>
-            </Card>
+      <div>
+        <h2 className="text-2xl font-bold text-[#1b2232] text-center mb-2">Quem já estudou com a Hop On</h2>
+        <p className="text-[#65758b] text-center mb-6">Histórias reais de alunos que conquistaram o mundo</p>
+        <div className="grid grid-cols-3 gap-4">
+          {testimonials.map((t, i) => (
+            <div key={i} className="bg-white rounded-2xl border border-[#e1e7ef] overflow-hidden">
+              <div className="bg-[#f3f5f7] h-40 flex items-center justify-center">
+                <button className="w-14 h-14 rounded-full bg-[#1f2c47] flex items-center justify-center">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><polygon points="5 3 19 12 5 21 5 3" /></svg>
+                </button>
+              </div>
+              <div className="p-4">
+                <p className="font-bold text-[#1b2232] text-sm mb-1">{t.name}</p>
+                <p className="text-xs text-[#65758b]">{t.quote}</p>
+              </div>
+            </div>
           ))}
         </div>
-
-        {/* Stats */}
-        <Card>
-          <CardContent className="p-6">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-              {[
-                { value: '2.400+', label: 'Alunos ativos' },
-                { value: '89%', label: 'Taxa de aprovação' },
-                { value: '150+', label: 'Universidades parceiras' },
-                { value: '4.9★', label: 'Avaliação média' },
-              ].map(({ value, label }) => (
-                <div key={label}>
-                  <p className="text-3xl font-bold text-[#0057B8]">{value}</p>
-                  <p className="text-sm text-[#657585] mt-1">{label}</p>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
       </div>
     </div>
   )
