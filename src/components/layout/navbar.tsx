@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname, useRouter } from 'next/navigation'
 import { Search, Bell, LayoutGrid, Tv, MessageSquare, Calculator, Star, LogOut, User } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -45,15 +46,8 @@ export function Navbar() {
     <nav className="sticky top-0 z-50 bg-white border-b border-[#e1e7ef] h-[65px]">
       <div className="flex items-center h-full px-6 gap-2">
         {/* Logo */}
-        <Link href="/home" className="flex items-center gap-1 mr-4 shrink-0">
-          <div className="relative">
-            <span className="text-[#FFCB22] font-extrabold text-xl leading-none">HOP</span>
-            <br />
-            <span className="text-[#1b2232] font-extrabold text-xl leading-none">ON</span>
-          </div>
-          <div className="w-6 h-6 rounded-full bg-[#78B4E3] flex items-center justify-center ml-1 shrink-0">
-            <span className="text-white text-xs font-bold">🐸</span>
-          </div>
+        <Link href="/home" className="flex items-center mr-4 shrink-0">
+          <Image src="/images/logo.svg" alt="Hop On" width={80} height={44} priority />
         </Link>
 
         {/* Nav items */}

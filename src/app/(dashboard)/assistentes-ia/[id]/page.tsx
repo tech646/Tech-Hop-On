@@ -2,32 +2,37 @@
 
 import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { ArrowLeft, Send } from 'lucide-react'
 import { use } from 'react'
 
-const assistantData: Record<string, { name: string; subtitle: string; emoji: string; greeting: string }> = {
+const assistantData: Record<string, { name: string; subtitle: string; emoji: string; image: string; greeting: string }> = {
   brighta: {
     name: 'Brighta',
     subtitle: 'The Storyteller',
     emoji: '👩‍💼',
+    image: '/images/brighta.png',
     greeting: '👋 Olá! Eu sou Brighta, sua especialista em narrativas para admissões. Posso te ajudar com **essays**, **personal statements** e **cartas de motivação**.\n\nDigite **"começar"** para receber sua primeira orientação, ou me pergunte qualquer dúvida sobre como escrever histórias impactantes!',
   },
   gritty: {
     name: 'Gritty',
     subtitle: 'The High-Performance Coach',
     emoji: '💪',
+    image: '/images/gritty.png',
     greeting: '👋 Olá! Eu sou Gritty, seu coach de alta performance! Estou aqui para te ajudar a **manter foco**, criar **planos de estudo** e te manter motivado.\n\nDigite **"começar"** para receber seu plano de estudos, ou me pergunte qualquer dúvida sobre organização e produtividade!',
   },
   smartle: {
     name: 'Smartle',
     subtitle: 'The Admission Officer',
     emoji: '🎓',
+    image: '/images/smartle.png',
     greeting: '👋 Olá! Eu sou Smartle, sua estrategista de admissões! Posso te ajudar a entender os processos das melhores universidades e criar uma **estratégia personalizada**.\n\nDigite **"começar"** para iniciar, ou me pergunte sobre qualquer universidade ou processo de admissão!',
   },
   wan: {
     name: 'Professor Wan',
     subtitle: 'The Operation Master',
     emoji: '🧑‍💻',
+    image: '/images/wan.png',
     greeting: '👋 Olá! Eu sou o Professor Wan, seu especialista em **vistos**, **documentação** e **prazos** internacionais. Garantirei que nenhum detalhe seja esquecido na sua jornada.\n\nDigite **"começar"** para iniciar, ou me pergunte sobre qualquer processo operacional da sua candidatura!',
   },
 }
@@ -75,8 +80,8 @@ export default function AssistantChatPage({ params }: { params: Promise<{ id: st
         <Link href="/assistentes-ia" className="text-[#65758b] hover:text-[#1b2232]">
           <ArrowLeft size={18} />
         </Link>
-        <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-2xl shadow-sm">
-          {assistant.emoji}
+        <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm overflow-hidden relative">
+          <Image src={assistant.image} alt={assistant.name} fill className="object-contain p-0.5" />
         </div>
         <div>
           <p className="font-bold text-[#1b2232]">{assistant.name}</p>
@@ -90,8 +95,8 @@ export default function AssistantChatPage({ params }: { params: Promise<{ id: st
           {messages.map((msg, i) => (
             <div key={i} className={`flex gap-3 ${msg.role === 'user' ? 'justify-end' : ''}`}>
               {msg.role === 'assistant' && (
-                <div className="w-9 h-9 rounded-full bg-[#f3f5f7] flex items-center justify-center text-xl shrink-0">
-                  {assistant.emoji}
+                <div className="w-9 h-9 rounded-full bg-[#f3f5f7] flex items-center justify-center text-xl shrink-0 overflow-hidden relative">
+                  <Image src={assistant.image} alt={assistant.name} fill className="object-contain" />
                 </div>
               )}
               <div className={`max-w-[600px] rounded-2xl px-4 py-3 text-sm leading-relaxed ${

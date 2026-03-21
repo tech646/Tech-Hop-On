@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
@@ -49,13 +50,7 @@ export default function LoginPage() {
         <div className="w-[649px] bg-gradient-to-br from-[#fafafa] to-white border-r border-white/5 flex flex-col p-12 relative overflow-hidden shrink-0">
           {/* Logo */}
           <div className="flex items-center gap-2">
-            <div>
-              <span className="text-[#FFCB22] font-extrabold text-2xl leading-none block">HOP</span>
-              <span className="text-[#1b2232] font-extrabold text-2xl leading-none block">ON</span>
-            </div>
-            <div className="w-8 h-8 rounded-full bg-[#78B4E3] flex items-center justify-center ml-1">
-              <span className="text-sm">🐸</span>
-            </div>
+            <Image src="/images/logo.svg" alt="Hop On" width={100} height={55} priority />
           </div>
 
           <div className="mt-16 flex-1">

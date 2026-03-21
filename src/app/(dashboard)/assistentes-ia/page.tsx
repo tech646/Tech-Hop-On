@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 
 const assistants = [
@@ -9,10 +10,9 @@ const assistants = [
     subtitle: 'The Storyteller',
     description: 'Especialista em criar narrativas poderosas para seus essays, personal statements e cartas de motivação. Ela transforma suas experiências em histórias memoráveis.',
     tags: ['Essays', 'Personal Statements', 'Cartas de Motivação'],
-    emoji: '👩‍💼',
+    image: '/images/brighta.png',
     bg: 'bg-[#fff8e7]',
     tagBg: 'bg-[#ffcb22]/15 text-[#a07800]',
-    iconColor: 'text-[#ffcb22]',
   },
   {
     id: 'gritty',
@@ -21,10 +21,9 @@ const assistants = [
     subtitle: 'The High-Performance Coach',
     description: 'Seu coach pessoal para manter foco, disciplina e alta performance nos estudos. Ele cria planos de estudo e te mantém motivado para conquistar seus objetivos.',
     tags: ['Plano de Estudos', 'Motivação', 'Gestão do Tempo'],
-    emoji: '💪',
+    image: '/images/gritty.png',
     bg: 'bg-[#fdf2f8]',
     tagBg: 'bg-pink-100 text-pink-700',
-    iconColor: 'text-pink-400',
   },
   {
     id: 'smartle',
@@ -33,10 +32,9 @@ const assistants = [
     subtitle: 'The Admission Officer',
     description: 'Sua consultora para entender os processos de admissão das melhores universidades. Ela te guia em cada etapa, desde a escolha da universidade até a submissão.',
     tags: ['Admissões', 'Universidades', 'Estratégia'],
-    emoji: '🎓',
+    image: '/images/smartle.png',
     bg: 'bg-[#f0f7ff]',
     tagBg: 'bg-blue-100 text-blue-700',
-    iconColor: 'text-blue-400',
   },
   {
     id: 'wan',
@@ -45,10 +43,9 @@ const assistants = [
     subtitle: 'The Operation Master',
     description: 'O mestre dos processos operacionais: vistos, documentação, prazos e logística. Ele garante que nenhum detalhe seja esquecido na sua jornada internacional.',
     tags: ['Vistos', 'Documentação', 'Prazos'],
-    emoji: '🧑‍💻',
+    image: '/images/wan.png',
     bg: 'bg-[#f0fdf4]',
     tagBg: 'bg-green-100 text-green-700',
-    iconColor: 'text-green-400',
   },
 ]
 
@@ -69,8 +66,8 @@ export default function AssistentesIAPage() {
         {assistants.map((a) => (
           <div key={a.id} className={`${a.bg} rounded-2xl p-6 flex flex-col`}>
             <div className="flex items-start gap-4 mb-4">
-              <div className="w-16 h-16 rounded-2xl bg-white flex items-center justify-center text-4xl shrink-0 shadow-sm">
-                {a.emoji}
+              <div className="w-16 h-16 rounded-2xl bg-white flex items-center justify-center shadow-sm overflow-hidden shrink-0 relative">
+                <Image src={a.image} alt={a.name} fill className="object-contain p-1" />
               </div>
               <div>
                 <h3 className="text-xl font-bold text-[#1b2232]">{a.name}</h3>
@@ -88,8 +85,8 @@ export default function AssistentesIAPage() {
             </div>
 
             <div className="flex items-center justify-between">
-              <div className="w-6 h-6 rounded-full bg-white/50 flex items-center justify-center">
-                <span className="text-xs">{a.emoji}</span>
+              <div className="w-6 h-6 rounded-full bg-white/50 overflow-hidden relative">
+                <Image src={a.image} alt={a.name} fill className="object-contain" />
               </div>
               <Link href={`/assistentes-ia/${a.id}`} className="text-[#0057b8] font-bold text-sm flex items-center gap-1 hover:gap-2 transition-all">
                 Conversar agora <ArrowRight size={14} />

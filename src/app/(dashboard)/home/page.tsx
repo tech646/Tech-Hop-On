@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
+import Image from 'next/image'
 import { ArrowRight, BookOpen, Calculator, Brain, Sparkles } from 'lucide-react'
 
 const journeyCards = [
@@ -10,7 +11,7 @@ const journeyCards = [
     icon: BookOpen,
     iconBg: 'bg-[#008db8]/10',
     iconColor: 'text-[#008db8]',
-    imageBg: 'bg-gradient-to-br from-blue-100 to-blue-200',
+    image: '/images/card-aulas.png',
   },
   {
     title: 'Math Classes',
@@ -19,7 +20,7 @@ const journeyCards = [
     icon: Calculator,
     iconBg: 'bg-[#ff9500]/10',
     iconColor: 'text-[#ff9500]',
-    imageBg: 'bg-gradient-to-br from-orange-100 to-orange-200',
+    image: '/images/card-math.png',
   },
   {
     title: 'Praticando',
@@ -28,7 +29,7 @@ const journeyCards = [
     icon: Brain,
     iconBg: 'bg-[#ef467c]/10',
     iconColor: 'text-[#ef467c]',
-    imageBg: 'bg-gradient-to-br from-pink-100 to-pink-200',
+    image: '/images/card-practicing.png',
   },
   {
     title: 'Assistentes IA',
@@ -36,8 +37,8 @@ const journeyCards = [
     href: '/assistentes-ia',
     icon: Sparkles,
     iconBg: 'bg-[#ffcb22]/10',
-    iconColor: 'text-[#ffcb22]',
-    imageBg: 'bg-gradient-to-br from-yellow-100 to-yellow-200',
+    iconColor: 'text-[#a07800]',
+    image: '/images/card-ia.png',
   },
 ]
 
@@ -50,7 +51,7 @@ export default async function HomePage() {
     <div className="max-w-[1400px] mx-auto px-6 py-8">
       {/* Hero banner */}
       <div className="bg-[#1f2c47] rounded-2xl overflow-hidden relative mb-8 h-[384px]">
-        <div className="absolute inset-0 p-12 flex flex-col justify-center">
+        <div className="absolute inset-0 p-12 flex flex-col justify-center z-10">
           <div className="inline-flex items-center bg-white/15 backdrop-blur-sm rounded-full px-4 py-1.5 mb-4 w-fit">
             <span className="text-white text-xs font-bold uppercase tracking-wider">Boas-vindas ao futuro</span>
           </div>
@@ -62,14 +63,14 @@ export default async function HomePage() {
             <Link href="/trilha-de-aulas" className="bg-white text-[#1b2232] font-bold text-sm px-6 h-11 rounded-full flex items-center hover:bg-white/90 transition-colors shadow-sm">
               Continuar Aula
             </Link>
-            <Link href="/math-classes" className="bg-white/0 border border-white/20 text-[#1b2232] font-bold text-sm px-6 h-11 rounded-full flex items-center hover:bg-white/10 transition-colors">
+            <Link href="/math-classes" className="border border-white/20 text-white font-bold text-sm px-6 h-11 rounded-full flex items-center hover:bg-white/10 transition-colors">
               Marcar Math Class
             </Link>
           </div>
         </div>
-        {/* Illustration placeholder */}
-        <div className="absolute right-0 bottom-0 w-[438px] h-[255px] flex items-center justify-center">
-          <div className="text-8xl">🎓</div>
+        {/* Hero illustration */}
+        <div className="absolute right-0 bottom-0 w-[438px] h-[280px] z-0">
+          <Image src="/images/hero-illustration.png" alt="Hero" fill className="object-contain object-bottom" />
         </div>
       </div>
 
@@ -98,15 +99,11 @@ export default async function HomePage() {
         <p className="text-[#65758b] mb-5">Tudo o que você precisa para alcançar o topo</p>
 
         <div className="grid grid-cols-4 gap-4">
-          {journeyCards.map(({ title, description, href, icon: Icon, iconBg, iconColor, imageBg }) => (
+          {journeyCards.map(({ title, description, href, icon: Icon, iconBg, iconColor, image }) => (
             <Link key={href} href={href} className="bg-white rounded-xl overflow-hidden group hover:shadow-md transition-shadow">
-              {/* Image area */}
-              <div className={`${imageBg} h-48 flex items-center justify-center`}>
-                <div className="text-6xl opacity-60">
-                  {title === 'Aulas' ? '🎬' : title === 'Math Classes' ? '📐' : title === 'Praticando' ? '📝' : '🤖'}
-                </div>
+              <div className="h-48 relative overflow-hidden">
+                <Image src={image} alt={title} fill className="object-cover" />
               </div>
-              {/* Content */}
               <div className="p-4">
                 <div className={`${iconBg} w-9 h-9 rounded-xl flex items-center justify-center mb-3`}>
                   <Icon size={18} className={iconColor} />

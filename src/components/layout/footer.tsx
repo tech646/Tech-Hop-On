@@ -1,3 +1,5 @@
+import Image from 'next/image'
+
 export function Footer() {
   return (
     <footer className="bg-white border-t border-[#e1e7ef] mt-auto">
@@ -5,14 +7,8 @@ export function Footer() {
         <div className="grid grid-cols-3 gap-8">
           {/* Logo + description */}
           <div>
-            <div className="flex items-center gap-1 mb-3">
-              <div>
-                <span className="text-[#FFCB22] font-extrabold text-lg leading-none block">HOP</span>
-                <span className="text-[#1b2232] font-extrabold text-lg leading-none block">ON</span>
-              </div>
-              <div className="w-5 h-5 rounded-full bg-[#78B4E3] flex items-center justify-center ml-1">
-                <span className="text-xs">🐸</span>
-              </div>
+            <div className="mb-3">
+              <Image src="/images/logo.svg" alt="Hop On" width={70} height={38} />
             </div>
             <p className="text-sm text-[#65758b] leading-relaxed max-w-[280px]">
               Capacitando jovens talentos para conquistar as melhores oportunidades educacionais no mundo todo.
