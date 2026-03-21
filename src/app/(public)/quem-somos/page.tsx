@@ -37,7 +37,7 @@ export default function QuemSomosPage() {
       </div>
       <p className="text-[#65758b] mb-8">Conheça a história por trás da Hop On.</p>
 
-      <div className="grid grid-cols-2 gap-5 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-8">
         {founders.map(f => (
           <div key={f.name} className="bg-white rounded-2xl border border-[#e1e7ef] p-6 text-center">
             <div className="text-5xl mb-3">{f.emoji}</div>
@@ -75,7 +75,7 @@ export default function QuemSomosPage() {
       <div>
         <h2 className="text-2xl font-bold text-[#1b2232] text-center mb-2">Quem já estudou com a Hop On</h2>
         <p className="text-[#65758b] text-center mb-6">Histórias reais de alunos que conquistaram o mundo</p>
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {testimonials.map((t, i) => (
             <div key={i} className="bg-white rounded-2xl border border-[#e1e7ef] overflow-hidden">
               <div className="bg-[#f3f5f7] h-40 flex items-center justify-center">

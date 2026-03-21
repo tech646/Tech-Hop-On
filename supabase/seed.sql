@@ -1,0 +1,15 @@
+insert into lessons (title, description, section, order_index, duration_minutes) values
+('Introduction to Critical Reading', 'Learn the basics of SAT critical reading strategies', 'critical_reading', 1, 45),
+('Main Idea & Purpose', 'Identify the main idea and author purpose in passages', 'critical_reading', 2, 40),
+('Evidence-Based Questions', 'Master questions that require textual evidence', 'critical_reading', 3, 50),
+('Inference & Vocabulary in Context', 'Tackle inference questions and contextual vocabulary', 'critical_reading', 4, 35),
+('Grammar Fundamentals', 'Review essential grammar rules for the SAT', 'grammar', 5, 45),
+('Sentence Structure & Punctuation', 'Master complex sentence structures and punctuation', 'grammar', 6, 40),
+('Agreement & Parallelism', 'Subject-verb agreement and parallel structure', 'grammar', 7, 35),
+('Transitions & Rhetorical Skills', 'Use transitions effectively in writing', 'grammar', 8, 30),
+('Essential Vocabulary Pack 1', 'High-frequency SAT words with context', 'vocabulary', 9, 25),
+('Essential Vocabulary Pack 2', 'Advanced academic vocabulary', 'vocabulary', 10, 25),
+('Math: Heart of Algebra', 'Linear equations and systems', 'math', 11, 60),
+('Math: Problem Solving', 'Data analysis and percentages', 'math', 12, 55),
+('Math: Passport to Advanced Math', 'Quadratics and polynomials', 'math', 13, 65),
+('Math: Additional Topics', 'Geometry, trigonometry, and complex numbers', 'math', 14, 50);

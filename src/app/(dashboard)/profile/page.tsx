@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { ArrowLeft, Edit2, Plus, Trash2, ExternalLink, RefreshCw } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
+import type { UserCollege, SATResult } from '@/types'
 
 type Tab = 'perfil' | 'plano'
 
@@ -15,29 +16,56 @@ const PLANS = [
   { key: 'anual', name: 'Anual', price: 'R$ 290', period: '/mês', desc: '12 meses — o melhor custo-benefício para quem leva a sério o sonho de estudar fora. Direito a quatro (4) aulas com especialistas por semana.', total: 'R$3.480,00 total', savings: 'Economia de R$1.920', active: false, cta: 'Trocar para Anual', recommended: true },
 ]
 
-const colleges = [
-  { name: 'MIT', location: 'Cambridge, MA', deadline: 'Jan 1, 2025', acceptance: '4%', category: 'Dream/Sonho' },
-  { name: 'Stanford University', location: 'Stanford, CA', deadline: 'Jan 5, 2025', acceptance: '4%', category: 'Dream/Sonho' },
-  { name: 'UC Berkeley', location: 'Berkeley, CA', deadline: 'Nov 30, 2024', acceptance: '14%', category: 'Target/Provável' },
-  { name: 'University of Michigan', location: 'Ann Arbor, MI', deadline: 'Feb 1, 2025', acceptance: '18%', category: 'Target/Provável' },
-  { name: 'Purdue University', location: 'West Lafayette, IN', deadline: 'Mar 1, 2025', acceptance: '67%', category: 'Safety/Segura' },
-  { name: 'Arizona State University', location: 'Tempe, AZ', deadline: 'Rolling', acceptance: '88%', category: 'Safety/Segura' },
-]
+type CollegeRow = UserCollege & { location?: string; deadline?: string; acceptance?: string }
+type CollegeCategoryLabel = 'Dream/Sonho' | 'Target/Provável' | 'Safety/Segura'
+
+const categoryMap: Record<UserCollege['category'], CollegeCategoryLabel> = {
+  dream: 'Dream/Sonho',
+  target: 'Target/Provável',
+  safety: 'Safety/Segura',
+}
 
 export default function ProfilePage() {
   const [tab, setTab] = useState<Tab>('perfil')
   const supabase = createClient()
   const router = useRouter()
-  const [user, setUser] = useState<{ email: string; name: string; created: string } | null>(null)
+  const [user, setUser] = useState<{ email: string; name: string; created: string; phone?: string | null; city?: string | null; school?: string | null } | null>(null)
+  const [colleges, setColleges] = useState<CollegeRow[]>([])
+  const [satHistory, setSatHistory] = useState<Pick<SATResult, 'score' | 'created_at'>[]>([])
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      if (user) {
+    const supabaseClient = createClient()
+    supabaseClient.auth.getUser().then(async ({ data: { user: authUser } }) => {
+      if (authUser) {
         setUser({
-          email: user.email || '',
-          name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'Usuário',
-          created: new Date(user.created_at).getFullYear().toString(),
+          email: authUser.email || '',
+          name: authUser.user_metadata?.full_name || authUser.email?.split('@')[0] || 'Usuário',
+          created: new Date(authUser.created_at).getFullYear().toString(),
         })
+        // Fetch profile for extra fields
+        const { data: profile } = await supabaseClient
+          .from('profiles')
+          .select('phone, city, school')
+          .eq('id', authUser.id)
+          .maybeSingle()
+        if (profile) {
+          setUser(prev => prev ? { ...prev, phone: profile.phone, city: profile.city, school: profile.school } : prev)
+        }
+        // Fetch colleges
+        const { data: collegesData } = await supabaseClient
+          .from('user_colleges')
+          .select('*')
+          .eq('user_id', authUser.id)
+          .order('created_at')
+        setColleges((collegesData as CollegeRow[]) ?? [])
+        // Fetch SAT history
+        const { data: satData } = await supabaseClient
+          .from('sat_practice_results')
+          .select('score, created_at')
+          .eq('user_id', authUser.id)
+          .order('created_at', { ascending: false })
+          .limit(5)
+        setSatHistory(satData ?? [])
       }
     })
   }, [])
@@ -70,7 +98,7 @@ export default function ProfilePage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex bg-white rounded-xl border border-[#e1e7ef] mb-6 p-1">
+      <div className="flex bg-white rounded-xl border border-[#e1e7ef] mb-6 p-1 overflow-x-auto">
         {[{key:'perfil',label:'Meu Perfil'},{key:'plano',label:'Meu Plano'}].map(t => (
           <button
             key={t.key}
@@ -102,14 +130,13 @@ export default function ProfilePage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {[
-                { label: 'Nome completo', value: user?.name || 'Maria Silva', icon: '👤' },
-                { label: 'Email', value: user?.email || 'maria.silva@email.com', icon: '✉️' },
-                { label: 'Telefone', value: '+55 11 91234-5678', icon: '📞' },
-                { label: 'Data de nascimento', value: '01/01/2006', icon: '📅' },
-                { label: 'Cidade', value: 'São Paulo / SP', icon: '📍' },
-                { label: 'Escola atual', value: 'Hop On High School', icon: '🏫' },
+                { label: 'Nome completo', value: user?.name || '—', icon: '👤' },
+                { label: 'Email', value: user?.email || '—', icon: '✉️' },
+                { label: 'Telefone', value: user?.phone || '—', icon: '📞' },
+                { label: 'Cidade', value: user?.city || '—', icon: '📍' },
+                { label: 'Escola atual', value: user?.school || '—', icon: '🏫' },
               ].map(({ label, value, icon }) => (
                 <div key={label} className="border border-[#e1e7ef] rounded-xl p-3">
                   <p className="text-xs text-[#65758b] mb-1 flex items-center gap-1"><span>{icon}</span>{label}</p>
@@ -133,59 +160,67 @@ export default function ProfilePage() {
 
             {/* Category tabs */}
             <div className="flex gap-2 mb-4">
-              {['2 Dream/Sonho', '2 Target/Provável', '2 Safety/Segura'].map(t => (
-                <span key={t} className="text-xs border border-[#e1e7ef] rounded-full px-3 py-1 text-[#65758b] flex items-center gap-1">
-                  <span>🎯</span>{t}
-                </span>
-              ))}
+              {(['dream', 'target', 'safety'] as const).map(cat => {
+                const count = colleges.filter(c => c.category === cat).length
+                return (
+                  <span key={cat} className="text-xs border border-[#e1e7ef] rounded-full px-3 py-1 text-[#65758b] flex items-center gap-1">
+                    <span>🎯</span>{count} {categoryMap[cat]}
+                  </span>
+                )
+              })}
             </div>
 
-            {['Dream/Sonho', 'Target/Provável', 'Safety/Segura'].map(category => (
-              <div key={category} className="mb-4">
+            {colleges.length === 0 && (
+              <p className="text-sm text-[#65758b] text-center py-6">Nenhuma universidade adicionada ainda.</p>
+            )}
+
+            {(['dream', 'target', 'safety'] as const).map(cat => {
+              const catColleges = colleges.filter(c => c.category === cat)
+              if (catColleges.length === 0) return null
+              const label = categoryMap[cat]
+              return (
+              <div key={cat} className="mb-4">
                 <div className="flex items-center gap-1.5 text-sm font-semibold text-[#1b2232] mb-2">
-                  <span>🎯</span> {category}
+                  <span>🎯</span> {label}
                   <span className="text-xs font-normal text-[#65758b]">
-                    {category === 'Dream/Sonho' ? 'Universidades muito competitivas, chances remotas mas vale tentar.' :
-                     category === 'Target/Provável' ? 'Universidades com histórico de admissão no seu perfil.' :
+                    {cat === 'dream' ? 'Universidades muito competitivas, chances remotas mas vale tentar.' :
+                     cat === 'target' ? 'Universidades com histórico de admissão no seu perfil.' :
                      'Altas chances de admissão, opções de backup.'}
                   </span>
                 </div>
-                {colleges.filter(c => c.category === category).map(college => (
-                  <div key={college.name} className="flex items-center gap-3 py-2.5 border-b border-[#f3f5f7] last:border-0">
+                {catColleges.map(college => (
+                  <div key={college.id} className="flex items-center gap-3 py-2.5 border-b border-[#f3f5f7] last:border-0">
                     <div className="flex-1">
-                      <p className="text-sm font-bold text-[#1b2232]">{college.name}</p>
-                      <p className="text-xs text-[#65758b]">{college.location} · Deadline: {college.deadline} · Aceitação: {college.acceptance}</p>
+                      <p className="text-sm font-bold text-[#1b2232]">{college.college_name}</p>
                     </div>
-                    <button className="text-[#65758b] hover:text-[#0057b8]"><ExternalLink size={14} /></button>
                     <button className="text-[#65758b] hover:text-red-500"><Trash2 size={14} /></button>
                   </div>
                 ))}
               </div>
-            ))}
+              )
+            })}
           </div>
 
           {/* SAT Score */}
           <div className="bg-white rounded-2xl border border-[#e1e7ef] p-6">
             <h2 className="font-bold text-[#1b2232] text-lg mb-2">Último resultado de prática SAT</h2>
             <p className="text-xs text-[#65758b] mb-4">Avaliação para application.</p>
-            <div className="flex items-center justify-between mb-3">
-              <p className="text-sm font-medium text-[#1b2232]">Resultado</p>
-              <p className="text-sm font-bold text-[#1b2232]">1300/1600</p>
-            </div>
-            <div className="w-full h-3 bg-[#f3f5f7] rounded-full mb-4">
-              <div className="h-full bg-[#1b2232] rounded-full" style={{ width: `${(1300/1600)*100}%` }} />
-            </div>
-            <div className="grid grid-cols-2 gap-3 mb-4">
-              <div className="bg-[#fff8e7] rounded-xl p-3 text-center">
-                <p className="text-xs text-[#65758b] mb-1">Evidence Based Reading and Writing (EBRW)</p>
-                <p className="text-sm font-bold text-[#a07800]">Fair</p>
-              </div>
-              <div className="bg-[#f0f7ff] rounded-xl p-3 text-center">
-                <p className="text-xs text-[#65758b] mb-1">Math</p>
-                <p className="text-sm font-bold text-[#0057b8]">Médio</p>
-              </div>
-            </div>
-            <p className="text-xs text-[#65758b] mb-3">Última prática: 13 de janeiro, 2024</p>
+            {satHistory.length === 0 ? (
+              <p className="text-sm text-[#65758b] text-center py-4">Nenhuma prática SAT realizada ainda.</p>
+            ) : (
+              <>
+                <div className="flex items-center justify-between mb-3">
+                  <p className="text-sm font-medium text-[#1b2232]">Resultado</p>
+                  <p className="text-sm font-bold text-[#1b2232]">{satHistory[0].score}/1600</p>
+                </div>
+                <div className="w-full h-3 bg-[#f3f5f7] rounded-full mb-4">
+                  <div className="h-full bg-[#1b2232] rounded-full" style={{ width: `${(satHistory[0].score / 1600) * 100}%` }} />
+                </div>
+                <p className="text-xs text-[#65758b] mb-3">
+                  Última prática: {new Date(satHistory[0].created_at).toLocaleDateString('pt-BR', { day: 'numeric', month: 'long', year: 'numeric' })}
+                </p>
+              </>
+            )}
             <button className="w-full bg-[#1f2c47] hover:bg-[#0057b8] text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition-colors text-sm">
               <RefreshCw size={14} /> Refazer Prática SAT
             </button>

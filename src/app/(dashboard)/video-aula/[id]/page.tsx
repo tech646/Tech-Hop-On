@@ -1,6 +1,8 @@
+'use client'
+
 import Link from 'next/link'
-import { ArrowLeft, Clock, Lock } from 'lucide-react'
-import { use } from 'react'
+import { ArrowLeft, Clock, Lock, ChevronDown, ChevronUp } from 'lucide-react'
+import { use, useState } from 'react'
 
 const playlist = [
   { id: '1', title: 'Intro', duration: '12:30', status: 'done' },
@@ -13,9 +15,10 @@ const playlist = [
 export default function VideoAulaPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
   const current = playlist.find(l => l.id === id) || playlist[0]
+  const [playlistOpen, setPlaylistOpen] = useState(false)
 
   return (
-    <div className="max-w-[1400px] mx-auto px-6 py-8">
+    <div className="max-w-[1400px] mx-auto px-4 lg:px-6 py-8">
       <div className="flex items-center gap-3 mb-6">
         <Link href="/trilha-de-aulas" className="text-[#65758b] hover:text-[#1b2232]">
           <ArrowLeft size={18} />
@@ -26,7 +29,8 @@ export default function VideoAulaPage({ params }: { params: Promise<{ id: string
         </div>
       </div>
 
-      <div className="flex gap-6">
+      {/* Desktop: side-by-side | Mobile: stacked */}
+      <div className="flex flex-col lg:flex-row gap-6">
         {/* Video player */}
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-4">
@@ -53,8 +57,18 @@ export default function VideoAulaPage({ params }: { params: Promise<{ id: string
         </div>
 
         {/* Playlist */}
-        <div className="w-80 shrink-0">
-          <div className="bg-white rounded-2xl border border-[#e1e7ef] overflow-hidden">
+        <div className="w-full lg:w-80 lg:shrink-0">
+          {/* Mobile toggle button */}
+          <button
+            onClick={() => setPlaylistOpen(!playlistOpen)}
+            className="lg:hidden w-full flex items-center justify-between bg-white rounded-2xl border border-[#e1e7ef] px-4 py-3 mb-2 font-bold text-[#1b2232]"
+          >
+            <span>Ver Playlist</span>
+            {playlistOpen ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+          </button>
+
+          {/* Playlist panel — always visible on desktop, togglable on mobile */}
+          <div className={`${playlistOpen ? 'block' : 'hidden'} lg:block bg-white rounded-2xl border border-[#e1e7ef] overflow-hidden`}>
             <div className="p-4 border-b border-[#e1e7ef]">
               <p className="font-bold text-[#1b2232]">Critical Reading</p>
               <p className="text-xs text-[#65758b]">2 de 13 aulas concluídas</p>

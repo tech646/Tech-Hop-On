@@ -62,11 +62,11 @@ export default function AssistentesIAPage() {
       </div>
       <p className="text-[#65758b] mb-8">Escolha o assistente ideal para te ajudar na sua jornada educacional</p>
 
-      <div className="grid grid-cols-2 gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
         {assistants.map((a) => (
           <div key={a.id} className={`${a.bg} rounded-2xl p-6 flex flex-col`}>
             <div className="flex items-start gap-4 mb-4">
-              <div className="w-16 h-16 rounded-2xl bg-white flex items-center justify-center shadow-sm overflow-hidden shrink-0 relative">
+              <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-white flex items-center justify-center shadow-sm overflow-hidden shrink-0 relative">
                 <Image src={a.image} alt={a.name} fill className="object-contain p-1" />
               </div>
               <div>

@@ -1,31 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { ArrowLeft, Plus, ExternalLink, X } from 'lucide-react'
+import { createClient } from '@/lib/supabase/client'
+import type { MathAppointment } from '@/types'
 
 type Tab = 'proximas' | 'calendario' | 'historico'
-
-const upcomingClasses = [
-  {
-    id: '1',
-    day: '05',
-    month: 'MAR',
-    label: 'Amanhã às 10:00',
-    title: 'Álgebra — Equações Quadráticas',
-    teacher: 'A. Prof. Carlos Mendes',
-    canCancel: false,
-  },
-  {
-    id: '2',
-    day: '07',
-    month: 'MAR',
-    label: '07 de março às 14:00',
-    title: 'Geometria — Áreas e Volumes',
-    teacher: 'A. Profª. Ana Oliveira',
-    canCancel: true,
-  },
-]
 
 const historyClasses = [
   { title: 'Estatística — Medidas de Tendência Central', teacher: 'Prof. Ricardo Lima', date: '02/03/2026 às 15:00' },
@@ -39,19 +20,50 @@ export default function MathClassesPage() {
   const [showModal, setShowModal] = useState(false)
   const [showCancel, setShowCancel] = useState(false)
   const [selectedDay, setSelectedDay] = useState<number | null>(null)
-  const [cancelTarget, setCancelTarget] = useState<typeof upcomingClasses[0] | null>(null)
+  const [cancelTarget, setCancelTarget] = useState<MathAppointment | null>(null)
+  const [appointments, setAppointments] = useState<MathAppointment[]>([])
+
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.auth.getUser().then(async ({ data: { user } }) => {
+      if (user) {
+        const { data } = await supabase
+          .from('math_appointments')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('scheduled_at', { ascending: true })
+        setAppointments((data as MathAppointment[]) ?? [])
+      }
+    })
+  }, [])
+
+  const upcomingClasses = appointments
+    .filter(a => a.status !== 'cancelled' && a.status !== 'completed')
+    .map(a => {
+      const date = new Date(a.scheduled_at)
+      return {
+        id: a.id,
+        day: date.getDate().toString().padStart(2, '0'),
+        month: date.toLocaleString('pt-BR', { month: 'short' }).toUpperCase().replace('.', ''),
+        label: date.toLocaleString('pt-BR', { day: '2-digit', month: 'long', hour: '2-digit', minute: '2-digit' }),
+        title: a.notes || 'Aula de Matemática',
+        teacher: a.teacher_name || '—',
+        canCancel: a.status === 'pending',
+        raw: a,
+      }
+    })
 
   return (
     <div className="max-w-[1400px] mx-auto px-6 py-8">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-3">
+      <div className="flex items-center justify-between mb-6 gap-3">
+        <div className="flex items-center gap-3 min-w-0">
           <Link href="/home" className="text-[#65758b] hover:text-[#1b2232]">
             <ArrowLeft size={18} />
           </Link>
           <div className="w-9 h-9 rounded-xl bg-[#ff9500]/10 flex items-center justify-center text-lg">📐</div>
           <div>
-            <h1 className="text-2xl font-bold text-[#1b2232]">Aulas de Matemática</h1>
+            <h1 className="text-xl sm:text-2xl font-bold text-[#1b2232]">Aulas de Matemática</h1>
             <p className="text-sm text-[#65758b]">Agende aulas e acesse suas reuniões</p>
           </div>
         </div>
@@ -62,7 +74,7 @@ export default function MathClassesPage() {
 
       {/* Plan info (show in proximas) */}
       {tab === 'proximas' && (
-        <div className="flex items-center gap-4 mb-4 text-sm">
+        <div className="flex flex-wrap items-center gap-3 mb-4 text-sm">
           <span className="text-[#65758b]">Plano <span className="font-bold text-[#1b2232]">Mensal</span></span>
           <span className="text-[#65758b]">Aulas inclusas: <span className="font-bold text-[#1b2232]">3</span></span>
           <span className="text-[#65758b]">Aulas realizadas: <span className="font-bold text-[#1b2232]">2</span></span>
@@ -74,7 +86,7 @@ export default function MathClassesPage() {
       )}
 
       {/* Tabs */}
-      <div className="flex gap-4 mb-6 border-b border-[#e1e7ef]">
+      <div className="flex gap-2 sm:gap-4 mb-6 border-b border-[#e1e7ef] overflow-x-auto scrollbar-none">
         {[
           { key: 'proximas', label: 'Próximas Aulas', icon: '📋' },
           { key: 'calendario', label: 'Calendário', icon: '📅' },
@@ -94,19 +106,21 @@ export default function MathClassesPage() {
       {tab === 'proximas' && (
         <div className="space-y-3">
           {upcomingClasses.map(cls => (
-            <div key={cls.id} className="bg-white rounded-2xl border border-[#e1e7ef] p-5 flex items-center gap-5">
-              <div className="text-center w-14 shrink-0">
-                <p className="text-3xl font-bold text-[#1b2232]">{cls.day}</p>
-                <p className="text-xs font-bold text-[#65758b] uppercase">{cls.month}</p>
+            <div key={cls.id} className="bg-white rounded-2xl border border-[#e1e7ef] p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-5">
+              <div className="flex items-center gap-4 sm:gap-5">
+                <div className="text-center w-14 shrink-0">
+                  <p className="text-3xl font-bold text-[#1b2232]">{cls.day}</p>
+                  <p className="text-xs font-bold text-[#65758b] uppercase">{cls.month}</p>
+                </div>
+                <div className="flex-1 sm:flex-none">
+                  <p className="text-xs text-[#65758b] mb-1">{cls.label}</p>
+                  <p className="font-bold text-[#1b2232]">{cls.title}</p>
+                  <p className="text-sm text-[#65758b]">{cls.teacher}</p>
+                </div>
               </div>
-              <div className="flex-1">
-                <p className="text-xs text-[#65758b] mb-1">{cls.label}</p>
-                <p className="font-bold text-[#1b2232]">{cls.title}</p>
-                <p className="text-sm text-[#65758b]">{cls.teacher}</p>
-              </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 sm:ml-auto flex-wrap">
                 {cls.canCancel && (
-                  <button onClick={() => { setCancelTarget(cls); setShowCancel(true) }} className="bg-[#ff4444] text-white text-sm px-3 py-1.5 rounded-xl flex items-center gap-1 font-medium">
+                  <button onClick={() => { setCancelTarget(cls.raw); setShowCancel(true) }} className="bg-[#ff4444] text-white text-sm px-3 py-1.5 rounded-xl flex items-center gap-1 font-medium">
                     Cancelar aula <ExternalLink size={12} />
                   </button>
                 )}
@@ -171,8 +185,8 @@ export default function MathClassesPage() {
 
       {/* Schedule Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white rounded-2xl p-6 w-[480px] shadow-2xl">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-end sm:items-center justify-center z-50">
+          <div className="bg-white rounded-t-2xl sm:rounded-2xl p-6 w-full sm:w-[480px] shadow-2xl max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-5">
               <h3 className="text-lg font-bold text-[#1b2232]">Agendar Nova Aula</h3>
               <button onClick={() => setShowModal(false)} className="text-[#65758b] hover:text-[#1b2232]"><X size={18} /></button>
@@ -215,8 +229,8 @@ export default function MathClassesPage() {
 
       {/* Cancel Modal */}
       {showCancel && cancelTarget && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white rounded-2xl p-6 w-[480px] shadow-2xl">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-end sm:items-center justify-center z-50">
+          <div className="bg-white rounded-t-2xl sm:rounded-2xl p-6 w-full sm:w-[480px] shadow-2xl">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-bold text-[#1b2232]">Desmarcar aula</h3>
               <button onClick={() => setShowCancel(false)} className="text-[#65758b] hover:text-[#1b2232]"><X size={18} /></button>
@@ -231,7 +245,21 @@ export default function MathClassesPage() {
               <button onClick={() => setShowCancel(false)} className="flex-1 bg-[#1f2c47] text-white font-bold py-2.5 rounded-xl hover:bg-[#0057b8] transition-colors">
                 Manter aula
               </button>
-              <button onClick={() => setShowCancel(false)} className="flex-1 bg-[#ff4444] text-white font-bold py-2.5 rounded-xl hover:bg-red-600 transition-colors">
+              <button
+                onClick={async () => {
+                  if (cancelTarget) {
+                    const supabase = createClient()
+                    await supabase
+                      .from('math_appointments')
+                      .update({ status: 'cancelled' })
+                      .eq('id', cancelTarget.id)
+                    setAppointments(prev => prev.map(a => a.id === cancelTarget.id ? { ...a, status: 'cancelled' } : a))
+                  }
+                  setShowCancel(false)
+                  setCancelTarget(null)
+                }}
+                className="flex-1 bg-[#ff4444] text-white font-bold py-2.5 rounded-xl hover:bg-red-600 transition-colors"
+              >
                 Cancelar aula
               </button>
             </div>

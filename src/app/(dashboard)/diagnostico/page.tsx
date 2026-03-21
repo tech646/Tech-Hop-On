@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { createClient } from '@/lib/supabase/client'
 
 const questions = [
   {
@@ -67,7 +68,7 @@ export default function DiagnosticoPage() {
   const total = questions.length
   const progress = ((current) / total) * 100
 
-  function handleNext() {
+  async function handleNext() {
     if (!selected) return
     const newAnswers = [...answers, selected]
     setAnswers(newAnswers)
@@ -76,6 +77,25 @@ export default function DiagnosticoPage() {
       setCurrent(current + 1)
       setSelected(null)
     } else {
+      // Save diagnostic result to Supabase
+      try {
+        const supabase = createClient()
+        const { data: { user } } = await supabase.auth.getUser()
+        if (user) {
+          const answersMap: Record<string, string> = {}
+          questions.forEach((q, i) => {
+            answersMap[`q${q.id}`] = newAnswers[i] ?? ''
+          })
+          await supabase
+            .from('diagnostic_results_v2')
+            .upsert(
+              { user_id: user.id, answers: answersMap, completed_at: new Date().toISOString() },
+              { onConflict: 'user_id' }
+            )
+        }
+      } catch {
+        // Non-blocking: proceed to home even if save fails
+      }
       router.push('/home')
     }
   }

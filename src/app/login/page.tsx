@@ -38,16 +38,16 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#141631] flex items-center justify-center relative overflow-hidden">
+    <div className="min-h-screen bg-[#141631] flex items-center justify-center relative overflow-hidden p-0 lg:p-4">
       {/* Blur orbs */}
       <div className="absolute -top-20 -left-40 w-[613px] h-[300px] rounded-full bg-[#155dfc]/10 blur-[60px]" />
       <div className="absolute -bottom-20 -right-40 w-[613px] h-[300px] rounded-full bg-[#4f39f6]/10 blur-[60px]" />
       <div className="absolute top-36 right-20 w-[300px] h-[300px] rounded-full bg-white/5 blur-[40px]" />
 
       {/* Modal */}
-      <div className="w-[1200px] max-w-[95vw] h-[752px] max-h-[95vh] bg-white/10 backdrop-blur-xl border border-white/10 rounded-[32px] shadow-2xl overflow-hidden flex">
-        {/* Left panel */}
-        <div className="w-[649px] bg-gradient-to-br from-[#fafafa] to-white border-r border-white/5 flex flex-col p-12 relative overflow-hidden shrink-0">
+      <div className="w-full lg:w-[1200px] lg:max-w-[95vw] lg:h-[752px] lg:max-h-[95vh] bg-white/10 backdrop-blur-xl border border-white/10 rounded-none lg:rounded-[32px] shadow-2xl overflow-hidden flex min-h-screen lg:min-h-0">
+        {/* Left panel — hidden on mobile */}
+        <div className="hidden lg:flex w-[649px] bg-gradient-to-br from-[#fafafa] to-white border-r border-white/5 flex-col p-12 relative overflow-hidden shrink-0">
           {/* Logo */}
           <div className="flex items-center gap-2">
             <Image src="/images/logo.svg" alt="Hop On" width={100} height={55} priority />
@@ -75,7 +75,7 @@ export default function LoginPage() {
         </div>
 
         {/* Right panel */}
-        <div className="flex-1 flex flex-col justify-center px-12 py-10 overflow-y-auto">
+        <div className="flex-1 flex flex-col justify-center px-6 py-10 lg:px-12 overflow-y-auto">
           <h2 className="text-[30px] font-bold text-white mb-1">Bem-vindo</h2>
           <p className="text-[#99a1af] text-base mb-8">Entre com suas credenciais ou use uma conta social.</p>
 

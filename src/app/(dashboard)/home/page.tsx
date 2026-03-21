@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { getUserStats } from '@/lib/supabase/actions'
 import Link from 'next/link'
 import Image from 'next/image'
 import { ArrowRight, BookOpen, Calculator, Brain, Sparkles } from 'lucide-react'
@@ -47,6 +48,10 @@ export default async function HomePage() {
   const { data: { user } } = await supabase.auth.getUser()
   const firstName = user?.user_metadata?.full_name?.split(' ')[0] || user?.email?.split('@')[0] || 'aluno'
 
+  const { completedLessons, studyHours, latestSAT, aiMessages } = user
+    ? await getUserStats(user.id)
+    : { completedLessons: 0, studyHours: 0, latestSAT: null, aiMessages: 0 }
+
   return (
     <div className="max-w-[1400px] mx-auto px-6 py-8">
       {/* Hero banner */}
@@ -55,7 +60,7 @@ export default async function HomePage() {
           <div className="inline-flex items-center bg-white/15 backdrop-blur-sm rounded-full px-4 py-1.5 mb-4 w-fit">
             <span className="text-white text-xs font-bold uppercase tracking-wider">Boas-vindas ao futuro</span>
           </div>
-          <h1 className="text-5xl font-bold text-white mb-4">Welcome back!</h1>
+          <h1 className="text-3xl sm:text-5xl font-bold text-white mb-4">Welcome back!</h1>
           <p className="text-white/75 text-lg leading-relaxed mb-8 max-w-md">
             Seu sonho de estudar fora está 12% mais próximo hoje. Vamos continuar sua jornada!
           </p>
@@ -75,11 +80,11 @@ export default async function HomePage() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-4 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
         {[
-          { label: 'Aulas Concluídas', value: '24', icon: BookOpen, color: 'bg-[#0057b8]/10' },
-          { label: 'Horas de Estudo', value: '48h', icon: Brain, color: 'bg-[#ff9500]/10' },
-          { label: 'Último Teste SAT', value: '900', icon: Sparkles, color: 'bg-[#1f4435]/10' },
+          { label: 'Aulas Concluídas', value: completedLessons.toString(), icon: BookOpen, color: 'bg-[#0057b8]/10' },
+          { label: 'Horas de Estudo', value: `${studyHours}h`, icon: Brain, color: 'bg-[#ff9500]/10' },
+          { label: 'Último Teste SAT', value: latestSAT?.toString() ?? '--', icon: Sparkles, color: 'bg-[#1f4435]/10' },
         ].map(({ label, value, icon: Icon, color }) => (
           <div key={label} className="bg-white rounded-xl p-5 flex items-center gap-4">
             <div className={`${color} rounded-xl w-12 h-12 flex items-center justify-center shrink-0`}>
@@ -98,7 +103,7 @@ export default async function HomePage() {
         <h2 className="text-2xl font-bold text-[#1b2232] mb-1">Sua Jornada</h2>
         <p className="text-[#65758b] mb-5">Tudo o que você precisa para alcançar o topo</p>
 
-        <div className="grid grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {journeyCards.map(({ title, description, href, icon: Icon, iconBg, iconColor, image }) => (
             <Link key={href} href={href} className="bg-white rounded-xl overflow-hidden group hover:shadow-md transition-shadow">
               <div className="h-48 relative overflow-hidden">

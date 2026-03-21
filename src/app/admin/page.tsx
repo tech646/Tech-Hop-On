@@ -1,18 +1,14 @@
-import { createClient } from '@/lib/supabase/server'
-import { Users, BookOpen, Calculator, TrendingUp, Activity } from 'lucide-react'
+import { getAdminStats } from '@/lib/supabase/actions'
+import { Users, BookOpen, Calculator, TrendingUp, MessageSquare } from 'lucide-react'
 
 export default async function AdminPage() {
-  const supabase = await createClient()
-
-  // Fetch basic stats
-  const { count: userCount } = await supabase.from('profiles').select('*', { count: 'exact', head: true })
-  const { count: appointmentCount } = await supabase.from('appointments').select('*', { count: 'exact', head: true })
+  const { totalUsers, totalAppointments, avgSATScore, totalAISessions } = await getAdminStats()
 
   const stats = [
-    { label: 'Total de Usuários', value: userCount?.toString() || '0', icon: Users, color: 'bg-[#0057b8]/20', iconColor: 'text-[#51a2ff]' },
-    { label: 'Aulas Agendadas', value: appointmentCount?.toString() || '0', icon: Calculator, color: 'bg-[#ff9500]/20', iconColor: 'text-[#ff9500]' },
-    { label: 'Planos Ativos', value: '—', icon: TrendingUp, color: 'bg-[#22c55e]/20', iconColor: 'text-[#22c55e]' },
-    { label: 'Atividade Hoje', value: '—', icon: Activity, color: 'bg-[#8b5cf6]/20', iconColor: 'text-[#a78bfa]' },
+    { label: 'Total de Usuários', value: totalUsers.toString(), icon: Users, color: 'bg-[#0057b8]/20', iconColor: 'text-[#51a2ff]' },
+    { label: 'Aulas Agendadas', value: totalAppointments.toString(), icon: Calculator, color: 'bg-[#ff9500]/20', iconColor: 'text-[#ff9500]' },
+    { label: 'Média SAT Score', value: avgSATScore > 0 ? avgSATScore.toString() : '—', icon: TrendingUp, color: 'bg-[#22c55e]/20', iconColor: 'text-[#22c55e]' },
+    { label: 'Sessões de IA', value: totalAISessions.toString(), icon: MessageSquare, color: 'bg-[#8b5cf6]/20', iconColor: 'text-[#a78bfa]' },
   ]
 
   return (

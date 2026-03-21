@@ -58,7 +58,7 @@ export default function TrilhaDeAulasPage() {
       </div>
 
       {/* Progress bar */}
-      <div className="bg-white rounded-2xl p-5 border border-[#e1e7ef] mb-6 flex items-center gap-6">
+      <div className="bg-white rounded-2xl p-5 border border-[#e1e7ef] mb-6 flex items-center gap-4 sm:gap-6">
         <div className="flex-1">
           <p className="font-bold text-[#1b2232] mb-1">Sua Trilha de Aprendizado</p>
           <p className="text-sm text-[#65758b] mb-3">{totalDone} de {totalLessons} aulas concluídas</p>
@@ -82,7 +82,7 @@ export default function TrilhaDeAulasPage() {
             </div>
             <div className="divide-y divide-[#f3f5f7]">
               {course.lessons.map((lesson) => (
-                <div key={lesson.id} className={`flex items-center gap-4 px-5 py-4 ${lesson.status === 'locked' ? 'opacity-60' : ''}`}>
+                <div key={lesson.id} className={`flex items-center gap-3 sm:gap-4 px-4 sm:px-5 py-4 ${lesson.status === 'locked' ? 'opacity-60' : ''}`}>
                   <div className="shrink-0">
                     {lesson.status === 'done' ? (
                       <div className="w-8 h-8 rounded-full border-2 border-[#65758b] flex items-center justify-center">
@@ -98,8 +98,8 @@ export default function TrilhaDeAulasPage() {
                       </div>
                     )}
                   </div>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-[#1b2232]">{lesson.title}</p>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-[#1b2232] truncate">{lesson.title}</p>
                     <p className="text-xs text-[#65758b] flex items-center gap-1">⏱ {lesson.duration}</p>
                   </div>
                   {lesson.status === 'done' && (
