@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { ArrowLeft, Send } from 'lucide-react'
 
-const INITIAL_MSG = '👋 Olá! Eu sou seu tutor de preparação para o SAT. Vou te apresentar questões no estilo do exame e explicar cada resposta em detalhe.\n\nDigite **"começar"** para receber sua primeira questão, ou me pergunte qualquer dúvida sobre o SAT!'
+const INITIAL_MSG = '👋 Hi! I\'m your SAT preparation tutor. I\'ll present you with exam-style questions and explain each answer in detail.\n\nType **"start"** to receive your first question, or ask me anything about the SAT!'
 
 interface Message { role: 'assistant' | 'user'; content: string }
 
@@ -34,9 +34,9 @@ export default function PracticingPage() {
         body: JSON.stringify({ assistantId: 'sat', messages: geminiMessages }),
       })
       const data = await res.json()
-      setMessages(prev => [...prev, { role: 'assistant', content: data.text || 'Erro ao obter resposta.' }])
+      setMessages(prev => [...prev, { role: 'assistant', content: data.text || 'Error getting response.' }])
     } catch {
-      setMessages(prev => [...prev, { role: 'assistant', content: 'Erro ao conectar com a IA. Tente novamente.' }])
+      setMessages(prev => [...prev, { role: 'assistant', content: 'Error connecting to AI. Please try again.' }])
     } finally {
       setLoading(false)
     }
@@ -52,8 +52,8 @@ export default function PracticingPage() {
           <span className="text-xl">⭐</span>
         </div>
         <div>
-          <p className="font-bold text-[#1b2232]">Praticando SAT</p>
-          <p className="text-xs text-[#65758b]">Simulado interativo com questões reais</p>
+          <p className="font-bold text-[#1b2232]">Practicing SAT</p>
+          <p className="text-xs text-[#65758b]">Interactive mock exam with real questions</p>
         </div>
       </div>
 
@@ -84,7 +84,7 @@ export default function PracticingPage() {
           <div ref={bottomRef} />
         </div>
         <div className="border-t border-[#e1e7ef] p-4 flex gap-3">
-          <input type="text" value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleSend()} placeholder="Digite sua resposta ou mensagem..." className="flex-1 bg-[#f3f5f7] rounded-xl px-4 py-2.5 text-sm text-[#1b2232] placeholder:text-[#65758b] outline-none" />
+          <input type="text" value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleSend()} placeholder="Type your answer or message..." className="flex-1 bg-[#f3f5f7] rounded-xl px-4 py-2.5 text-sm text-[#1b2232] placeholder:text-[#65758b] outline-none" />
           <button onClick={handleSend} disabled={!input.trim() || loading} className="w-10 h-10 bg-[#1f2c47] hover:bg-[#0057b8] disabled:opacity-50 rounded-xl flex items-center justify-center transition-colors">
             <Send size={16} className="text-white" />
           </button>

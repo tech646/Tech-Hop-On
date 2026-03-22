@@ -48,13 +48,13 @@ export default function RegisterPage() {
           <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
             <span className="text-3xl">✉️</span>
           </div>
-          <h2 className="text-xl font-bold text-white mb-2">Verifique seu email</h2>
+          <h2 className="text-xl font-bold text-white mb-2">Check your email</h2>
           <p className="text-[#99A1AE] text-sm mb-6">
-            Enviamos um link de confirmação para <strong className="text-white">{email}</strong>. Clique nele para ativar sua conta.
+            We sent a confirmation link to <strong className="text-white">{email}</strong>. Click it to activate your account.
           </p>
           <Link href="/login">
             <Button variant="outline" className="w-full border-white/10 text-white hover:bg-white/5">
-              Voltar ao login
+              Back to sign in
             </Button>
           </Link>
         </div>
@@ -74,10 +74,10 @@ export default function RegisterPage() {
             <span className="text-white font-bold text-xl">Hop On Academy</span>
           </div>
           <h1 className="text-4xl font-bold text-white leading-tight mb-6">
-            Comece sua preparação para o SAT hoje!
+            Start your SAT preparation today!
           </h1>
           <p className="text-[#99A1AE] text-lg leading-relaxed">
-            Junte-se a mais de 2.400 alunos que já estão no caminho para as melhores universidades do mundo.
+            Join over 2,400 students already on the path to the world&apos;s best universities.
           </p>
         </div>
       </div>
@@ -85,8 +85,8 @@ export default function RegisterPage() {
       <div className="w-full lg:w-[480px] flex items-center justify-center p-8">
         <div className="w-full max-w-sm">
           <div className="bg-[#7BB8E3]/10 border border-white/10 rounded-2xl p-8">
-            <h2 className="text-2xl font-bold text-white mb-2">Criar conta</h2>
-            <p className="text-[#99A1AE] text-sm mb-8">Preencha os dados abaixo para começar</p>
+            <h2 className="text-2xl font-bold text-white mb-2">Create account</h2>
+            <p className="text-[#99A1AE] text-sm mb-8">Fill in your details below to get started</p>
 
             {error && (
               <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3 mb-6">
@@ -96,9 +96,9 @@ export default function RegisterPage() {
 
             <form onSubmit={handleRegister} className="space-y-4">
               <Input
-                label="Nome completo"
+                label="Full name"
                 type="text"
-                placeholder="Seu nome"
+                placeholder="Your name"
                 value={fullName}
                 onChange={e => setFullName(e.target.value)}
                 icon={<User size={16} />}
@@ -114,12 +114,12 @@ export default function RegisterPage() {
                 required
               />
               <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-medium text-[#D0D5DB]">Senha</label>
+                <label className="text-sm font-medium text-[#D0D5DB]">Password</label>
                 <div className="relative">
                   <Lock size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#657585]" />
                   <input
                     type={showPassword ? 'text' : 'password'}
-                    placeholder="Mínimo 8 caracteres"
+                    placeholder="Minimum 8 characters"
                     value={password}
                     onChange={e => setPassword(e.target.value)}
                     minLength={8}
@@ -137,14 +137,14 @@ export default function RegisterPage() {
               </div>
 
               <Button type="submit" size="lg" className="w-full" loading={loading}>
-                Criar conta
+                Create account
               </Button>
             </form>
 
             <p className="text-center text-sm text-[#99A1AE] mt-6">
-              Já tem conta?{' '}
+              Already have an account?{' '}
               <Link href="/login" className="text-[#50A2FF] hover:underline font-medium">
-                Entrar
+                Sign in
               </Link>
             </p>
           </div>

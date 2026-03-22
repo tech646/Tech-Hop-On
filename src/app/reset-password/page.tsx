@@ -15,8 +15,8 @@ export default function ResetPasswordPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (password !== confirm) { setError('As senhas não coincidem'); return }
-    if (password.length < 6) { setError('A senha deve ter ao menos 6 caracteres'); return }
+    if (password !== confirm) { setError('Passwords do not match'); return }
+    if (password.length < 6) { setError('Password must be at least 6 characters'); return }
     setLoading(true)
     const { error } = await supabase.auth.updateUser({ password })
     if (error) { setError(error.message); setLoading(false); return }
@@ -32,17 +32,17 @@ export default function ResetPasswordPage() {
         </div>
         {done ? (
           <div className="text-center">
-            <p className="text-white font-bold text-xl mb-2">Senha atualizada!</p>
-            <p className="text-white/60 text-sm">Redirecionando para o login...</p>
+            <p className="text-white font-bold text-xl mb-2">Password updated!</p>
+            <p className="text-white/60 text-sm">Redirecting to sign in...</p>
           </div>
         ) : (
           <>
-            <h1 className="text-2xl font-bold text-white mb-1">Nova senha</h1>
-            <p className="text-white/60 text-sm mb-6">Crie uma nova senha segura para sua conta.</p>
+            <h1 className="text-2xl font-bold text-white mb-1">New password</h1>
+            <p className="text-white/60 text-sm mb-6">Create a new secure password for your account.</p>
             {error && <p className="text-red-400 text-sm mb-4 bg-red-400/10 px-3 py-2 rounded-xl">{error}</p>}
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="text-white/70 text-xs font-bold uppercase tracking-wider block mb-2">Nova senha</label>
+                <label className="text-white/70 text-xs font-bold uppercase tracking-wider block mb-2">New password</label>
                 <input
                   type="password"
                   value={password}
@@ -53,7 +53,7 @@ export default function ResetPasswordPage() {
                 />
               </div>
               <div>
-                <label className="text-white/70 text-xs font-bold uppercase tracking-wider block mb-2">Confirmar senha</label>
+                <label className="text-white/70 text-xs font-bold uppercase tracking-wider block mb-2">Confirm password</label>
                 <input
                   type="password"
                   value={confirm}
@@ -68,7 +68,7 @@ export default function ResetPasswordPage() {
                 disabled={loading}
                 className="w-full bg-[#0057b8] hover:bg-[#0046a0] text-white font-bold rounded-2xl h-14 transition-colors disabled:opacity-50"
               >
-                {loading ? 'Salvando...' : 'Salvar nova senha'}
+                {loading ? 'Saving...' : 'Save new password'}
               </button>
             </form>
           </>

@@ -8,14 +8,14 @@ const founders = [
     role: 'Founder',
     aka: 'Also known as Mrs Brighta',
     image: '/images/brighta.png',
-    bio: '+35 anos no mercado de educação. Experiência com processos de admissão ultra-seletivos (nacionais e internacionais, incluindo bolsas de estudo). Atua no desenvolvimento de estratégias personalizadas para potencializar as chances de aprovação de estudantes em universidades de excelência. Mestre em Educação pela Harvard Graduate School of Education.',
+    bio: '35+ years in education. Experience with highly selective admissions processes (domestic and international, including scholarships). Specializes in developing personalized strategies to maximize students\' chances of admission to top universities. Master\'s in Education from Harvard Graduate School of Education.',
   },
   {
     name: 'Ana Paula Camargo',
     role: 'Founder',
     aka: 'Also known as Promptie',
     image: '/images/ana-paula.png',
-    bio: 'Gestora de times de engenharia de AI, mestre em educação pela Tampere University (Finlândia), com mais de 20 anos de experiência em trilhas de aprendizagem e soluções em educação em meios digitais e gestão educacional e 3° setor.',
+    bio: 'AI engineering team manager, Master\'s in Education from Tampere University (Finland), with 20+ years of experience in learning tracks and digital education solutions, educational management, and the non-profit sector.',
   },
 ]
 
@@ -29,13 +29,13 @@ export default function QuemSomosPage() {
   return (
     <div className="max-w-[900px] mx-auto px-6 py-8">
       <Link href="/home" className="flex items-center gap-1 text-sm text-[#65758b] hover:text-[#1b2232] mb-6 w-fit">
-        <ArrowLeft size={14} /> Voltar
+        <ArrowLeft size={14} /> Back
       </Link>
 
       <div className="flex items-center gap-2 mb-2">
-        <h1 className="text-3xl font-bold text-[#1b2232]">Quem somos</h1>
+        <h1 className="text-3xl font-bold text-[#1b2232]">About Us</h1>
       </div>
-      <p className="text-[#65758b] mb-8">Conheça a história por trás da Hop On.</p>
+      <p className="text-[#65758b] mb-8">Meet the story behind Hop On.</p>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-8">
         {founders.map(f => (
@@ -52,33 +52,33 @@ export default function QuemSomosPage() {
       </div>
 
       <div className="bg-white rounded-2xl border border-[#e1e7ef] p-8 text-center mb-8">
-        <h2 className="text-2xl font-bold text-[#1b2232] mb-4">Nossa Missão</h2>
+        <h2 className="text-2xl font-bold text-[#1b2232] mb-4">Our Mission</h2>
         <p className="text-[#65758b] leading-relaxed max-w-2xl mx-auto">
-          Garantir que cada aluno tenha acesso a uma preparação completa, personalizada e acessível, aumentando suas chances de aprovação e sucesso nos processos internacionais de candidatura para graduação e pós-graduação.
+          Ensure every student has access to complete, personalized, and affordable preparation — increasing their chances of success in international undergraduate and graduate admissions processes.
         </p>
       </div>
 
       <div className="bg-white rounded-2xl border border-[#e1e7ef] p-8 text-center mb-8">
         <Link href="/assistentes-ia" className="inline-flex items-center gap-1.5 text-xs text-[#0057b8] border border-[#0057b8]/20 bg-[#0057b8]/5 rounded-full px-3 py-1 mb-4">
-          ✨ Conheça nossos assistentes
+          ✨ Meet our assistants
         </Link>
-        <h2 className="text-2xl font-bold text-[#1b2232] mb-4">Somos IA, mas sabemos muito!</h2>
+        <h2 className="text-2xl font-bold text-[#1b2232] mb-4">We're AI — and we know a lot!</h2>
         <div className="flex items-center justify-center gap-4 mb-4">
           <Image src="/images/ia-gritty.png" alt="Gritty" width={70} height={70} className="object-contain" />
           <Image src="/images/ia-smartle.png" alt="Smartle" width={70} height={70} className="object-contain" />
           <Image src="/images/ia-wan.png" alt="Wan" width={70} height={70} className="object-contain" />
         </div>
         <p className="text-[#65758b] leading-relaxed max-w-xl mx-auto mb-2">
-          Nossos personagens são inteligências artificiais treinadas com uma base de conhecimento intensiva e especializada em estudar fora.
+          Our characters are AI assistants trained with an intensive, specialized knowledge base focused on studying abroad.
         </p>
         <p className="text-[#65758b] leading-relaxed max-w-xl mx-auto">
-          Combinamos o conhecimento e histórico das fundadoras, com tecnologia de ponta para oferecer a melhor experiência acadêmica para nossos alunos.
+          We combine the founders' expertise and track record with cutting-edge technology to deliver the best academic experience for our students.
         </p>
       </div>
 
       <div>
-        <h2 className="text-2xl font-bold text-[#1b2232] text-center mb-2">Quem já estudou com a Hop On</h2>
-        <p className="text-[#65758b] text-center mb-6">Histórias reais de alunos que conquistaram o mundo</p>
+        <h2 className="text-2xl font-bold text-[#1b2232] text-center mb-2">Who has studied with Hop On</h2>
+        <p className="text-[#65758b] text-center mb-6">Real stories from students who conquered the world</p>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {testimonials.map((t, i) => (
             <div key={i} className="bg-white rounded-2xl border border-[#e1e7ef] overflow-hidden">

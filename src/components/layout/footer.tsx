@@ -11,27 +11,27 @@ export function Footer() {
               <Image src="/images/logo.svg" alt="Hop On" width={70} height={38} />
             </div>
             <p className="text-sm text-[#65758b] leading-relaxed max-w-[280px]">
-              Capacitando jovens talentos para conquistar as melhores oportunidades educacionais no mundo todo.
+              Empowering young talents to seize the best educational opportunities around the world.
             </p>
           </div>
 
           {/* Suporte */}
           <div>
-            <p className="text-xs font-bold text-[#1b2232] uppercase tracking-wider mb-4">Suporte</p>
+            <p className="text-xs font-bold text-[#1b2232] uppercase tracking-wider mb-4">Support</p>
             <ul className="space-y-2.5">
-              <li><a href="/central-de-ajuda" className="text-sm text-[#65758b] hover:text-[#0057b8] transition-colors">Central de Ajuda</a></li>
-              <li><a href="#" className="text-sm text-[#65758b] hover:text-[#0057b8] transition-colors">Termos de Uso</a></li>
-              <li><a href="/quem-somos" className="text-sm text-[#65758b] hover:text-[#0057b8] transition-colors">Quem somos</a></li>
+              <li><a href="/central-de-ajuda" className="text-sm text-[#65758b] hover:text-[#0057b8] transition-colors">Help Center</a></li>
+              <li><a href="#" className="text-sm text-[#65758b] hover:text-[#0057b8] transition-colors">Terms of Use</a></li>
+              <li><a href="/quem-somos" className="text-sm text-[#65758b] hover:text-[#0057b8] transition-colors">About Us</a></li>
             </ul>
           </div>
 
           {/* Novidades */}
           <div>
-            <p className="text-xs font-bold text-[#1b2232] uppercase tracking-wider mb-4">Novidades</p>
+            <p className="text-xs font-bold text-[#1b2232] uppercase tracking-wider mb-4">Updates</p>
             <div className="flex items-center gap-2 bg-[#edf0f3] rounded-xl p-1 pl-3">
               <input
                 type="email"
-                placeholder="Seu e-mail"
+                placeholder="Your email"
                 className="bg-transparent text-sm text-[#65758b] outline-none flex-1 placeholder:text-[#65758b]"
               />
               <button className="w-8 h-8 bg-[#0057b8] rounded-xl flex items-center justify-center shrink-0">

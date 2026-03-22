@@ -67,49 +67,49 @@ const aiCharacters = [
 ]
 
 const resultCards = [
-  { src: '/images/brighta.png', alt: 'Brighta', text: 'Navegue pelas vídeo-aulas para saber mais sobre a língua inglesa!' },
-  { src: '/images/gritty.png', alt: 'Gritty', text: 'Use nossos assistentes de IA para tirar dúvidas a qualquer hora!' },
-  { src: '/images/smartle.png', alt: 'Smartle', text: 'Pratique seu SAT!' },
-  { src: '/images/wan.png', alt: 'Wan', text: 'Marque uma aula de matemática com nossos especialistas!' },
+  { src: '/images/brighta.png', alt: 'Brighta', text: 'Browse the video lessons to learn more about the English language!' },
+  { src: '/images/gritty.png', alt: 'Gritty', text: 'Use our AI assistants to get answers anytime!' },
+  { src: '/images/smartle.png', alt: 'Smartle', text: 'Practice your SAT!' },
+  { src: '/images/wan.png', alt: 'Wan', text: 'Book a math class with our specialists!' },
 ]
 
 const plans = [
   {
     id: 'gratuito',
-    name: 'Gratuito',
-    description: 'Acesso ao login e avaliação diagnóstica. Sem acesso a aulas ou assistentes.',
-    price: 'Grátis',
-    badge: 'Ativo',
+    name: 'Free',
+    description: 'Access to login and diagnostic assessment. No access to lessons or assistants.',
+    price: 'Free',
+    badge: 'Active',
     badgeColor: 'bg-green-100 text-green-700',
     active: true,
   },
   {
     id: 'mensal',
-    name: 'Mensal',
-    description: 'Flexibilidade total, sem fidelidade. Direito a duas (2) aulas com especialistas por semana.',
-    price: 'R$ 450/mês',
+    name: 'Monthly',
+    description: 'Full flexibility, no commitment. Up to two (2) classes with specialists per week.',
+    price: 'R$ 450/month',
     badge: null,
     active: false,
   },
   {
     id: 'semestral',
-    name: 'Semestral',
-    description: '6 meses de acesso com desconto para você avançar no seu processo sem pressa.',
-    price: 'R$ 380/mês',
-    total: 'R$ 2.280,00 total',
-    badge: 'Economia de R$ 420',
+    name: '6-Month',
+    description: '6 months of access at a discount so you can advance at your own pace.',
+    price: 'R$ 380/month',
+    total: 'R$ 2,280.00 total',
+    badge: 'Save R$ 420',
     badgeColor: 'bg-orange-100 text-orange-700',
     active: false,
   },
   {
     id: 'anual',
-    name: 'Anual',
-    description: '10 meses de acesso com o melhor custo-benefício da plataforma.',
-    price: 'R$ 290/mês',
-    total: 'R$ 3.480,00 total',
-    badge: 'Recomendado',
+    name: 'Annual',
+    description: '10 months of access with the best value on the platform.',
+    price: 'R$ 290/month',
+    total: 'R$ 3,480.00 total',
+    badge: 'Recommended',
     badgeColor: 'bg-blue-100 text-blue-700',
-    extraBadge: 'Economia de R$1.920',
+    extraBadge: 'Save R$1,920',
     active: false,
   },
 ]
@@ -240,7 +240,7 @@ export default function DiagnosticoPage() {
                 onClick={handleNext}
                 className="flex items-center gap-2 bg-[#1f2c47] hover:bg-[#0057b8] text-white font-bold text-sm px-6 py-3 rounded-xl transition-colors"
               >
-                Próximo <ArrowRight size={14} />
+                Next <ArrowRight size={14} />
               </button>
             </div>
           </div>
@@ -258,7 +258,7 @@ export default function DiagnosticoPage() {
       <div className="max-w-[960px] mx-auto px-6 py-8">
         <div className="bg-white rounded-2xl p-8 border border-[#e1e7ef]">
           <p className="text-lg font-bold text-[#1b2232] mb-2">
-            Pergunta {step}/{totalQuestions}
+            Question {step}/{totalQuestions}
           </p>
           <p className="text-[#65758b] text-sm mb-6">{q.question}</p>
 
@@ -296,14 +296,14 @@ export default function DiagnosticoPage() {
               onClick={handleBack}
               className="flex items-center gap-1 text-[#1b2232] text-sm hover:opacity-70 transition-opacity"
             >
-              <ArrowLeft size={14} /> Voltar
+              <ArrowLeft size={14} /> Back
             </button>
             <button
               onClick={handleNext}
               disabled={!currentSelected}
               className="flex items-center gap-2 bg-[#1f2c47] hover:bg-[#0057b8] disabled:opacity-50 text-white font-bold text-sm px-6 py-3 rounded-xl transition-colors"
             >
-              Próximo <ArrowRight size={14} />
+              Next <ArrowRight size={14} />
             </button>
           </div>
         </div>
@@ -317,10 +317,10 @@ export default function DiagnosticoPage() {
       <div className="max-w-[960px] mx-auto px-6 py-8">
         <div className="bg-white rounded-2xl p-8 border border-[#e1e7ef]">
           <h2 className="text-xl font-bold text-[#1b2232] mb-3 max-w-[600px]">
-            O caminho para a universidade dos seus sonhos tem muitos detalhes, mas você não precisa percorrê-lo no escuro.
+            The path to your dream university has many details, but you don&apos;t have to walk it in the dark.
           </h2>
           <p className="text-[#65758b] text-sm mb-6">
-            Com base no seu perfil, você pode aproveitar:
+            Based on your profile, you can take advantage of:
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
@@ -346,13 +346,13 @@ export default function DiagnosticoPage() {
               onClick={handleBack}
               className="flex items-center gap-1 text-[#1b2232] text-sm hover:opacity-70 transition-opacity"
             >
-              <ArrowLeft size={14} /> Voltar
+              <ArrowLeft size={14} /> Back
             </button>
             <button
               onClick={handleNext}
               className="flex items-center gap-2 bg-[#1f2c47] hover:bg-[#0057b8] text-white font-bold text-sm px-6 py-3 rounded-xl transition-colors"
             >
-              Próximo <ArrowRight size={14} />
+              Next <ArrowRight size={14} />
             </button>
           </div>
         </div>
@@ -365,9 +365,9 @@ export default function DiagnosticoPage() {
     return (
       <div className="max-w-[960px] mx-auto px-6 py-8">
         <div className="bg-white rounded-2xl p-8 border border-[#e1e7ef]">
-          <h2 className="text-xl font-bold text-[#1b2232] mb-2">Escolha seu plano</h2>
+          <h2 className="text-xl font-bold text-[#1b2232] mb-2">Choose your plan</h2>
           <p className="text-[#65758b] text-sm mb-6">
-            Preparar-se para estudar fora é um processo de anos. Quanto mais tempo, melhor o custo-benefício.
+            Preparing to study abroad is a multi-year journey. The longer the commitment, the better the value.
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
@@ -410,7 +410,7 @@ export default function DiagnosticoPage() {
                         onClick={(e) => { e.stopPropagation(); setSelectedPlan(plan.id) }}
                         className="mt-3 w-full bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold py-2 px-3 rounded-lg transition-colors"
                       >
-                        Escolher {plan.name.toLowerCase()}
+                        Choose {plan.name}
                       </button>
                     )}
                   </div>
@@ -424,13 +424,13 @@ export default function DiagnosticoPage() {
               onClick={handleBack}
               className="flex items-center gap-1 text-[#1b2232] text-sm hover:opacity-70 transition-opacity"
             >
-              <ArrowLeft size={14} /> Voltar
+              <ArrowLeft size={14} /> Back
             </button>
             <button
               onClick={handleNext}
               className="flex items-center gap-2 bg-[#1f2c47] hover:bg-[#0057b8] text-white font-bold text-sm px-6 py-3 rounded-xl transition-colors"
             >
-              Próximo <ArrowRight size={14} />
+              Next <ArrowRight size={14} />
             </button>
           </div>
         </div>

@@ -12,28 +12,28 @@ const assistantData: Record<string, { name: string; subtitle: string; emoji: str
     subtitle: 'The Storyteller',
     emoji: '👩‍💼',
     image: '/images/brighta.png',
-    greeting: '👋 Olá! Eu sou Brighta, sua especialista em narrativas para admissões. Posso te ajudar com **essays**, **personal statements** e **cartas de motivação**.\n\nDigite **"começar"** para receber sua primeira orientação, ou me pergunte qualquer dúvida sobre como escrever histórias impactantes!',
+    greeting: '👋 Hi! I\'m Brighta, your narrative specialist for college admissions. I can help you with **essays**, **personal statements**, and **motivation letters**.\n\nType **"start"** to receive your first guidance, or ask me anything about writing impactful stories!',
   },
   gritty: {
     name: 'Gritty',
     subtitle: 'The High-Performance Coach',
     emoji: '💪',
     image: '/images/gritty.png',
-    greeting: '👋 Olá! Eu sou Gritty, seu coach de alta performance! Estou aqui para te ajudar a **manter foco**, criar **planos de estudo** e te manter motivado.\n\nDigite **"começar"** para receber seu plano de estudos, ou me pergunte qualquer dúvida sobre organização e produtividade!',
+    greeting: '👋 Hi! I\'m Gritty, your high-performance coach! I\'m here to help you **stay focused**, build **study plans**, and keep you motivated.\n\nType **"start"** to receive your study plan, or ask me anything about organization and productivity!',
   },
   smartle: {
     name: 'Smartle',
     subtitle: 'The Admission Officer',
     emoji: '🎓',
     image: '/images/smartle.png',
-    greeting: '👋 Olá! Eu sou Smartle, sua estrategista de admissões! Posso te ajudar a entender os processos das melhores universidades e criar uma **estratégia personalizada**.\n\nDigite **"começar"** para iniciar, ou me pergunte sobre qualquer universidade ou processo de admissão!',
+    greeting: '👋 Hi! I\'m Smartle, your admissions strategist! I can help you understand the processes at top universities and create a **personalized strategy**.\n\nType **"start"** to begin, or ask me about any university or admissions process!',
   },
   wan: {
     name: 'Professor Wan',
     subtitle: 'The Operation Master',
     emoji: '🧑‍💻',
     image: '/images/wan.png',
-    greeting: '👋 Olá! Eu sou o Professor Wan, seu especialista em **vistos**, **documentação** e **prazos** internacionais. Garantirei que nenhum detalhe seja esquecido na sua jornada.\n\nDigite **"começar"** para iniciar, ou me pergunte sobre qualquer processo operacional da sua candidatura!',
+    greeting: '👋 Hi! I\'m Professor Wan, your specialist in **visas**, **documentation**, and international **deadlines**. I\'ll make sure no detail is missed on your journey.\n\nType **"start"** to begin, or ask me about any operational process in your application!',
   },
 }
 
@@ -75,9 +75,9 @@ export default function AssistantChatPage({ params }: { params: Promise<{ id: st
         body: JSON.stringify({ assistantId: id, messages: geminiMessages }),
       })
       const data = await res.json()
-      setMessages(prev => [...prev, { role: 'assistant', content: data.text || 'Erro ao obter resposta.' }])
+      setMessages(prev => [...prev, { role: 'assistant', content: data.text || 'Error getting response.' }])
     } catch {
-      setMessages(prev => [...prev, { role: 'assistant', content: 'Erro ao conectar com a IA. Tente novamente.' }])
+      setMessages(prev => [...prev, { role: 'assistant', content: 'Error connecting to AI. Please try again.' }])
     } finally {
       setLoading(false)
     }
@@ -148,7 +148,7 @@ export default function AssistantChatPage({ params }: { params: Promise<{ id: st
             value={input}
             onChange={e => setInput(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && handleSend()}
-            placeholder="Digite sua resposta ou mensagem..."
+            placeholder="Type your answer or message..."
             className="flex-1 bg-[#f3f5f7] rounded-xl px-4 py-2.5 text-sm text-[#1b2232] placeholder:text-[#65758b] outline-none"
           />
           <button

@@ -4,7 +4,7 @@ import { ArrowLeft, Lock, RotateCcw, Play } from 'lucide-react'
 const courses = [
   {
     subject: 'Critical Reading',
-    progress: '2/10 aulas',
+    progress: '2/10 lessons',
     icon: '📚',
     lessons: [
       { id: '1', title: 'Intro', duration: '12:30', status: 'done' },
@@ -16,7 +16,7 @@ const courses = [
   },
   {
     subject: 'Grammar',
-    progress: '0/10 aulas',
+    progress: '0/10 lessons',
     icon: '✏️',
     lessons: [
       { id: '6', title: 'Each and Every Agreement', duration: '13:40', status: 'locked' },
@@ -27,7 +27,7 @@ const courses = [
   },
   {
     subject: 'Vocabulary',
-    progress: '0/8 aulas',
+    progress: '0/8 lessons',
     icon: '📖',
     lessons: [
       { id: '10', title: 'Intro', duration: '10:30', status: 'locked' },
@@ -52,16 +52,16 @@ export default function TrilhaDeAulasPage() {
           <span className="text-lg">👤</span>
         </div>
         <div>
-          <h1 className="text-2xl font-bold text-[#1b2232]">Aulas</h1>
-          <p className="text-sm text-[#65758b]">Assista nossas vídeo aulas</p>
+          <h1 className="text-2xl font-bold text-[#1b2232]">Lessons</h1>
+          <p className="text-sm text-[#65758b]">Watch our video lessons</p>
         </div>
       </div>
 
       {/* Progress bar */}
       <div className="bg-white rounded-2xl p-5 border border-[#e1e7ef] mb-6 flex items-center gap-4 sm:gap-6">
         <div className="flex-1">
-          <p className="font-bold text-[#1b2232] mb-1">Sua Trilha de Aprendizado</p>
-          <p className="text-sm text-[#65758b] mb-3">{totalDone} de {totalLessons} aulas concluídas</p>
+          <p className="font-bold text-[#1b2232] mb-1">Your Learning Track</p>
+          <p className="text-sm text-[#65758b] mb-3">{totalDone} of {totalLessons} lessons completed</p>
           <div className="w-full h-2.5 bg-[#f3f5f7] rounded-full">
             <div className="h-full bg-[#1b2232] rounded-full" style={{ width: `${(totalDone / totalLessons) * 100}%` }} />
           </div>
@@ -104,12 +104,12 @@ export default function TrilhaDeAulasPage() {
                   </div>
                   {lesson.status === 'done' && (
                     <Link href={`/video-aula/${lesson.id}`} className="flex items-center gap-1.5 text-[#65758b] text-sm hover:text-[#1b2232]">
-                      <RotateCcw size={14} /> Rever
+                      <RotateCcw size={14} /> Review
                     </Link>
                   )}
                   {lesson.status === 'current' && (
                     <Link href={`/video-aula/${lesson.id}`} className="flex items-center gap-1.5 bg-[#0057b8] text-white text-sm px-4 py-1.5 rounded-xl font-medium hover:bg-[#0046a0] transition-colors">
-                      <Play size={14} /> Assistir
+                      <Play size={14} /> Watch
                     </Link>
                   )}
                 </div>

@@ -6,10 +6,10 @@ const assistants = [
   {
     id: 'brighta',
     name: 'Brighta',
-    role: 'A Arquiteta de Narrativas',
+    role: 'The Narrative Architect',
     subtitle: 'The Storyteller',
-    description: 'Especialista em criar narrativas poderosas para seus essays, personal statements e cartas de motivação. Ela transforma suas experiências em histórias memoráveis.',
-    tags: ['Essays', 'Personal Statements', 'Cartas de Motivação'],
+    description: 'Expert at crafting powerful narratives for your essays, personal statements, and motivation letters. She transforms your experiences into memorable stories.',
+    tags: ['Essays', 'Personal Statements', 'Motivation Letters'],
     image: '/images/brighta.png',
     bg: 'bg-[#fff8e7]',
     tagBg: 'bg-[#ffcb22]/15 text-[#a07800]',
@@ -17,10 +17,10 @@ const assistants = [
   {
     id: 'gritty',
     name: 'Gritty',
-    role: 'O Treinador de Performance',
+    role: 'The High-Performance Coach',
     subtitle: 'The High-Performance Coach',
-    description: 'Seu coach pessoal para manter foco, disciplina e alta performance nos estudos. Ele cria planos de estudo e te mantém motivado para conquistar seus objetivos.',
-    tags: ['Plano de Estudos', 'Motivação', 'Gestão do Tempo'],
+    description: 'Your personal coach for focus, discipline, and high performance in your studies. He creates study plans and keeps you motivated to achieve your goals.',
+    tags: ['Study Plan', 'Motivation', 'Time Management'],
     image: '/images/gritty.png',
     bg: 'bg-[#fdf2f8]',
     tagBg: 'bg-pink-100 text-pink-700',
@@ -28,10 +28,10 @@ const assistants = [
   {
     id: 'smartle',
     name: 'Smartle',
-    role: 'A Estrategista de Admissões',
+    role: 'The Admissions Strategist',
     subtitle: 'The Admission Officer',
-    description: 'Sua consultora para entender os processos de admissão das melhores universidades. Ela te guia em cada etapa, desde a escolha da universidade até a submissão.',
-    tags: ['Admissões', 'Universidades', 'Estratégia'],
+    description: 'Your consultant for understanding admissions processes at top universities. She guides you through every step, from choosing a school to submitting your application.',
+    tags: ['Admissions', 'Universities', 'Strategy'],
     image: '/images/smartle.png',
     bg: 'bg-[#f0f7ff]',
     tagBg: 'bg-blue-100 text-blue-700',
@@ -39,10 +39,10 @@ const assistants = [
   {
     id: 'wan',
     name: 'Professor Wan',
-    role: 'O Arquiteto de Processos',
+    role: 'The Process Architect',
     subtitle: 'The Operation Master',
-    description: 'O mestre dos processos operacionais: vistos, documentação, prazos e logística. Ele garante que nenhum detalhe seja esquecido na sua jornada internacional.',
-    tags: ['Vistos', 'Documentação', 'Prazos'],
+    description: 'The master of operational processes: visas, documentation, deadlines, and logistics. He ensures no detail is missed on your international journey.',
+    tags: ['Visas', 'Documentation', 'Deadlines'],
     image: '/images/wan.png',
     bg: 'bg-[#f0fdf4]',
     tagBg: 'bg-green-100 text-green-700',
@@ -53,14 +53,14 @@ export default function AssistentesIAPage() {
   return (
     <div className="max-w-[1400px] mx-auto px-6 py-8">
       <Link href="/home" className="flex items-center gap-1 text-sm text-[#65758b] hover:text-[#1b2232] mb-6 w-fit">
-        <ArrowLeft size={14} /> Lar
+        <ArrowLeft size={14} /> Home
       </Link>
 
       <div className="flex items-center gap-3 mb-2">
         <span className="text-2xl">⚡</span>
-        <h1 className="text-3xl font-bold text-[#1b2232]">Assistentes IA</h1>
+        <h1 className="text-3xl font-bold text-[#1b2232]">AI Assistants</h1>
       </div>
-      <p className="text-[#65758b] mb-8">Escolha o assistente ideal para te ajudar na sua jornada educacional</p>
+      <p className="text-[#65758b] mb-8">Choose the ideal assistant to help you on your educational journey</p>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
         {assistants.map((a) => (
@@ -89,7 +89,7 @@ export default function AssistentesIAPage() {
                 <Image src={a.image} alt={a.name} fill className="object-contain" />
               </div>
               <Link href={`/assistentes-ia/${a.id}`} className="text-[#0057b8] font-bold text-sm flex items-center gap-1 hover:gap-2 transition-all">
-                Conversar agora <ArrowRight size={14} />
+                Chat now <ArrowRight size={14} />
               </Link>
             </div>
           </div>

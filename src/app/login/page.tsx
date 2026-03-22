@@ -22,7 +22,7 @@ export default function LoginPage() {
     setError('')
     const { data, error } = await supabase.auth.signInWithPassword({ email, password })
     if (error) {
-      setError('Email ou senha incorretos.')
+      setError('Incorrect email or password.')
       setLoading(false)
     } else {
       // Check if diagnostic completed
@@ -67,10 +67,10 @@ export default function LoginPage() {
 
           <div className="mt-16 flex-1">
             <h1 className="text-[36px] font-bold text-[#0f111a] leading-tight mb-4">
-              Sua jornada para o Ensino<br />Superior internacional<br />começa aqui!
+              Your journey to international<br />higher education<br />starts here!
             </h1>
             <p className="text-[18px] text-[#0f111a]/70 leading-relaxed">
-              Acesse a plataforma Hop On e descubra novas possibilidades.
+              Access the Hop On platform and discover new possibilities.
             </p>
           </div>
 
@@ -80,21 +80,21 @@ export default function LoginPage() {
               <div className="w-6 h-6 rounded-full bg-[#0f111a]" />
             </div>
             <div>
-              <p className="text-[#0f111a] font-medium text-[24px] leading-tight">Quer saber mais?</p>
-              <p className="text-[#0f111a]/70 text-base mt-0.5">Clique aqui e faça o teste para saber como a Hop On pode te ajudar!</p>
+              <p className="text-[#0f111a] font-medium text-[24px] leading-tight">Want to know more?</p>
+              <p className="text-[#0f111a]/70 text-base mt-0.5">Click here and take the test to see how Hop On can help you!</p>
             </div>
           </Link>
         </div>
 
         {/* Right panel */}
         <div className="flex-1 flex flex-col justify-center px-6 py-10 lg:px-12 overflow-y-auto">
-          <h2 className="text-[30px] font-bold text-white mb-1">Bem-vindo</h2>
-          <p className="text-[#99a1af] text-base mb-8">Entre com suas credenciais ou use uma conta social.</p>
+          <h2 className="text-[30px] font-bold text-white mb-1">Welcome</h2>
+          <p className="text-[#99a1af] text-base mb-8">Sign in with your credentials or use a social account.</p>
 
           <form onSubmit={handleLogin} className="space-y-4">
             {/* Email */}
             <div>
-              <label className="block text-[#d1d5dc] text-sm font-medium mb-1.5">E-mail</label>
+              <label className="block text-[#d1d5dc] text-sm font-medium mb-1.5">Email</label>
               <div className="relative">
                 <svg className="absolute left-4 top-1/2 -translate-y-1/2 text-[#4a5565]" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <rect x="2" y="4" width="20" height="16" rx="2" /><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
@@ -114,7 +114,7 @@ export default function LoginPage() {
             <div>
               <div className="flex justify-between mb-1.5">
                 <label className="text-[#d1d5dc] text-sm font-medium">Senha</label>
-                <Link href="/forgot-password" className="text-[#51a2ff] text-xs hover:underline">Esqueceu?</Link>
+                <Link href="/forgot-password" className="text-[#51a2ff] text-xs hover:underline">Forgot?</Link>
               </div>
               <div className="relative">
                 <svg className="absolute left-4 top-1/2 -translate-y-1/2 text-[#4a5565]" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -152,7 +152,7 @@ export default function LoginPage() {
                   </svg>
                 )}
               </div>
-              <span className="text-[#99a1af] text-sm">Lembrar de mim</span>
+              <span className="text-[#99a1af] text-sm">Remember me</span>
             </label>
 
             {error && <p className="text-red-400 text-sm">{error}</p>}
@@ -163,7 +163,7 @@ export default function LoginPage() {
               disabled={loading}
               className="w-full h-14 bg-[#0057b8] hover:bg-[#0046a0] text-white font-bold text-base rounded-2xl transition-colors disabled:opacity-70 flex items-center justify-center gap-2 shadow-[0_10px_15px_-3px_rgba(28,57,142,0.3)]"
             >
-              {loading ? 'Entrando...' : 'Entrar'}
+              {loading ? 'Signing in...' : 'Sign In'}
               {!loading && (
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                   <path d="M5 12h14M12 5l7 7-7 7" />
@@ -175,7 +175,7 @@ export default function LoginPage() {
           {/* Divider */}
           <div className="flex items-center gap-4 my-5">
             <div className="flex-1 border-t border-white/5" />
-            <span className="text-[#6a7282] text-xs uppercase tracking-widest">Ou continuar com</span>
+            <span className="text-[#6a7282] text-xs uppercase tracking-widest">Or continue with</span>
             <div className="flex-1 border-t border-white/5" />
           </div>
 
@@ -206,9 +206,9 @@ export default function LoginPage() {
 
           {/* Register link */}
           <p className="text-center mt-5 text-sm text-[#6a7282]">
-            Não possui uma conta?{' '}
+            Don&apos;t have an account?{' '}
             <Link href="/register" className="text-[#51a2ff] font-bold hover:underline">
-              Cadastre-se agora
+              Sign up now
             </Link>
           </p>
         </div>

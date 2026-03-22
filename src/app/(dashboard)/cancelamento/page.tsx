@@ -11,21 +11,21 @@ export default function CancelamentoPage() {
   const [reason, setReason] = useState('')
 
   const reasons = [
-    'Não estou usando a plataforma',
-    'O preço está muito alto',
-    'Encontrei outra plataforma',
-    'Já atingi meu objetivo',
-    'Outro motivo',
+    "I'm not using the platform",
+    'The price is too high',
+    'I found another platform',
+    "I've already reached my goal",
+    'Other reason',
   ]
 
   if (step === 3) {
     return (
       <div className="max-w-[600px] mx-auto px-6 py-16 text-center">
         <div className="text-6xl mb-4">😢</div>
-        <h1 className="text-2xl font-bold text-[#1b2232] mb-2">Assinatura cancelada</h1>
-        <p className="text-[#65758b] mb-8">Você terá acesso até o final do período pago. Esperamos te ver de volta em breve!</p>
+        <h1 className="text-2xl font-bold text-[#1b2232] mb-2">Subscription cancelled</h1>
+        <p className="text-[#65758b] mb-8">You will have access until the end of the paid period. Hope to see you back soon!</p>
         <Link href="/home" className="bg-[#0057b8] text-white font-bold px-8 py-3 rounded-xl hover:bg-[#0046a0] transition-colors inline-block">
-          Voltar para Home
+          Back to Home
         </Link>
       </div>
     )
@@ -34,17 +34,17 @@ export default function CancelamentoPage() {
   return (
     <div className="max-w-[600px] mx-auto px-6 py-8">
       <Link href="/profile" className="flex items-center gap-1 text-sm text-[#65758b] hover:text-[#1b2232] mb-8 w-fit">
-        <ArrowLeft size={14} /> Voltar
+        <ArrowLeft size={14} /> Back
       </Link>
 
       {step === 1 && (
         <div>
           <div className="text-4xl mb-4">💔</div>
-          <h1 className="text-2xl font-bold text-[#1b2232] mb-2">Cancelar assinatura?</h1>
-          <p className="text-[#65758b] mb-6">Antes de ir, que tal conferir o que você vai perder ao cancelar?</p>
+          <h1 className="text-2xl font-bold text-[#1b2232] mb-2">Cancel subscription?</h1>
+          <p className="text-[#65758b] mb-6">Before you go, here&apos;s what you&apos;ll lose by cancelling:</p>
 
           <div className="bg-white rounded-2xl border border-[#e1e7ef] p-5 mb-6 space-y-3">
-            {['Acesso a todas as vídeo aulas', 'Sessões de Math Classes com especialistas', 'Chat com os Assistentes IA (Brighta, Gritty, Smartle, Wan)', 'Suporte personalizado para admissões'].map(item => (
+            {['Access to all video lessons', 'Math Class sessions with specialists', 'Chat with AI Assistants (Brighta, Gritty, Smartle, Wan)', 'Personalized admissions support'].map(item => (
               <div key={item} className="flex items-center gap-3 text-sm text-[#1b2232]">
                 <span className="text-red-400">✕</span> {item}
               </div>
@@ -53,10 +53,10 @@ export default function CancelamentoPage() {
 
           <div className="flex gap-3">
             <Link href="/profile" className="flex-1 bg-[#1f2c47] text-white font-bold py-3 rounded-xl text-center hover:bg-[#0057b8] transition-colors text-sm">
-              Manter assinatura
+              Keep subscription
             </Link>
             <button onClick={() => setStep(2)} className="flex-1 border border-[#e1e7ef] text-[#65758b] font-medium py-3 rounded-xl hover:border-red-300 hover:text-red-500 transition-colors text-sm">
-              Continuar cancelamento
+              Continue cancellation
             </button>
           </div>
         </div>
@@ -64,8 +64,8 @@ export default function CancelamentoPage() {
 
       {step === 2 && (
         <div>
-          <h1 className="text-2xl font-bold text-[#1b2232] mb-2">Por que está cancelando?</h1>
-          <p className="text-[#65758b] mb-6">Sua resposta nos ajuda a melhorar.</p>
+          <h1 className="text-2xl font-bold text-[#1b2232] mb-2">Why are you cancelling?</h1>
+          <p className="text-[#65758b] mb-6">Your feedback helps us improve.</p>
 
           <div className="space-y-3 mb-6">
             {reasons.map(r => (
@@ -78,14 +78,14 @@ export default function CancelamentoPage() {
 
           <div className="flex gap-3">
             <button onClick={() => setStep(1)} className="flex-1 border border-[#e1e7ef] text-[#65758b] font-medium py-3 rounded-xl hover:border-[#1b2232] hover:text-[#1b2232] transition-colors text-sm">
-              Voltar
+              Back
             </button>
             <button
               disabled={!reason}
               onClick={() => setStep(3)}
               className="flex-1 bg-[#ff4444] disabled:opacity-50 text-white font-bold py-3 rounded-xl hover:bg-red-600 transition-colors text-sm"
             >
-              Confirmar cancelamento
+              Confirm cancellation
             </button>
           </div>
         </div>

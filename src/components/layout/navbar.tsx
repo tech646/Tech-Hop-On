@@ -10,8 +10,8 @@ import { useEffect, useState } from 'react'
 
 const navItems = [
   { href: '/home', label: 'Menu', icon: LayoutGrid, exact: true },
-  { href: '/trilha-de-aulas', label: 'Aulas', icon: Tv },
-  { href: '/assistentes-ia', label: 'Assistente', icon: MessageSquare },
+  { href: '/trilha-de-aulas', label: 'Lessons', icon: Tv },
+  { href: '/assistentes-ia', label: 'Assistants', icon: MessageSquare },
   { href: '/math-classes', label: 'Math Classes', icon: Calculator },
   { href: '/practicing', label: 'Practicing', icon: Star },
 ]
@@ -20,7 +20,7 @@ export function Navbar() {
   const pathname = usePathname()
   const router = useRouter()
   const supabase = createClient()
-  const [userName, setUserName] = useState('Usuário')
+  const [userName, setUserName] = useState('User')
   const [menuOpen, setMenuOpen] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [isGestor, setIsGestor] = useState(false)
@@ -28,7 +28,7 @@ export function Navbar() {
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (user) {
-        const name = user.user_metadata?.full_name || user.email?.split('@')[0] || 'Usuário'
+        const name = user.user_metadata?.full_name || user.email?.split('@')[0] || 'User'
         setUserName(name.split(' ')[0])
         if (user.email?.endsWith('@hopon.academy')) setIsGestor(true)
       }
@@ -84,7 +84,7 @@ export function Navbar() {
               )}
             >
               <Users size={15} />
-              Gestor
+              Manager
             </Link>
           )}
         </div>
@@ -96,7 +96,7 @@ export function Navbar() {
             <Search size={14} className="text-[#65758b]" />
             <input
               type="text"
-              placeholder="Pesquisar..."
+              placeholder="Search..."
               className="bg-transparent text-sm text-[#65758b] outline-none w-full placeholder:text-[#65758b]"
             />
           </div>
@@ -127,7 +127,7 @@ export function Navbar() {
                   className="flex items-center gap-2 px-4 py-2 text-sm text-[#1b2232] hover:bg-[#f3f5f7]"
                 >
                   <User size={15} />
-                  Meu Perfil
+                  My Profile
                 </Link>
                 <hr className="my-1 border-[#e1e7ef]" />
                 <button
@@ -135,7 +135,7 @@ export function Navbar() {
                   className="flex items-center gap-2 px-4 py-2 text-sm text-red-500 hover:bg-[#f3f5f7] w-full text-left"
                 >
                   <LogOut size={15} />
-                  Sair
+                  Sign Out
                 </button>
               </div>
             )}
@@ -188,7 +188,7 @@ export function Navbar() {
                 )}
               >
                 <Users size={16} />
-                Gestor
+                Manager
               </Link>
             )}
           </div>
@@ -198,7 +198,7 @@ export function Navbar() {
             <Search size={14} className="text-[#65758b]" />
             <input
               type="text"
-              placeholder="Pesquisar..."
+              placeholder="Search..."
               className="bg-transparent text-sm text-[#65758b] outline-none w-full placeholder:text-[#65758b]"
             />
           </div>
@@ -211,14 +211,14 @@ export function Navbar() {
               className="flex items-center gap-2 px-4 py-3 rounded-xl text-sm text-[#1b2232] hover:bg-[#f3f5f7] font-medium"
             >
               <User size={16} />
-              Meu Perfil
+              My Profile
             </Link>
             <button
               onClick={handleSignOut}
               className="flex items-center gap-2 px-4 py-3 rounded-xl text-sm text-red-500 hover:bg-[#f3f5f7] w-full text-left font-medium"
             >
               <LogOut size={16} />
-              Sair
+              Sign Out
             </button>
           </div>
         </div>

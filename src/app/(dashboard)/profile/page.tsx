@@ -10,9 +10,9 @@ import type { UserCollege, SATResult } from '@/types'
 type Tab = 'perfil' | 'plano'
 
 const categoryMap: Record<UserCollege['category'], string> = {
-  dream: 'Dream/Sonho',
-  target: 'Target/Provável',
-  safety: 'Safety/Segura',
+  dream: 'Dream',
+  target: 'Target',
+  safety: 'Safety',
 }
 
 type ProfileData = {
@@ -115,7 +115,7 @@ export default function ProfilePage() {
         updated_at: new Date().toISOString(),
       }, { onConflict: 'id' })
     setEditSaving(false)
-    if (error) { setEditError('Erro ao salvar. Tente novamente.'); return }
+    if (error) { setEditError('Error saving. Please try again.'); return }
     setUser(prev => prev ? { ...prev, name: editForm.name, phone: editForm.phone, city: editForm.city, school: editForm.school } : prev)
     setEditOpen(false)
   }
@@ -129,7 +129,7 @@ export default function ProfilePage() {
 
   async function handleAddCollege(e: React.FormEvent) {
     e.preventDefault()
-    if (!userId || !collegeForm.name.trim()) { setCollegeError('Informe o nome da universidade.'); return }
+    if (!userId || !collegeForm.name.trim()) { setCollegeError('Please enter the university name.'); return }
     setCollegeSaving(true)
     setCollegeError('')
     const { data, error } = await supabase
@@ -138,21 +138,21 @@ export default function ProfilePage() {
       .select()
       .single()
     setCollegeSaving(false)
-    if (error) { setCollegeError('Erro ao adicionar. Tente novamente.'); return }
+    if (error) { setCollegeError('Error adding. Please try again.'); return }
     setColleges(prev => [...prev, data as UserCollege])
     setAddCollegeOpen(false)
   }
 
   // ── Delete college ──────────────────────────────────────────────────────────
   async function handleDeleteCollege(id: string) {
-    if (!confirm('Remover esta universidade da sua lista?')) return
+    if (!confirm('Remove this university from your list?')) return
     await supabase.from('user_colleges').delete().eq('id', id)
     setColleges(prev => prev.filter(c => c.id !== id))
   }
 
   // ── Delete account ──────────────────────────────────────────────────────────
   async function handleDelete() {
-    if (!confirm('Tem certeza que deseja deletar sua conta? Esta ação é irreversível.')) return
+    if (!confirm('Are you sure you want to delete your account? This action is irreversible.')) return
     await supabase.auth.signOut()
     router.push('/login')
   }
@@ -160,21 +160,21 @@ export default function ProfilePage() {
   return (
     <div className="max-w-[900px] mx-auto px-6 py-8">
       <Link href="/home" className="flex items-center gap-1 text-sm text-[#65758b] hover:text-[#1b2232] mb-6 w-fit">
-        <ArrowLeft size={14} /> Voltar para home
+        <ArrowLeft size={14} /> Back to home
       </Link>
 
       {/* Header */}
       <div className="bg-[#1f2c47] rounded-2xl p-6 flex items-center gap-4 mb-4">
         <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-white text-xl">👤</div>
         <div>
-          <h1 className="text-2xl font-bold text-white">Meu Perfil</h1>
-          <p className="text-white/70 text-sm">Gerencie suas informações e acompanhe sua estratégia de application.</p>
+          <h1 className="text-2xl font-bold text-white">My Profile</h1>
+          <p className="text-white/70 text-sm">Manage your information and track your application strategy.</p>
         </div>
       </div>
 
       {/* Tabs */}
       <div className="flex bg-white rounded-xl border border-[#e1e7ef] mb-6 p-1 overflow-x-auto">
-        {[{ key: 'perfil', label: 'Meu Perfil' }, { key: 'plano', label: 'Meu Plano' }].map(t => (
+        {[{ key: 'perfil', label: 'My Profile' }, { key: 'plano', label: 'My Plan' }].map(t => (
           <button
             key={t.key}
             onClick={() => setTab(t.key as Tab)}
@@ -190,12 +190,12 @@ export default function ProfilePage() {
           {/* Personal info */}
           <div className="bg-white rounded-2xl border border-[#e1e7ef] p-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="font-bold text-[#1b2232] text-lg">Informações Pessoais</h2>
+              <h2 className="font-bold text-[#1b2232] text-lg">Personal Information</h2>
               <button
                 onClick={openEdit}
                 className="flex items-center gap-1.5 text-[#0057b8] text-sm font-medium hover:underline"
               >
-                <Edit2 size={14} /> Editar meu perfil
+                <Edit2 size={14} /> Edit my profile
               </button>
             </div>
 
@@ -204,17 +204,17 @@ export default function ProfilePage() {
               <div>
                 <p className="font-bold text-[#1b2232]">{user?.name || '—'}</p>
                 <p className="text-sm text-[#65758b]">{user?.email || '—'}</p>
-                <p className="text-xs text-[#65758b]">Membro desde {user?.created}</p>
+                <p className="text-xs text-[#65758b]">Member since {user?.created}</p>
               </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {[
-                { label: 'Nome completo', value: user?.name || '—', icon: '👤' },
+                { label: 'Full name', value: user?.name || '—', icon: '👤' },
                 { label: 'Email', value: user?.email || '—', icon: '✉️' },
-                { label: 'Telefone', value: user?.phone || '—', icon: '📞' },
-                { label: 'Cidade', value: user?.city || '—', icon: '📍' },
-                { label: 'Escola atual', value: user?.school || '—', icon: '🏫' },
+                { label: 'Phone', value: user?.phone || '—', icon: '📞' },
+                { label: 'City', value: user?.city || '—', icon: '📍' },
+                { label: 'Current school', value: user?.school || '—', icon: '🏫' },
               ].map(({ label, value, icon }) => (
                 <div key={label} className="border border-[#e1e7ef] rounded-xl p-3">
                   <p className="text-xs text-[#65758b] mb-1 flex items-center gap-1"><span>{icon}</span>{label}</p>
@@ -228,14 +228,14 @@ export default function ProfilePage() {
           <div className="bg-white rounded-2xl border border-[#e1e7ef] p-6">
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h2 className="font-bold text-[#1b2232] text-lg">Minha lista de College</h2>
-                <p className="text-xs text-[#65758b]">Organize suas universidades por estratégia de application.</p>
+                <h2 className="font-bold text-[#1b2232] text-lg">My College List</h2>
+                <p className="text-xs text-[#65758b]">Organize your universities by application strategy.</p>
               </div>
               <button
                 onClick={openAddCollege}
                 className="flex items-center gap-1.5 bg-[#0057b8] hover:bg-[#0046a0] text-white text-sm px-3 py-1.5 rounded-xl font-medium transition-colors"
               >
-                <Plus size={14} /> Adicionar College
+                <Plus size={14} /> Add College
               </button>
             </div>
 
@@ -251,7 +251,7 @@ export default function ProfilePage() {
             </div>
 
             {colleges.length === 0 && (
-              <p className="text-sm text-[#65758b] text-center py-6">Nenhuma universidade adicionada ainda.</p>
+              <p className="text-sm text-[#65758b] text-center py-6">No universities added yet.</p>
             )}
 
             {(['dream', 'target', 'safety'] as const).map(cat => {
@@ -262,9 +262,9 @@ export default function ProfilePage() {
                   <div className="flex items-center gap-1.5 text-sm font-semibold text-[#1b2232] mb-2">
                     🎯 {categoryMap[cat]}
                     <span className="text-xs font-normal text-[#65758b]">
-                      {cat === 'dream' ? '— Muito competitivas, vale tentar.' :
-                       cat === 'target' ? '— Bom fit com seu perfil.' :
-                       '— Altas chances de admissão.'}
+                      {cat === 'dream' ? '— Very competitive, worth trying.' :
+                       cat === 'target' ? '— Good fit with your profile.' :
+                       '— High chances of admission.'}
                     </span>
                   </div>
                   {catColleges.map(college => (
@@ -285,32 +285,32 @@ export default function ProfilePage() {
 
           {/* SAT Score */}
           <div className="bg-white rounded-2xl border border-[#e1e7ef] p-6">
-            <h2 className="font-bold text-[#1b2232] text-lg mb-2">Último resultado de prática SAT</h2>
-            <p className="text-xs text-[#65758b] mb-4">Avaliação para application.</p>
+            <h2 className="font-bold text-[#1b2232] text-lg mb-2">Latest SAT Practice Result</h2>
+            <p className="text-xs text-[#65758b] mb-4">Assessment for your application.</p>
             {satHistory.length === 0 ? (
-              <p className="text-sm text-[#65758b] text-center py-4">Nenhuma prática SAT realizada ainda.</p>
+              <p className="text-sm text-[#65758b] text-center py-4">No SAT practice completed yet.</p>
             ) : (
               <>
                 <div className="flex items-center justify-between mb-3">
-                  <p className="text-sm font-medium text-[#1b2232]">Resultado</p>
+                  <p className="text-sm font-medium text-[#1b2232]">Score</p>
                   <p className="text-sm font-bold text-[#1b2232]">{satHistory[0].score}/1600</p>
                 </div>
                 <div className="w-full h-3 bg-[#f3f5f7] rounded-full mb-4">
                   <div className="h-full bg-[#1b2232] rounded-full" style={{ width: `${(satHistory[0].score / 1600) * 100}%` }} />
                 </div>
                 <p className="text-xs text-[#65758b] mb-3">
-                  Última prática: {new Date(satHistory[0].created_at).toLocaleDateString('pt-BR', { day: 'numeric', month: 'long', year: 'numeric' })}
+                  Last practice: {new Date(satHistory[0].created_at).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })}
                 </p>
               </>
             )}
             <Link href="/practicing" className="w-full bg-[#1f2c47] hover:bg-[#0057b8] text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition-colors text-sm">
-              <RefreshCw size={14} /> Refazer Prática SAT
+              <RefreshCw size={14} /> Retake SAT Practice
             </Link>
           </div>
 
           {/* Delete */}
           <button onClick={handleDelete} className="w-full bg-[#ff4444] hover:bg-red-600 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition-colors text-sm">
-            🗑 Deletar conta
+            🗑 Delete account
           </button>
         </div>
       )}
@@ -320,32 +320,32 @@ export default function ProfilePage() {
           <div className="bg-[#1f2c47] rounded-2xl p-5 flex items-start gap-3">
             <span className="text-2xl mt-0.5">👑</span>
             <div>
-              <p className="text-xs font-medium text-white/60 uppercase tracking-wide mb-1">Seu plano atual</p>
-              <p className="text-2xl font-bold text-white">Plano Gratuito</p>
+              <p className="text-xs font-medium text-white/60 uppercase tracking-wide mb-1">Your current plan</p>
+              <p className="text-2xl font-bold text-white">Free Plan</p>
             </div>
           </div>
 
           <div className="bg-white rounded-2xl border border-[#e1e7ef] p-6">
-            <h2 className="font-bold text-[#1b2232] text-lg mb-1">Escolha seu plano</h2>
-            <p className="text-sm text-[#65758b] mb-5">Preparar-se para estudar fora é um processo de anos. Quanto mais tempo, melhor o custo-benefício.</p>
+            <h2 className="font-bold text-[#1b2232] text-lg mb-1">Choose your plan</h2>
+            <p className="text-sm text-[#65758b] mb-5">Preparing to study abroad is a multi-year journey. The longer the commitment, the better the value.</p>
             <div className="space-y-3">
               <div className="border-2 border-[#e1e7ef] rounded-2xl p-4 flex items-center justify-between">
                 <div>
                   <div className="flex items-center gap-2">
                     <span className="font-bold text-[#1b2232]">Gratuito</span>
-                    <span className="text-xs bg-[#f3f5f7] text-[#65758b] px-2 py-0.5 rounded-full">✓ Ativo</span>
+                    <span className="text-xs bg-[#f3f5f7] text-[#65758b] px-2 py-0.5 rounded-full">✓ Active</span>
                   </div>
-                  <p className="text-sm text-[#65758b] mt-1">Acesso ao login e avaliação diagnóstica. Sem acesso a aulas ou assistentes.</p>
+                  <p className="text-sm text-[#65758b] mt-1">Access to login and diagnostic assessment. No access to lessons or assistants.</p>
                 </div>
                 <span className="font-bold text-[#1b2232] text-xl ml-4 shrink-0">Grátis</span>
               </div>
               {[
-                { name: 'Mensal', price: 'R$ 450', period: '/mês', desc: 'Flexibilidade total. Direito a 2 aulas com especialistas por semana.' },
-                { name: 'Semestral', price: 'R$ 380', period: '/mês', desc: '6 meses com desconto. 3 aulas/semana.', total: 'R$2.280 total', savings: 'Economia de R$420' },
-                { name: 'Anual', price: 'R$ 290', period: '/mês', desc: '12 meses — melhor custo-benefício. 4 aulas/semana.', total: 'R$3.480 total', savings: 'Economia de R$1.920', recommended: true },
+                { name: 'Monthly', price: 'R$ 450', period: '/mo', desc: 'Full flexibility. Up to 2 classes with specialists per week.' },
+                { name: '6-Month', price: 'R$ 380', period: '/mo', desc: '6 months at a discount. 3 classes/week.', total: 'R$2,280 total', savings: 'Save R$420' },
+                { name: 'Annual', price: 'R$ 290', period: '/mo', desc: '12 months — best value. 4 classes/week.', total: 'R$3,480 total', savings: 'Save R$1,920', recommended: true },
               ].map(p => (
                 <div key={p.name} className={`border-2 rounded-2xl p-4 ${p.recommended ? 'border-[#ff9500]' : 'border-[#e1e7ef]'} relative`}>
-                  {p.recommended && <div className="absolute -top-3 left-4 bg-[#ff9500] text-white text-xs font-bold px-3 py-1 rounded-full">🏆 Recomendado</div>}
+                  {p.recommended && <div className="absolute -top-3 left-4 bg-[#ff9500] text-white text-xs font-bold px-3 py-1 rounded-full">🏆 Recommended</div>}
                   <div className="flex items-center justify-between mb-2 mt-1">
                     <span className="font-bold text-[#1b2232]">{p.name}</span>
                     <div className="text-right"><span className="text-xl font-bold text-[#1b2232]">{p.price}</span><span className="text-sm text-[#65758b]">{p.period}</span></div>
@@ -353,7 +353,7 @@ export default function ProfilePage() {
                   <p className="text-sm text-[#65758b] mb-2">{p.desc}</p>
                   {p.savings && <span className="text-xs bg-[#f0fdf4] text-[#22c55e] px-2 py-0.5 rounded-full font-medium mb-3 inline-block">{p.savings}</span>}
                   <button className="w-full bg-[#ff9500] hover:bg-orange-500 text-white font-bold py-2.5 rounded-xl text-sm transition-colors block mt-2">
-                    Escolher {p.name}
+                    Choose {p.name}
                   </button>
                 </div>
               ))}
@@ -361,11 +361,11 @@ export default function ProfilePage() {
           </div>
 
           <div className="bg-white rounded-2xl border border-[#e1e7ef] p-6">
-            <h2 className="font-bold text-[#1b2232] text-lg mb-4">Perguntas frequentes</h2>
+            <h2 className="font-bold text-[#1b2232] text-lg mb-4">Frequently asked questions</h2>
             {[
-              { q: 'Posso trocar de plano a qualquer momento?', a: 'Sim! A diferença será calculada proporcionalmente e aplicada na próxima cobrança.' },
-              { q: 'O que acontece se eu cancelar?', a: 'Você mantém acesso até o fim do período pago. Não há multa por cancelamento.' },
-              { q: 'Há desconto para pagamento à vista?', a: 'Os planos semestral e anual já incluem desconto progressivo.' },
+              { q: 'Can I switch plans at any time?', a: 'Yes! The difference will be calculated proportionally and applied to the next billing.' },
+              { q: 'What happens if I cancel?', a: 'You keep access until the end of the paid period. There is no cancellation fee.' },
+              { q: 'Is there a discount for upfront payment?', a: 'The 6-month and annual plans already include a progressive discount.' },
             ].map(({ q, a }) => (
               <div key={q} className="py-3 border-b border-[#f3f5f7] last:border-0">
                 <p className="font-medium text-[#1b2232] text-sm mb-1">{q}</p>
@@ -375,7 +375,7 @@ export default function ProfilePage() {
           </div>
 
           <Link href="/cancelamento" className="block text-center text-sm text-[#65758b] hover:text-red-500 transition-colors">
-            Cancelar assinatura
+            Cancel subscription
           </Link>
         </div>
       )}
@@ -385,45 +385,45 @@ export default function ProfilePage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
           <div className="bg-white rounded-2xl w-full max-w-[480px] shadow-xl">
             <div className="flex items-center justify-between p-6 border-b border-[#e1e7ef]">
-              <h3 className="font-bold text-[#1b2232] text-lg">Editar Perfil</h3>
+              <h3 className="font-bold text-[#1b2232] text-lg">Edit Profile</h3>
               <button onClick={() => setEditOpen(false)} className="text-[#65758b] hover:text-[#1b2232]">
                 <X size={20} />
               </button>
             </div>
             <form onSubmit={handleSaveProfile} className="p-6 space-y-4">
               <div>
-                <label className="block text-xs font-medium text-[#65758b] mb-1">Nome completo</label>
+                <label className="block text-xs font-medium text-[#65758b] mb-1">Full name</label>
                 <input
                   value={editForm.name}
                   onChange={e => setEditForm(f => ({ ...f, name: e.target.value }))}
-                  placeholder="Seu nome"
+                  placeholder="Your name"
                   className="w-full border border-[#e1e7ef] rounded-xl px-4 py-2.5 text-sm text-[#1b2232] outline-none focus:border-[#0057b8] transition-colors"
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-[#65758b] mb-1">Telefone</label>
+                <label className="block text-xs font-medium text-[#65758b] mb-1">Phone</label>
                 <input
                   value={editForm.phone}
                   onChange={e => setEditForm(f => ({ ...f, phone: e.target.value }))}
-                  placeholder="+55 11 99999-9999"
+                  placeholder="+1 555 000-0000"
                   className="w-full border border-[#e1e7ef] rounded-xl px-4 py-2.5 text-sm text-[#1b2232] outline-none focus:border-[#0057b8] transition-colors"
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-[#65758b] mb-1">Cidade</label>
+                <label className="block text-xs font-medium text-[#65758b] mb-1">City</label>
                 <input
                   value={editForm.city}
                   onChange={e => setEditForm(f => ({ ...f, city: e.target.value }))}
-                  placeholder="São Paulo"
+                  placeholder="New York"
                   className="w-full border border-[#e1e7ef] rounded-xl px-4 py-2.5 text-sm text-[#1b2232] outline-none focus:border-[#0057b8] transition-colors"
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-[#65758b] mb-1">Escola atual</label>
+                <label className="block text-xs font-medium text-[#65758b] mb-1">Current school</label>
                 <input
                   value={editForm.school}
                   onChange={e => setEditForm(f => ({ ...f, school: e.target.value }))}
-                  placeholder="Nome da escola"
+                  placeholder="School name"
                   className="w-full border border-[#e1e7ef] rounded-xl px-4 py-2.5 text-sm text-[#1b2232] outline-none focus:border-[#0057b8] transition-colors"
                 />
               </div>
@@ -434,7 +434,7 @@ export default function ProfilePage() {
                   onClick={() => setEditOpen(false)}
                   className="flex-1 border border-[#e1e7ef] text-[#65758b] font-medium py-2.5 rounded-xl text-sm hover:bg-[#f3f5f7] transition-colors"
                 >
-                  Cancelar
+                  Cancel
                 </button>
                 <button
                   type="submit"
@@ -442,7 +442,7 @@ export default function ProfilePage() {
                   className="flex-1 bg-[#0057b8] hover:bg-[#0046a0] disabled:opacity-60 text-white font-bold py-2.5 rounded-xl text-sm flex items-center justify-center gap-2 transition-colors"
                 >
                   {editSaving ? <Loader2 size={14} className="animate-spin" /> : null}
-                  Salvar
+                  Save
                 </button>
               </div>
             </form>
@@ -455,14 +455,14 @@ export default function ProfilePage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
           <div className="bg-white rounded-2xl w-full max-w-[420px] shadow-xl">
             <div className="flex items-center justify-between p-6 border-b border-[#e1e7ef]">
-              <h3 className="font-bold text-[#1b2232] text-lg">Adicionar College</h3>
+              <h3 className="font-bold text-[#1b2232] text-lg">Add College</h3>
               <button onClick={() => setAddCollegeOpen(false)} className="text-[#65758b] hover:text-[#1b2232]">
                 <X size={20} />
               </button>
             </div>
             <form onSubmit={handleAddCollege} className="p-6 space-y-4">
               <div>
-                <label className="block text-xs font-medium text-[#65758b] mb-1">Nome da universidade</label>
+                <label className="block text-xs font-medium text-[#65758b] mb-1">University name</label>
                 <input
                   value={collegeForm.name}
                   onChange={e => setCollegeForm(f => ({ ...f, name: e.target.value }))}
@@ -472,15 +472,15 @@ export default function ProfilePage() {
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-[#65758b] mb-1">Categoria</label>
+                <label className="block text-xs font-medium text-[#65758b] mb-1">Category</label>
                 <select
                   value={collegeForm.category}
                   onChange={e => setCollegeForm(f => ({ ...f, category: e.target.value as UserCollege['category'] }))}
                   className="w-full border border-[#e1e7ef] rounded-xl px-4 py-2.5 text-sm text-[#1b2232] outline-none focus:border-[#0057b8] transition-colors bg-white"
                 >
-                  <option value="dream">🎯 Dream/Sonho — Muito competitiva</option>
-                  <option value="target">🎯 Target/Provável — Bom fit com meu perfil</option>
-                  <option value="safety">🎯 Safety/Segura — Altas chances de admissão</option>
+                  <option value="dream">🎯 Dream — Very competitive</option>
+                  <option value="target">🎯 Target — Good fit with my profile</option>
+                  <option value="safety">🎯 Safety — High chances of admission</option>
                 </select>
               </div>
               {collegeError && <p className="text-red-500 text-sm">{collegeError}</p>}
@@ -490,7 +490,7 @@ export default function ProfilePage() {
                   onClick={() => setAddCollegeOpen(false)}
                   className="flex-1 border border-[#e1e7ef] text-[#65758b] font-medium py-2.5 rounded-xl text-sm hover:bg-[#f3f5f7] transition-colors"
                 >
-                  Cancelar
+                  Cancel
                 </button>
                 <button
                   type="submit"
@@ -498,7 +498,7 @@ export default function ProfilePage() {
                   className="flex-1 bg-[#0057b8] hover:bg-[#0046a0] disabled:opacity-60 text-white font-bold py-2.5 rounded-xl text-sm flex items-center justify-center gap-2 transition-colors"
                 >
                   {collegeSaving ? <Loader2 size={14} className="animate-spin" /> : null}
-                  Adicionar
+                  Add
                 </button>
               </div>
             </form>

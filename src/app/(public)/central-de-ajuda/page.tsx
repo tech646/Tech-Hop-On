@@ -8,44 +8,44 @@ const categories = [
   {
     id: 'aulas',
     icon: '📺',
-    title: 'Aulas e Conteúdo',
+    title: 'Lessons & Content',
     color: 'bg-[#0057b8]/10',
     faqs: [
-      { q: 'Como acesso minhas aulas?', a: 'Acesse o menu principal e clique em "Aulas". Todas as suas aulas estarão organizadas por módulo e tema.' },
-      { q: 'Posso assistir as aulas offline?', a: 'No momento, as aulas estão disponíveis apenas online. Estamos trabalhando no modo offline para versões futuras.' },
-      { q: 'Como acompanho meu progresso?', a: 'Na página de Aulas, você pode ver a barra de progresso e quantas aulas já foram concluídas.' },
+      { q: 'How do I access my lessons?', a: 'Go to the main menu and click "Lessons". All your lessons will be organized by module and topic.' },
+      { q: 'Can I watch lessons offline?', a: 'At the moment, lessons are only available online. We are working on offline mode for future versions.' },
+      { q: 'How do I track my progress?', a: 'On the Lessons page, you can see the progress bar and how many lessons have been completed.' },
     ],
   },
   {
     id: 'pagamentos',
     icon: '💳',
-    title: 'Pagamentos e Planos',
+    title: 'Payments & Plans',
     color: 'bg-[#ff9500]/10',
     faqs: [
-      { q: 'Quais formas de pagamento são aceitas?', a: 'Aceitamos cartão de crédito, débito e PIX. Parcelamento disponível para planos semestral e anual.' },
-      { q: 'Como cancelo minha assinatura?', a: 'Acesse Perfil > Meu Plano > Cancelar assinatura. Você mantém acesso até o fim do período pago.' },
-      { q: 'Posso trocar de plano?', a: 'Sim! A diferença será calculada proporcionalmente. Acesse Perfil > Meu Plano para trocar.' },
+      { q: 'What payment methods are accepted?', a: 'We accept credit card, debit card, and PIX. Installments available for 6-month and annual plans.' },
+      { q: 'How do I cancel my subscription?', a: 'Go to Profile > My Plan > Cancel subscription. You keep access until the end of the paid period.' },
+      { q: 'Can I switch plans?', a: 'Yes! The difference will be calculated proportionally. Go to Profile > My Plan to switch.' },
     ],
   },
   {
     id: 'conta',
     icon: '🔒',
-    title: 'Conta e Segurança',
+    title: 'Account & Security',
     color: 'bg-[#22c55e]/10',
     faqs: [
-      { q: 'Como altero minha senha?', a: 'Acesse Perfil > Informações Pessoais > Editar. Você receberá um e-mail para redefinir a senha.' },
-      { q: 'Esqueci minha senha, o que faço?', a: 'Na tela de login, clique em "Esqueceu?" e siga as instruções enviadas ao seu e-mail.' },
-      { q: 'Como ativo a verificação em duas etapas?', a: 'Acesse Perfil > Segurança > Verificação em duas etapas e siga as instruções.' },
+      { q: 'How do I change my password?', a: 'Go to Profile > Personal Information > Edit. You will receive an email to reset your password.' },
+      { q: 'I forgot my password, what should I do?', a: 'On the sign in screen, click "Forgot?" and follow the instructions sent to your email.' },
+      { q: 'How do I enable two-step verification?', a: 'Go to Profile > Security > Two-step verification and follow the instructions.' },
     ],
   },
   {
     id: 'config',
     icon: '⚙️',
-    title: 'Configurações',
+    title: 'Settings',
     color: 'bg-[#8b5cf6]/10',
     faqs: [
-      { q: 'Como altero o idioma da plataforma?', a: 'No momento, a plataforma está disponível apenas em português. Mais idiomas em breve.' },
-      { q: 'Como ativo o modo escuro?', a: 'Acesse as configurações do perfil. O modo escuro estará disponível em próximas atualizações.' },
+      { q: 'How do I change the platform language?', a: 'The platform is now available in English. More language options coming soon.' },
+      { q: 'How do I enable dark mode?', a: 'Go to profile settings. Dark mode will be available in upcoming updates.' },
     ],
   },
 ]
@@ -66,8 +66,8 @@ export default function CentralDeAjudaPage() {
       {/* Hero */}
       <div className="text-center mb-10">
         <div className="w-16 h-16 rounded-2xl bg-[#1f2c47] flex items-center justify-center text-2xl mx-auto mb-4">❓</div>
-        <h1 className="text-3xl font-bold text-[#1b2232] mb-2">Central de Ajuda</h1>
-        <p className="text-[#65758b]">Encontre respostas para as dúvidas mais frequentes ou reporte um problema.</p>
+        <h1 className="text-3xl font-bold text-[#1b2232] mb-2">Help Center</h1>
+        <p className="text-[#65758b]">Find answers to the most frequently asked questions or report a problem.</p>
       </div>
 
       {/* Search */}
@@ -77,7 +77,7 @@ export default function CentralDeAjudaPage() {
           type="text"
           value={search}
           onChange={e => setSearch(e.target.value)}
-          placeholder="Buscar nas perguntas frequentes..."
+          placeholder="Search frequently asked questions..."
           className="flex-1 text-sm text-[#1b2232] placeholder:text-[#65758b] outline-none bg-transparent"
         />
       </div>
@@ -115,15 +115,15 @@ export default function CentralDeAjudaPage() {
       {/* Report bug */}
       <div className="bg-white rounded-2xl border border-[#e1e7ef] p-8 text-center mb-6">
         <div className="text-3xl mb-3">🐛</div>
-        <h3 className="font-bold text-[#1b2232] text-lg mb-1">Encontrou um problema?</h3>
-        <p className="text-[#65758b] text-sm mb-4">Nos ajude a melhorar reportando erros ou bugs.</p>
+        <h3 className="font-bold text-[#1b2232] text-lg mb-1">Found a problem?</h3>
+        <p className="text-[#65758b] text-sm mb-4">Help us improve by reporting errors or bugs.</p>
         <button className="flex items-center gap-2 bg-[#1f2c47] hover:bg-[#0057b8] text-white font-bold px-6 py-2.5 rounded-xl mx-auto text-sm transition-colors">
-          🐛 Reportar Erro ou Bug
+          🐛 Report Error or Bug
         </button>
       </div>
 
       <Link href="/home" className="text-sm text-[#65758b] hover:text-[#0057b8] flex items-center justify-center gap-1">
-        <ArrowLeft size={14} /> Voltar para a página Inicial
+        <ArrowLeft size={14} /> Back to Home
       </Link>
     </div>
   )

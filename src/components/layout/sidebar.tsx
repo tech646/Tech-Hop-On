@@ -13,20 +13,20 @@ import { useRouter } from 'next/navigation'
 
 const navItems = [
   { href: '/home', label: 'Home', icon: Home },
-  { href: '/profile', label: 'Perfil', icon: User },
-  { href: '/assistentes-ia', label: 'Assistentes IA', icon: Bot },
-  { href: '/trilha-de-aulas', label: 'Trilha de Aulas', icon: BookOpen },
+  { href: '/profile', label: 'Profile', icon: User },
+  { href: '/assistentes-ia', label: 'AI Assistants', icon: Bot },
+  { href: '/trilha-de-aulas', label: 'Lesson Track', icon: BookOpen },
   { href: '/math-classes', label: 'Math Classes', icon: Calculator },
   { href: '/practicing', label: 'Practicing', icon: Brain },
-  { href: '/diagnostico', label: 'Diagnóstico', icon: BarChart2 },
-  { href: '/calendario', label: 'Calendário', icon: Calendar },
-  { href: '/agendamentos', label: 'Agendamentos', icon: Clock },
-  { href: '/planos', label: 'Planos', icon: CreditCard },
+  { href: '/diagnostico', label: 'Diagnostic', icon: BarChart2 },
+  { href: '/calendario', label: 'Calendar', icon: Calendar },
+  { href: '/agendamentos', label: 'Appointments', icon: Clock },
+  { href: '/planos', label: 'Plans', icon: CreditCard },
 ]
 
 const bottomItems = [
-  { href: '/central-de-ajuda', label: 'Central de Ajuda', icon: HelpCircle },
-  { href: '/quem-somos', label: 'Quem Somos', icon: Info },
+  { href: '/central-de-ajuda', label: 'Help Center', icon: HelpCircle },
+  { href: '/quem-somos', label: 'About Us', icon: Info },
 ]
 
 export function Sidebar() {
@@ -101,7 +101,7 @@ export function Sidebar() {
           className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-[#99A1AE] hover:bg-white/5 hover:text-red-400 transition-colors"
         >
           <LogOut size={18} />
-          Sair
+          Sign Out
         </button>
       </div>
     </aside>

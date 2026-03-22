@@ -6,8 +6,8 @@ import { ArrowRight, BookOpen, Calculator, Brain, Sparkles } from 'lucide-react'
 
 const journeyCards = [
   {
-    title: 'Aulas',
-    description: 'Acesse as vídeo aulas',
+    title: 'Lessons',
+    description: 'Access the video lessons',
     href: '/trilha-de-aulas',
     icon: BookOpen,
     iconBg: 'bg-[#008db8]/10',
@@ -24,8 +24,8 @@ const journeyCards = [
     image: '/images/card-math.png',
   },
   {
-    title: 'Praticando',
-    description: 'Pratique o SAT',
+    title: 'Practicing',
+    description: 'Practice the SAT',
     href: '/practicing',
     icon: Brain,
     iconBg: 'bg-[#ef467c]/10',
@@ -33,8 +33,8 @@ const journeyCards = [
     image: '/images/card-practicing.png',
   },
   {
-    title: 'Assistentes IA',
-    description: 'Tire suas dúvidas agora',
+    title: 'AI Assistants',
+    description: 'Get your questions answered now',
     href: '/assistentes-ia',
     icon: Sparkles,
     iconBg: 'bg-[#ffcb22]/10',
@@ -58,18 +58,18 @@ export default async function HomePage() {
       <div className="bg-[#1f2c47] rounded-2xl overflow-hidden relative mb-8 h-[384px]">
         <div className="absolute inset-0 p-12 flex flex-col justify-center z-10">
           <div className="inline-flex items-center bg-white/15 backdrop-blur-sm rounded-full px-4 py-1.5 mb-4 w-fit">
-            <span className="text-white text-xs font-bold uppercase tracking-wider">Boas-vindas ao futuro</span>
+            <span className="text-white text-xs font-bold uppercase tracking-wider">Welcome to the future</span>
           </div>
           <h1 className="text-3xl sm:text-5xl font-bold text-white mb-4">Welcome back!</h1>
           <p className="text-white/75 text-lg leading-relaxed mb-8 max-w-md">
-            Seu sonho de estudar fora está 12% mais próximo hoje. Vamos continuar sua jornada!
+            Your dream of studying abroad is 12% closer today. Let&apos;s keep going!
           </p>
           <div className="flex gap-4">
             <Link href="/trilha-de-aulas" className="bg-white text-[#1b2232] font-bold text-sm px-6 h-11 rounded-full flex items-center hover:bg-white/90 transition-colors shadow-sm">
-              Continuar Aula
+              Continue Lesson
             </Link>
             <Link href="/math-classes" className="border border-white/20 text-white font-bold text-sm px-6 h-11 rounded-full flex items-center hover:bg-white/10 transition-colors">
-              Marcar Math Class
+              Book Math Class
             </Link>
           </div>
         </div>
@@ -82,9 +82,9 @@ export default async function HomePage() {
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
         {[
-          { label: 'Aulas Concluídas', value: completedLessons.toString(), icon: BookOpen, color: 'bg-[#0057b8]/10' },
-          { label: 'Horas de Estudo', value: `${studyHours}h`, icon: Brain, color: 'bg-[#ff9500]/10' },
-          { label: 'Último Teste SAT', value: latestSAT?.toString() ?? '--', icon: Sparkles, color: 'bg-[#1f4435]/10' },
+          { label: 'Lessons Completed', value: completedLessons.toString(), icon: BookOpen, color: 'bg-[#0057b8]/10' },
+          { label: 'Study Hours', value: `${studyHours}h`, icon: Brain, color: 'bg-[#ff9500]/10' },
+          { label: 'Latest SAT Score', value: latestSAT?.toString() ?? '--', icon: Sparkles, color: 'bg-[#1f4435]/10' },
         ].map(({ label, value, icon: Icon, color }) => (
           <div key={label} className="bg-white rounded-xl p-5 flex items-center gap-4">
             <div className={`${color} rounded-xl w-12 h-12 flex items-center justify-center shrink-0`}>
@@ -100,8 +100,8 @@ export default async function HomePage() {
 
       {/* Journey section */}
       <div>
-        <h2 className="text-2xl font-bold text-[#1b2232] mb-1">Sua Jornada</h2>
-        <p className="text-[#65758b] mb-5">Tudo o que você precisa para alcançar o topo</p>
+        <h2 className="text-2xl font-bold text-[#1b2232] mb-1">Your Journey</h2>
+        <p className="text-[#65758b] mb-5">Everything you need to reach the top</p>
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {journeyCards.map(({ title, description, href, icon: Icon, iconBg, iconColor, image }) => (
@@ -116,7 +116,7 @@ export default async function HomePage() {
                 <p className="font-bold text-[#1b2232] text-base mb-1">{title}</p>
                 <p className="text-[#65758b] text-sm mb-3">{description}</p>
                 <span className="text-[#0057b8] font-bold text-sm flex items-center gap-1 group-hover:gap-2 transition-all">
-                  Começar agora <ArrowRight size={14} />
+                  Start now <ArrowRight size={14} />
                 </span>
               </div>
             </Link>

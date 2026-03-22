@@ -9,7 +9,7 @@ import type { MathAppointment } from '@/types'
 type Tab = 'proximas' | 'calendario' | 'historico'
 
 const historyClasses = [
-  { title: 'Estatística — Medidas de Tendência Central', teacher: 'Prof. Ricardo Lima', date: '02/03/2026 às 15:00' },
+  { title: 'Statistics — Measures of Central Tendency', teacher: 'Prof. Ricardo Lima', date: '03/02/2026 at 3:00 PM' },
 ]
 
 const DAYS_IN_MARCH = Array.from({ length: 31 }, (_, i) => i + 1)
@@ -44,9 +44,9 @@ export default function MathClassesPage() {
       return {
         id: a.id,
         day: date.getDate().toString().padStart(2, '0'),
-        month: date.toLocaleString('pt-BR', { month: 'short' }).toUpperCase().replace('.', ''),
-        label: date.toLocaleString('pt-BR', { day: '2-digit', month: 'long', hour: '2-digit', minute: '2-digit' }),
-        title: a.notes || 'Aula de Matemática',
+        month: date.toLocaleString('en-US', { month: 'short' }).toUpperCase(),
+        label: date.toLocaleString('en-US', { day: '2-digit', month: 'long', hour: '2-digit', minute: '2-digit' }),
+        title: a.notes || 'Math Class',
         teacher: a.teacher_name || '—',
         canCancel: a.status === 'pending',
         raw: a,
@@ -63,24 +63,24 @@ export default function MathClassesPage() {
           </Link>
           <div className="w-9 h-9 rounded-xl bg-[#ff9500]/10 flex items-center justify-center text-lg">📐</div>
           <div>
-            <h1 className="text-xl sm:text-2xl font-bold text-[#1b2232]">Aulas de Matemática</h1>
-            <p className="text-sm text-[#65758b]">Agende aulas e acesse suas reuniões</p>
+            <h1 className="text-xl sm:text-2xl font-bold text-[#1b2232]">Math Classes</h1>
+            <p className="text-sm text-[#65758b]">Book classes and access your sessions</p>
           </div>
         </div>
         <button onClick={() => setShowModal(true)} className="flex items-center gap-2 bg-[#1f2c47] hover:bg-[#0057b8] text-white text-sm font-bold px-4 py-2 rounded-xl transition-colors">
-          <Plus size={16} /> Agendar Aula
+          <Plus size={16} /> Book Class
         </button>
       </div>
 
       {/* Plan info (show in proximas) */}
       {tab === 'proximas' && (
         <div className="flex flex-wrap items-center gap-3 mb-4 text-sm">
-          <span className="text-[#65758b]">Plano <span className="font-bold text-[#1b2232]">Mensal</span></span>
-          <span className="text-[#65758b]">Aulas inclusas: <span className="font-bold text-[#1b2232]">3</span></span>
-          <span className="text-[#65758b]">Aulas realizadas: <span className="font-bold text-[#1b2232]">2</span></span>
-          <span className="text-[#ff4444] font-medium">Próxima aula: extra de R$385,00</span>
+          <span className="text-[#65758b]">Plan <span className="font-bold text-[#1b2232]">Monthly</span></span>
+          <span className="text-[#65758b]">Included classes: <span className="font-bold text-[#1b2232]">3</span></span>
+          <span className="text-[#65758b]">Classes taken: <span className="font-bold text-[#1b2232]">2</span></span>
+          <span className="text-[#ff4444] font-medium">Next class: extra R$385.00</span>
           <button className="flex items-center gap-1 bg-[#1f2c47] text-white text-xs px-3 py-1.5 rounded-xl ml-auto">
-            <ExternalLink size={12} /> Entrar na Aula
+            <ExternalLink size={12} /> Join Class
           </button>
         </div>
       )}
@@ -88,9 +88,9 @@ export default function MathClassesPage() {
       {/* Tabs */}
       <div className="flex gap-2 sm:gap-4 mb-6 border-b border-[#e1e7ef] overflow-x-auto scrollbar-none">
         {[
-          { key: 'proximas', label: 'Próximas Aulas', icon: '📋' },
-          { key: 'calendario', label: 'Calendário', icon: '📅' },
-          { key: 'historico', label: 'Histórico', icon: '⏱' },
+          { key: 'proximas', label: 'Upcoming Classes', icon: '📋' },
+          { key: 'calendario', label: 'Calendar', icon: '📅' },
+          { key: 'historico', label: 'History', icon: '⏱' },
         ].map(t => (
           <button
             key={t.key}
@@ -121,11 +121,11 @@ export default function MathClassesPage() {
               <div className="flex items-center gap-2 sm:ml-auto flex-wrap">
                 {cls.canCancel && (
                   <button onClick={() => { setCancelTarget(cls.raw); setShowCancel(true) }} className="bg-[#ff4444] text-white text-sm px-3 py-1.5 rounded-xl flex items-center gap-1 font-medium">
-                    Cancelar aula <ExternalLink size={12} />
+                    Cancel class <ExternalLink size={12} />
                   </button>
                 )}
                 <button className="bg-[#1f2c47] text-white text-sm px-3 py-1.5 rounded-xl flex items-center gap-1">
-                  <ExternalLink size={12} /> Entrar na Aula
+                  <ExternalLink size={12} /> Join Class
                 </button>
               </div>
             </div>
@@ -139,11 +139,11 @@ export default function MathClassesPage() {
           <div className="bg-white rounded-2xl border border-[#e1e7ef] p-5 w-56 shrink-0">
             <div className="flex items-center justify-between mb-4">
               <button className="text-[#65758b] hover:text-[#1b2232]">‹</button>
-              <p className="font-bold text-[#1b2232] text-sm">março 2026</p>
+              <p className="font-bold text-[#1b2232] text-sm">March 2026</p>
               <button className="text-[#65758b] hover:text-[#1b2232]">›</button>
             </div>
             <div className="grid grid-cols-7 gap-1 text-xs text-center">
-              {['dom','seg','ter','qua','qui','sex','sáb'].map(d => (
+              {['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(d => (
                 <div key={d} className="text-[#65758b] font-medium py-1">{d}</div>
               ))}
               {Array.from({ length: START_DAY }).map((_, i) => <div key={`e${i}`} />)}
@@ -157,11 +157,11 @@ export default function MathClassesPage() {
           </div>
           {/* Day content */}
           <div className="flex-1 bg-white rounded-2xl border border-[#e1e7ef] p-6">
-            <p className="font-bold text-[#1b2232] mb-4">04 de março, 2026</p>
+            <p className="font-bold text-[#1b2232] mb-4">March 04, 2026</p>
             <div className="flex flex-col items-center justify-center h-40 gap-3">
-              <p className="text-[#65758b] text-sm">Nenhuma aula neste dia.</p>
+              <p className="text-[#65758b] text-sm">No classes on this day.</p>
               <button onClick={() => setShowModal(true)} className="flex items-center gap-1 text-[#65758b] text-sm border border-[#e1e7ef] px-4 py-1.5 rounded-xl hover:border-[#0057b8] hover:text-[#0057b8] transition-colors">
-                <Plus size={14} /> Agendar neste dia
+                <Plus size={14} /> Book on this day
               </button>
             </div>
           </div>
@@ -177,7 +177,7 @@ export default function MathClassesPage() {
                 <p className="font-bold text-[#1b2232]">{cls.title}</p>
                 <p className="text-sm text-[#65758b]">{cls.teacher} — {cls.date}</p>
               </div>
-              <span className="text-xs font-medium text-[#22c55e] bg-[#22c55e]/10 px-3 py-1 rounded-full">Concluído</span>
+              <span className="text-xs font-medium text-[#22c55e] bg-[#22c55e]/10 px-3 py-1 rounded-full">Completed</span>
             </div>
           ))}
         </div>
@@ -188,28 +188,28 @@ export default function MathClassesPage() {
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-end sm:items-center justify-center z-50">
           <div className="bg-white rounded-t-2xl sm:rounded-2xl p-6 w-full sm:w-[480px] shadow-2xl max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-5">
-              <h3 className="text-lg font-bold text-[#1b2232]">Agendar Nova Aula</h3>
+              <h3 className="text-lg font-bold text-[#1b2232]">Book New Class</h3>
               <button onClick={() => setShowModal(false)} className="text-[#65758b] hover:text-[#1b2232]"><X size={18} /></button>
             </div>
             <div className="mb-4">
-              <label className="text-sm font-medium text-[#1b2232] mb-2 block">Professor</label>
+              <label className="text-sm font-medium text-[#1b2232] mb-2 block">Teacher</label>
               <select className="w-full border border-[#e1e7ef] rounded-xl px-3 py-2.5 text-sm text-[#65758b] outline-none focus:border-[#0057b8]">
-                <option value="">Escolha um professor</option>
+                <option value="">Choose a teacher</option>
                 <option>Prof. Carlos Mendes</option>
                 <option>Profª. Ana Oliveira</option>
                 <option>Prof. Ricardo Lima</option>
               </select>
             </div>
             <div className="mb-6">
-              <label className="text-sm font-medium text-[#1b2232] mb-2 block">Data</label>
+              <label className="text-sm font-medium text-[#1b2232] mb-2 block">Date</label>
               <div className="border border-[#e1e7ef] rounded-xl p-4">
                 <div className="flex items-center justify-between mb-3">
                   <button className="text-[#65758b] hover:text-[#1b2232]">‹</button>
-                  <p className="font-bold text-[#1b2232] text-sm">março 2026</p>
+                  <p className="font-bold text-[#1b2232] text-sm">March 2026</p>
                   <button className="text-[#65758b] hover:text-[#1b2232]">›</button>
                 </div>
                 <div className="grid grid-cols-7 gap-1 text-xs text-center">
-                  {['dom','seg','ter','qua','qui','sex','sáb'].map(d => <div key={d} className="text-[#65758b] font-medium py-1">{d}</div>)}
+                  {['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(d => <div key={d} className="text-[#65758b] font-medium py-1">{d}</div>)}
                   {Array.from({ length: START_DAY }).map((_, i) => <div key={`e${i}`} />)}
                   {DAYS_IN_MARCH.map(d => (
                     <button key={d} onClick={() => setSelectedDay(d)}
@@ -221,7 +221,7 @@ export default function MathClassesPage() {
               </div>
             </div>
             <button onClick={() => setShowModal(false)} className="w-full bg-[#0057b8] hover:bg-[#0046a0] text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition-colors">
-              ✓ Confirmar Agendamento
+              ✓ Confirm Booking
             </button>
           </div>
         </div>
@@ -232,18 +232,18 @@ export default function MathClassesPage() {
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-end sm:items-center justify-center z-50">
           <div className="bg-white rounded-t-2xl sm:rounded-2xl p-6 w-full sm:w-[480px] shadow-2xl">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold text-[#1b2232]">Desmarcar aula</h3>
+              <h3 className="text-lg font-bold text-[#1b2232]">Cancel class</h3>
               <button onClick={() => setShowCancel(false)} className="text-[#65758b] hover:text-[#1b2232]"><X size={18} /></button>
             </div>
-            <p className="text-sm text-[#1b2232] mb-1">Aula: Math Class 1</p>
-            <p className="text-sm text-[#65758b] mb-4">Prof: Lucas</p>
+            <p className="text-sm text-[#1b2232] mb-1">Class: Math Class 1</p>
+            <p className="text-sm text-[#65758b] mb-4">Teacher: Lucas</p>
             <div className="bg-[#fff5f5] border border-[#ffcdd2] rounded-xl p-3 mb-6 text-sm text-[#c62828] space-y-1">
-              <p>• Você poderá remarcar em até 5 dias.</p>
-              <p>• Após 5 dias sem remarcar, a aula será considerada perdida.</p>
+              <p>• You can reschedule within 5 days.</p>
+              <p>• After 5 days without rescheduling, the class will be considered lost.</p>
             </div>
             <div className="flex gap-3">
               <button onClick={() => setShowCancel(false)} className="flex-1 bg-[#1f2c47] text-white font-bold py-2.5 rounded-xl hover:bg-[#0057b8] transition-colors">
-                Manter aula
+                Keep class
               </button>
               <button
                 onClick={async () => {
