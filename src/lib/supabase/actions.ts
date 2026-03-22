@@ -173,6 +173,91 @@ export async function saveDiagnosticResult(userId: string, answers: Record<strin
   return supabase.from('diagnostic_results_v2').upsert({ user_id: userId, answers, completed_at: new Date().toISOString() }, { onConflict: 'user_id' })
 }
 
+// Gestor: get all students' performance data
+export async function getGestorStudentsData() {
+  const supabase = await createClient()
+
+  // Get all non-admin profiles
+  const { data: profiles } = await supabase
+    .from('profiles')
+    .select('id, full_name, email, country, sat_target_score')
+    .not('email', 'ilike', '%@hopon.academy')
+
+  if (!profiles || profiles.length === 0) return { students: [], stats: { total: 0, avgSAT: 0, avgLessons: 0, avgAI: 0 } }
+
+  const userIds = profiles.map(p => p.id)
+
+  // Fetch all needed data in parallel
+  const [mathData, lessonsData, aiData, satData, collegesData] = await Promise.all([
+    supabase
+      .from('math_appointments')
+      .select('user_id')
+      .in('user_id', userIds)
+      .eq('status', 'confirmed'),
+    supabase
+      .from('user_lesson_progress')
+      .select('user_id')
+      .in('user_id', userIds)
+      .eq('completed', true),
+    supabase
+      .from('ai_chat_sessions')
+      .select('user_id, messages')
+      .in('user_id', userIds),
+    supabase
+      .from('sat_practice_results')
+      .select('user_id, score, created_at')
+      .in('user_id', userIds)
+      .order('created_at', { ascending: false }),
+    supabase
+      .from('user_colleges')
+      .select('user_id, name')
+      .in('user_id', userIds),
+  ])
+
+  const students = profiles.map(p => {
+    const mathCount = (mathData.data ?? []).filter(r => r.user_id === p.id).length
+    const lessonsCount = (lessonsData.data ?? []).filter(r => r.user_id === p.id).length
+    const aiMsgs = (aiData.data ?? [])
+      .filter(r => r.user_id === p.id)
+      .reduce((acc: number, r) => acc + ((r.messages as unknown[])?.length ?? 0), 0)
+
+    const userSAT = (satData.data ?? []).filter(r => r.user_id === p.id)
+    const latestSAT = userSAT[0]?.score ?? null
+    const prevSAT = userSAT[1]?.score ?? null
+    const trend = latestSAT && prevSAT
+      ? latestSAT >= prevSAT ? 'up' : 'down'
+      : 'neutral'
+
+    const colleges = (collegesData.data ?? [])
+      .filter(r => r.user_id === p.id)
+      .map(r => r.name)
+      .slice(0, 3)
+
+    return {
+      id: p.id,
+      name: p.full_name || p.email?.split('@')[0] || 'Aluno',
+      country: p.country || 'Brazil',
+      mathClasses: mathCount,
+      mathMax: 40,
+      onlineCourses: lessonsCount,
+      aiUsage: aiMsgs,
+      satScore: latestSAT,
+      satTarget: p.sat_target_score || 1300,
+      trend,
+      colleges,
+    }
+  })
+
+  const total = students.length
+  const avgSAT = students.filter(s => s.satScore).length > 0
+    ? Math.round(students.filter(s => s.satScore).reduce((a, s) => a + (s.satScore ?? 0), 0) / students.filter(s => s.satScore).length)
+    : 0
+  const avgLessons = total > 0 ? Math.round(students.reduce((a, s) => a + s.onlineCourses, 0) / total) : 0
+  const avgAI = total > 0 ? Math.round(students.reduce((a, s) => a + s.aiUsage, 0) / total) : 0
+
+  return { students, stats: { total, avgSAT, avgLessons, avgAI } }
+}
+
 // Admin: get all stats
 export async function getAdminStats() {
   const supabase = await createClient()

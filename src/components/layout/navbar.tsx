@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname, useRouter } from 'next/navigation'
-import { Search, Bell, LayoutGrid, Tv, MessageSquare, Calculator, Star, LogOut, User, Menu, X } from 'lucide-react'
+import { Search, Bell, LayoutGrid, Tv, MessageSquare, Calculator, Star, LogOut, User, Menu, X, Users } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { createClient } from '@/lib/supabase/client'
 import { useEffect, useState } from 'react'
@@ -23,12 +23,14 @@ export function Navbar() {
   const [userName, setUserName] = useState('Usuário')
   const [menuOpen, setMenuOpen] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [isGestor, setIsGestor] = useState(false)
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (user) {
         const name = user.user_metadata?.full_name || user.email?.split('@')[0] || 'Usuário'
         setUserName(name.split(' ')[0])
+        if (user.email?.endsWith('@hopon.academy')) setIsGestor(true)
       }
     })
   }, [])
@@ -71,6 +73,20 @@ export function Navbar() {
               </Link>
             )
           })}
+          {isGestor && (
+            <Link
+              href="/admin"
+              className={cn(
+                'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-colors',
+                pathname === '/admin' || pathname.startsWith('/admin/')
+                  ? 'bg-[#0057b8] text-white'
+                  : 'text-[#1b2232] hover:bg-[#f3f5f7]'
+              )}
+            >
+              <Users size={15} />
+              Gestor
+            </Link>
+          )}
         </div>
 
         {/* Right side */}
@@ -160,6 +176,21 @@ export function Navbar() {
                 </Link>
               )
             })}
+            {isGestor && (
+              <Link
+                href="/admin"
+                onClick={() => setMobileMenuOpen(false)}
+                className={cn(
+                  'flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-medium transition-colors',
+                  pathname === '/admin' || pathname.startsWith('/admin/')
+                    ? 'bg-[#0057b8] text-white'
+                    : 'text-[#1b2232] hover:bg-[#f3f5f7]'
+                )}
+              >
+                <Users size={16} />
+                Gestor
+              </Link>
+            )}
           </div>
 
           {/* Search input */}
