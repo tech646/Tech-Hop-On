@@ -75,13 +75,13 @@ export default function LoginPage() {
           </div>
 
           {/* CTA card */}
-          <Link href="/diagnostico" className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-4 flex items-center gap-4 hover:bg-white/10 transition-colors">
+          <Link href="/diagnostico" className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl px-4 py-3 flex items-center gap-4 hover:bg-white/10 transition-colors">
             <div className="w-12 h-12 rounded-full bg-[#2b7fff]/20 border border-[#2b7fff]/30 flex items-center justify-center shrink-0">
               <div className="w-6 h-6 rounded-full bg-[#0f111a]" />
             </div>
             <div>
-              <p className="text-[#0f111a] font-semibold text-base">Quer saber mais?</p>
-              <p className="text-[#0f111a]/70 text-sm">Clique aqui e faça o teste para saber como a Hop On pode te ajudar!</p>
+              <p className="text-[#0f111a] font-medium text-[24px] leading-tight">Quer saber mais?</p>
+              <p className="text-[#0f111a]/70 text-base mt-0.5">Clique aqui e faça o teste para saber como a Hop On pode te ajudar!</p>
             </div>
           </Link>
         </div>
