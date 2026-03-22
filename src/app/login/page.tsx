@@ -20,11 +20,23 @@ export default function LoginPage() {
     e.preventDefault()
     setLoading(true)
     setError('')
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password })
     if (error) {
       setError('Email ou senha incorretos.')
       setLoading(false)
     } else {
+      // Check if diagnostic completed
+      if (data.user) {
+        const { data: diag } = await supabase
+          .from('diagnostic_results_v2')
+          .select('user_id')
+          .eq('user_id', data.user.id)
+          .single()
+        if (!diag) {
+          router.push('/diagnostico')
+          return
+        }
+      }
       router.push('/home')
     }
   }
@@ -63,7 +75,7 @@ export default function LoginPage() {
           </div>
 
           {/* CTA card */}
-          <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-4 flex items-center gap-4">
+          <Link href="/diagnostico" className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-4 flex items-center gap-4 hover:bg-white/10 transition-colors">
             <div className="w-12 h-12 rounded-full bg-[#2b7fff]/20 border border-[#2b7fff]/30 flex items-center justify-center shrink-0">
               <div className="w-6 h-6 rounded-full bg-[#0f111a]" />
             </div>
@@ -71,7 +83,7 @@ export default function LoginPage() {
               <p className="text-[#0f111a] font-semibold text-base">Quer saber mais?</p>
               <p className="text-[#0f111a]/70 text-sm">Clique aqui e faça o teste para saber como a Hop On pode te ajudar!</p>
             </div>
-          </div>
+          </Link>
         </div>
 
         {/* Right panel */}
