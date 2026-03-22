@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { ArrowLeft } from 'lucide-react'
 
 const founders = [
@@ -6,14 +7,14 @@ const founders = [
     name: 'Anelisa Macedo',
     role: 'Founder',
     aka: 'Also known as Mrs Brighta',
-    emoji: '👩‍🏫',
+    image: '/images/brighta.png',
     bio: '+35 anos no mercado de educação. Experiência com processos de admissão ultra-seletivos (nacionais e internacionais, incluindo bolsas de estudo). Atua no desenvolvimento de estratégias personalizadas para potencializar as chances de aprovação de estudantes em universidades de excelência. Mestre em Educação pela Harvard Graduate School of Education.',
   },
   {
     name: 'Ana Paula Camargo',
     role: 'Founder',
     aka: 'Also known as Promptie',
-    emoji: '👩‍💻',
+    image: '/images/ana-paula.png',
     bio: 'Gestora de times de engenharia de AI, mestre em educação pela Tampere University (Finlândia), com mais de 20 anos de experiência em trilhas de aprendizagem e soluções em educação em meios digitais e gestão educacional e 3° setor.',
   },
 ]
@@ -32,7 +33,6 @@ export default function QuemSomosPage() {
       </Link>
 
       <div className="flex items-center gap-2 mb-2">
-        <span className="text-2xl">💡</span>
         <h1 className="text-3xl font-bold text-[#1b2232]">Quem somos</h1>
       </div>
       <p className="text-[#65758b] mb-8">Conheça a história por trás da Hop On.</p>
@@ -40,7 +40,9 @@ export default function QuemSomosPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-8">
         {founders.map(f => (
           <div key={f.name} className="bg-white rounded-2xl border border-[#e1e7ef] p-6 text-center">
-            <div className="text-5xl mb-3">{f.emoji}</div>
+            <div className="flex justify-center mb-3">
+            <Image src={f.image} alt={f.name} width={128} height={128} className="object-contain" />
+          </div>
             <h3 className="font-bold text-[#1b2232] text-lg">{f.name}</h3>
             <p className="text-sm text-[#65758b]">{f.role}</p>
             <p className="text-xs text-[#65758b] italic mb-4">{f.aka}</p>
@@ -61,8 +63,10 @@ export default function QuemSomosPage() {
           ✨ Conheça nossos assistentes
         </Link>
         <h2 className="text-2xl font-bold text-[#1b2232] mb-4">Somos IA, mas sabemos muito!</h2>
-        <div className="flex items-center justify-center gap-3 mb-4 text-4xl">
-          <span>🦊</span><span>🐳</span><span>🦩</span>
+        <div className="flex items-center justify-center gap-4 mb-4">
+          <Image src="/images/ia-gritty.png" alt="Gritty" width={70} height={70} className="object-contain" />
+          <Image src="/images/ia-smartle.png" alt="Smartle" width={70} height={70} className="object-contain" />
+          <Image src="/images/ia-wan.png" alt="Wan" width={70} height={70} className="object-contain" />
         </div>
         <p className="text-[#65758b] leading-relaxed max-w-xl mx-auto mb-2">
           Nossos personagens são inteligências artificiais treinadas com uma base de conhecimento intensiva e especializada em estudar fora.
