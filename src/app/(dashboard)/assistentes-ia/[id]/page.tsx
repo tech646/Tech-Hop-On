@@ -63,14 +63,24 @@ export default function AssistantChatPage({ params }: { params: Promise<{ id: st
     setMessages(prev => [...prev, { role: 'user', content: userMsg }])
     setLoading(true)
 
-    // Simulate AI response
-    setTimeout(() => {
-      setMessages(prev => [...prev, {
-        role: 'assistant',
-        content: `Entendi sua mensagem! Como ${assistant.name}, estou aqui para te ajudar. Para uma resposta personalizada, conecte a IA via Supabase Edge Functions. Por enquanto, continue me fazendo perguntas!`
-      }])
+    try {
+      const history = [...messages, { role: 'user', content: userMsg }]
+      const geminiMessages = history.map(m => ({
+        role: m.role === 'user' ? 'user' : 'model',
+        parts: [{ text: m.content }],
+      }))
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ assistantId: id, messages: geminiMessages }),
+      })
+      const data = await res.json()
+      setMessages(prev => [...prev, { role: 'assistant', content: data.text || 'Erro ao obter resposta.' }])
+    } catch {
+      setMessages(prev => [...prev, { role: 'assistant', content: 'Erro ao conectar com a IA. Tente novamente.' }])
+    } finally {
       setLoading(false)
-    }, 1000)
+    }
   }
 
   return (

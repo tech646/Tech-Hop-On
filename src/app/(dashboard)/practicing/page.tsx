@@ -22,13 +22,24 @@ export default function PracticingPage() {
     setInput('')
     setMessages(prev => [...prev, { role: 'user', content: userMsg }])
     setLoading(true)
-    setTimeout(() => {
-      setMessages(prev => [...prev, {
-        role: 'assistant',
-        content: 'Ótima resposta! Aqui está uma questão no estilo SAT:\n\n**Reading: The following passage is adapted from a 2023 article about climate change.**\n\nA: The author primarily argues that...\nB: Climate policies need immediate reform...\nC: Scientific consensus must be reconsidered...\nD: Local governments should take action...\n\nQual alternativa você escolhe?'
-      }])
+    try {
+      const history = [...messages, { role: 'user', content: userMsg }]
+      const geminiMessages = history.map(m => ({
+        role: m.role === 'user' ? 'user' : 'model',
+        parts: [{ text: m.content }],
+      }))
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ assistantId: 'sat', messages: geminiMessages }),
+      })
+      const data = await res.json()
+      setMessages(prev => [...prev, { role: 'assistant', content: data.text || 'Erro ao obter resposta.' }])
+    } catch {
+      setMessages(prev => [...prev, { role: 'assistant', content: 'Erro ao conectar com a IA. Tente novamente.' }])
+    } finally {
       setLoading(false)
-    }, 1000)
+    }
   }
 
   return (
