@@ -124,7 +124,7 @@ export type MathAppointment = {
 export type UserCollege = {
   id: string
   user_id: string
-  college_name: string
+  name: string
   category: 'dream' | 'target' | 'safety'
   created_at: string
 }

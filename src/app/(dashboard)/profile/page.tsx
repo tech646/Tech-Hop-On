@@ -2,84 +2,159 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { ArrowLeft, Edit2, Plus, Trash2, ExternalLink, RefreshCw } from 'lucide-react'
+import { ArrowLeft, Edit2, Plus, Trash2, RefreshCw, X, Loader2 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import type { UserCollege, SATResult } from '@/types'
 
 type Tab = 'perfil' | 'plano'
 
-const PLANS = [
-  { key: 'gratuito', name: 'Gratuito', price: 'Grátis', period: '', desc: 'Acesso ao login e avaliação diagnóstica. Sem acesso a aulas ou assistentes.', active: false, cta: 'Gratuito' },
-  { key: 'mensal', name: 'Mensal', price: 'R$ 450', period: '/mês', desc: 'Flexibilidade total, sem fidelidade. Direito a duas (2) aulas com especialistas por semana.', active: false, cta: 'Trocar para Mensal' },
-  { key: 'semestral', name: 'Semestral', price: 'R$ 380', period: '/mês', desc: '6 meses de acesso com desconto. Direito a três (3) aulas com especialistas por semana.', total: 'R$2.280,00 total', savings: 'Economia de R$420', active: false, cta: 'Trocar para Semestral' },
-  { key: 'anual', name: 'Anual', price: 'R$ 290', period: '/mês', desc: '12 meses — o melhor custo-benefício para quem leva a sério o sonho de estudar fora. Direito a quatro (4) aulas com especialistas por semana.', total: 'R$3.480,00 total', savings: 'Economia de R$1.920', active: false, cta: 'Trocar para Anual', recommended: true },
-]
-
-type CollegeRow = UserCollege & { location?: string; deadline?: string; acceptance?: string }
-type CollegeCategoryLabel = 'Dream/Sonho' | 'Target/Provável' | 'Safety/Segura'
-
-const categoryMap: Record<UserCollege['category'], CollegeCategoryLabel> = {
+const categoryMap: Record<UserCollege['category'], string> = {
   dream: 'Dream/Sonho',
   target: 'Target/Provável',
   safety: 'Safety/Segura',
+}
+
+type ProfileData = {
+  email: string
+  name: string
+  created: string
+  phone: string
+  city: string
+  school: string
 }
 
 export default function ProfilePage() {
   const [tab, setTab] = useState<Tab>('perfil')
   const supabase = createClient()
   const router = useRouter()
-  const [user, setUser] = useState<{ email: string; name: string; created: string; phone?: string | null; city?: string | null; school?: string | null } | null>(null)
-  const [colleges, setColleges] = useState<CollegeRow[]>([])
+  const [userId, setUserId] = useState<string | null>(null)
+  const [user, setUser] = useState<ProfileData | null>(null)
+  const [colleges, setColleges] = useState<UserCollege[]>([])
   const [satHistory, setSatHistory] = useState<Pick<SATResult, 'score' | 'created_at'>[]>([])
 
+  // Edit profile modal
+  const [editOpen, setEditOpen] = useState(false)
+  const [editForm, setEditForm] = useState({ name: '', phone: '', city: '', school: '' })
+  const [editSaving, setEditSaving] = useState(false)
+  const [editError, setEditError] = useState('')
+
+  // Add college modal
+  const [addCollegeOpen, setAddCollegeOpen] = useState(false)
+  const [collegeForm, setCollegeForm] = useState({ name: '', category: 'dream' as UserCollege['category'] })
+  const [collegeSaving, setCollegeSaving] = useState(false)
+  const [collegeError, setCollegeError] = useState('')
+
   useEffect(() => {
-    const supabaseClient = createClient()
-    supabaseClient.auth.getUser().then(async ({ data: { user: authUser } }) => {
-      if (authUser) {
-        setUser({
-          email: authUser.email || '',
-          name: authUser.user_metadata?.full_name || authUser.email?.split('@')[0] || 'Usuário',
-          created: new Date(authUser.created_at).getFullYear().toString(),
-        })
-        // Fetch profile for extra fields
-        const { data: profile } = await supabaseClient
-          .from('profiles')
-          .select('phone, city, school')
-          .eq('id', authUser.id)
-          .maybeSingle()
-        if (profile) {
-          setUser(prev => prev ? { ...prev, phone: profile.phone, city: profile.city, school: profile.school } : prev)
-        }
-        // Fetch colleges
-        const { data: collegesData } = await supabaseClient
-          .from('user_colleges')
-          .select('*')
-          .eq('user_id', authUser.id)
-          .order('created_at')
-        setColleges((collegesData as CollegeRow[]) ?? [])
-        // Fetch SAT history
-        const { data: satData } = await supabaseClient
-          .from('sat_practice_results')
-          .select('score, created_at')
-          .eq('user_id', authUser.id)
-          .order('created_at', { ascending: false })
-          .limit(5)
-        setSatHistory(satData ?? [])
+    supabase.auth.getUser().then(async ({ data: { user: authUser } }) => {
+      if (!authUser) return
+      setUserId(authUser.id)
+      const base = {
+        email: authUser.email || '',
+        name: authUser.user_metadata?.full_name || authUser.email?.split('@')[0] || 'Usuário',
+        created: new Date(authUser.created_at).getFullYear().toString(),
+        phone: '',
+        city: '',
+        school: '',
       }
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('full_name, phone, city, school')
+        .eq('id', authUser.id)
+        .maybeSingle()
+      if (profile) {
+        base.name = profile.full_name || base.name
+        base.phone = profile.phone || ''
+        base.city = profile.city || ''
+        base.school = profile.school || ''
+      }
+      setUser(base)
+
+      const { data: collegesData } = await supabase
+        .from('user_colleges')
+        .select('*')
+        .eq('user_id', authUser.id)
+        .order('created_at')
+      setColleges((collegesData as UserCollege[]) ?? [])
+
+      const { data: satData } = await supabase
+        .from('sat_practice_results')
+        .select('score, created_at')
+        .eq('user_id', authUser.id)
+        .order('created_at', { ascending: false })
+        .limit(5)
+      setSatHistory(satData ?? [])
     })
   }, [])
 
+  // ── Edit profile ────────────────────────────────────────────────────────────
+  function openEdit() {
+    setEditForm({
+      name: user?.name || '',
+      phone: user?.phone || '',
+      city: user?.city || '',
+      school: user?.school || '',
+    })
+    setEditError('')
+    setEditOpen(true)
+  }
+
+  async function handleSaveProfile(e: React.FormEvent) {
+    e.preventDefault()
+    if (!userId) return
+    setEditSaving(true)
+    setEditError('')
+    const { error } = await supabase
+      .from('profiles')
+      .upsert({
+        id: userId,
+        full_name: editForm.name,
+        phone: editForm.phone,
+        city: editForm.city,
+        school: editForm.school,
+        updated_at: new Date().toISOString(),
+      }, { onConflict: 'id' })
+    setEditSaving(false)
+    if (error) { setEditError('Erro ao salvar. Tente novamente.'); return }
+    setUser(prev => prev ? { ...prev, name: editForm.name, phone: editForm.phone, city: editForm.city, school: editForm.school } : prev)
+    setEditOpen(false)
+  }
+
+  // ── Add college ─────────────────────────────────────────────────────────────
+  function openAddCollege() {
+    setCollegeForm({ name: '', category: 'dream' })
+    setCollegeError('')
+    setAddCollegeOpen(true)
+  }
+
+  async function handleAddCollege(e: React.FormEvent) {
+    e.preventDefault()
+    if (!userId || !collegeForm.name.trim()) { setCollegeError('Informe o nome da universidade.'); return }
+    setCollegeSaving(true)
+    setCollegeError('')
+    const { data, error } = await supabase
+      .from('user_colleges')
+      .insert({ user_id: userId, name: collegeForm.name.trim(), category: collegeForm.category })
+      .select()
+      .single()
+    setCollegeSaving(false)
+    if (error) { setCollegeError('Erro ao adicionar. Tente novamente.'); return }
+    setColleges(prev => [...prev, data as UserCollege])
+    setAddCollegeOpen(false)
+  }
+
+  // ── Delete college ──────────────────────────────────────────────────────────
+  async function handleDeleteCollege(id: string) {
+    if (!confirm('Remover esta universidade da sua lista?')) return
+    await supabase.from('user_colleges').delete().eq('id', id)
+    setColleges(prev => prev.filter(c => c.id !== id))
+  }
+
+  // ── Delete account ──────────────────────────────────────────────────────────
   async function handleDelete() {
     if (!confirm('Tem certeza que deseja deletar sua conta? Esta ação é irreversível.')) return
     await supabase.auth.signOut()
     router.push('/login')
-  }
-
-  const categoryColors: Record<string, string> = {
-    'Dream/Sonho': 'text-[#1b2232]',
-    'Target/Provável': 'text-[#1b2232]',
-    'Safety/Segura': 'text-[#1b2232]',
   }
 
   return (
@@ -88,7 +163,7 @@ export default function ProfilePage() {
         <ArrowLeft size={14} /> Voltar para home
       </Link>
 
-      {/* Header card */}
+      {/* Header */}
       <div className="bg-[#1f2c47] rounded-2xl p-6 flex items-center gap-4 mb-4">
         <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-white text-xl">👤</div>
         <div>
@@ -99,7 +174,7 @@ export default function ProfilePage() {
 
       {/* Tabs */}
       <div className="flex bg-white rounded-xl border border-[#e1e7ef] mb-6 p-1 overflow-x-auto">
-        {[{key:'perfil',label:'Meu Perfil'},{key:'plano',label:'Meu Plano'}].map(t => (
+        {[{ key: 'perfil', label: 'Meu Perfil' }, { key: 'plano', label: 'Meu Plano' }].map(t => (
           <button
             key={t.key}
             onClick={() => setTab(t.key as Tab)}
@@ -116,7 +191,10 @@ export default function ProfilePage() {
           <div className="bg-white rounded-2xl border border-[#e1e7ef] p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="font-bold text-[#1b2232] text-lg">Informações Pessoais</h2>
-              <button className="flex items-center gap-1.5 text-[#0057b8] text-sm font-medium">
+              <button
+                onClick={openEdit}
+                className="flex items-center gap-1.5 text-[#0057b8] text-sm font-medium hover:underline"
+              >
                 <Edit2 size={14} /> Editar meu perfil
               </button>
             </div>
@@ -124,9 +202,9 @@ export default function ProfilePage() {
             <div className="flex items-center gap-4 mb-6 p-4 bg-[#f3f5f7] rounded-xl">
               <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center text-2xl">👤</div>
               <div>
-                <p className="font-bold text-[#1b2232]">{user?.name || 'Maria Silva'}</p>
-                <p className="text-sm text-[#65758b]">{user?.email || 'maria.silva@email.com'}</p>
-                <p className="text-xs text-[#65758b]">Membro desde janeiro de 2024</p>
+                <p className="font-bold text-[#1b2232]">{user?.name || '—'}</p>
+                <p className="text-sm text-[#65758b]">{user?.email || '—'}</p>
+                <p className="text-xs text-[#65758b]">Membro desde {user?.created}</p>
               </div>
             </div>
 
@@ -153,18 +231,20 @@ export default function ProfilePage() {
                 <h2 className="font-bold text-[#1b2232] text-lg">Minha lista de College</h2>
                 <p className="text-xs text-[#65758b]">Organize suas universidades por estratégia de application.</p>
               </div>
-              <button className="flex items-center gap-1.5 bg-[#0057b8] text-white text-sm px-3 py-1.5 rounded-xl font-medium">
+              <button
+                onClick={openAddCollege}
+                className="flex items-center gap-1.5 bg-[#0057b8] hover:bg-[#0046a0] text-white text-sm px-3 py-1.5 rounded-xl font-medium transition-colors"
+              >
                 <Plus size={14} /> Adicionar College
               </button>
             </div>
 
-            {/* Category tabs */}
-            <div className="flex gap-2 mb-4">
+            <div className="flex gap-2 mb-4 flex-wrap">
               {(['dream', 'target', 'safety'] as const).map(cat => {
                 const count = colleges.filter(c => c.category === cat).length
                 return (
                   <span key={cat} className="text-xs border border-[#e1e7ef] rounded-full px-3 py-1 text-[#65758b] flex items-center gap-1">
-                    <span>🎯</span>{count} {categoryMap[cat]}
+                    🎯 {count} {categoryMap[cat]}
                   </span>
                 )
               })}
@@ -177,26 +257,28 @@ export default function ProfilePage() {
             {(['dream', 'target', 'safety'] as const).map(cat => {
               const catColleges = colleges.filter(c => c.category === cat)
               if (catColleges.length === 0) return null
-              const label = categoryMap[cat]
               return (
-              <div key={cat} className="mb-4">
-                <div className="flex items-center gap-1.5 text-sm font-semibold text-[#1b2232] mb-2">
-                  <span>🎯</span> {label}
-                  <span className="text-xs font-normal text-[#65758b]">
-                    {cat === 'dream' ? 'Universidades muito competitivas, chances remotas mas vale tentar.' :
-                     cat === 'target' ? 'Universidades com histórico de admissão no seu perfil.' :
-                     'Altas chances de admissão, opções de backup.'}
-                  </span>
-                </div>
-                {catColleges.map(college => (
-                  <div key={college.id} className="flex items-center gap-3 py-2.5 border-b border-[#f3f5f7] last:border-0">
-                    <div className="flex-1">
-                      <p className="text-sm font-bold text-[#1b2232]">{college.college_name}</p>
-                    </div>
-                    <button className="text-[#65758b] hover:text-red-500"><Trash2 size={14} /></button>
+                <div key={cat} className="mb-4">
+                  <div className="flex items-center gap-1.5 text-sm font-semibold text-[#1b2232] mb-2">
+                    🎯 {categoryMap[cat]}
+                    <span className="text-xs font-normal text-[#65758b]">
+                      {cat === 'dream' ? '— Muito competitivas, vale tentar.' :
+                       cat === 'target' ? '— Bom fit com seu perfil.' :
+                       '— Altas chances de admissão.'}
+                    </span>
                   </div>
-                ))}
-              </div>
+                  {catColleges.map(college => (
+                    <div key={college.id} className="flex items-center gap-3 py-2.5 border-b border-[#f3f5f7] last:border-0">
+                      <p className="flex-1 text-sm font-bold text-[#1b2232]">{college.name}</p>
+                      <button
+                        onClick={() => handleDeleteCollege(college.id)}
+                        className="text-[#65758b] hover:text-red-500 transition-colors"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
               )
             })}
           </div>
@@ -221,25 +303,9 @@ export default function ProfilePage() {
                 </p>
               </>
             )}
-            <button className="w-full bg-[#1f2c47] hover:bg-[#0057b8] text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition-colors text-sm">
+            <Link href="/practicing" className="w-full bg-[#1f2c47] hover:bg-[#0057b8] text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition-colors text-sm">
               <RefreshCw size={14} /> Refazer Prática SAT
-            </button>
-          </div>
-
-          {/* Progress */}
-          <div className="bg-white rounded-2xl border border-[#e1e7ef] p-6">
-            <h2 className="font-bold text-[#1b2232] text-lg mb-4">Seu progresso</h2>
-            {[
-              { label: 'Aulas concluídas', value: '24/36' },
-              { label: 'Exercícios Feitos', value: '154' },
-              { label: 'Horas de Estudo', value: '41h' },
-              { label: 'Mentorias Realizadas', value: '8' },
-            ].map(({ label, value }) => (
-              <div key={label} className="flex items-center justify-between py-3 border-b border-[#f3f5f7] last:border-0">
-                <p className="text-sm text-[#1b2232]">{label}</p>
-                <p className="text-sm font-bold text-[#1b2232]">{value}</p>
-              </div>
-            ))}
+            </Link>
           </div>
 
           {/* Delete */}
@@ -251,73 +317,49 @@ export default function ProfilePage() {
 
       {tab === 'plano' && (
         <div className="space-y-4">
-          {/* Current plan */}
           <div className="bg-[#1f2c47] rounded-2xl p-5 flex items-start gap-3">
             <span className="text-2xl mt-0.5">👑</span>
             <div>
               <p className="text-xs font-medium text-white/60 uppercase tracking-wide mb-1">Seu plano atual</p>
-              <p className="text-2xl font-bold text-white">Plano Mensal</p>
-              <p className="text-sm text-white/70 mt-1">Próxima cobrança <span className="font-bold text-white">01/04/2026</span> <span className="font-bold text-white">R$ 450,00</span></p>
+              <p className="text-2xl font-bold text-white">Plano Gratuito</p>
             </div>
           </div>
 
           <div className="bg-white rounded-2xl border border-[#e1e7ef] p-6">
             <h2 className="font-bold text-[#1b2232] text-lg mb-1">Escolha seu plano</h2>
             <p className="text-sm text-[#65758b] mb-5">Preparar-se para estudar fora é um processo de anos. Quanto mais tempo, melhor o custo-benefício.</p>
-
             <div className="space-y-3">
-              {/* Gratuito */}
               <div className="border-2 border-[#e1e7ef] rounded-2xl p-4 flex items-center justify-between">
                 <div>
                   <div className="flex items-center gap-2">
                     <span className="font-bold text-[#1b2232]">Gratuito</span>
-                    <span className="text-xs bg-[#f3f5f7] text-[#65758b] px-2 py-0.5 rounded-full flex items-center gap-1">✓ Ativo</span>
+                    <span className="text-xs bg-[#f3f5f7] text-[#65758b] px-2 py-0.5 rounded-full">✓ Ativo</span>
                   </div>
                   <p className="text-sm text-[#65758b] mt-1">Acesso ao login e avaliação diagnóstica. Sem acesso a aulas ou assistentes.</p>
                 </div>
                 <span className="font-bold text-[#1b2232] text-xl ml-4 shrink-0">Grátis</span>
               </div>
-
-              {/* Mensal */}
-              <div className="border-2 border-[#e1e7ef] rounded-2xl p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="font-bold text-[#1b2232]">Mensal</span>
-                  <div className="text-right"><span className="text-xl font-bold text-[#1b2232]">R$ 450</span><span className="text-sm text-[#65758b]">/mês</span></div>
+              {[
+                { name: 'Mensal', price: 'R$ 450', period: '/mês', desc: 'Flexibilidade total. Direito a 2 aulas com especialistas por semana.' },
+                { name: 'Semestral', price: 'R$ 380', period: '/mês', desc: '6 meses com desconto. 3 aulas/semana.', total: 'R$2.280 total', savings: 'Economia de R$420' },
+                { name: 'Anual', price: 'R$ 290', period: '/mês', desc: '12 meses — melhor custo-benefício. 4 aulas/semana.', total: 'R$3.480 total', savings: 'Economia de R$1.920', recommended: true },
+              ].map(p => (
+                <div key={p.name} className={`border-2 rounded-2xl p-4 ${p.recommended ? 'border-[#ff9500]' : 'border-[#e1e7ef]'} relative`}>
+                  {p.recommended && <div className="absolute -top-3 left-4 bg-[#ff9500] text-white text-xs font-bold px-3 py-1 rounded-full">🏆 Recomendado</div>}
+                  <div className="flex items-center justify-between mb-2 mt-1">
+                    <span className="font-bold text-[#1b2232]">{p.name}</span>
+                    <div className="text-right"><span className="text-xl font-bold text-[#1b2232]">{p.price}</span><span className="text-sm text-[#65758b]">{p.period}</span></div>
+                  </div>
+                  <p className="text-sm text-[#65758b] mb-2">{p.desc}</p>
+                  {p.savings && <span className="text-xs bg-[#f0fdf4] text-[#22c55e] px-2 py-0.5 rounded-full font-medium mb-3 inline-block">{p.savings}</span>}
+                  <button className="w-full bg-[#ff9500] hover:bg-orange-500 text-white font-bold py-2.5 rounded-xl text-sm transition-colors block mt-2">
+                    Escolher {p.name}
+                  </button>
                 </div>
-                <p className="text-sm text-[#65758b] mb-3">Flexibilidade total, sem fidelidade. Direito a duas (2) aulas com especialistas por semana.</p>
-                <button className="w-full bg-[#ff9500] hover:bg-orange-500 text-white font-bold py-2.5 rounded-xl text-sm transition-colors">Trocar para Mensal</button>
-              </div>
-
-              {/* Semestral */}
-              <div className="border-2 border-[#e1e7ef] rounded-2xl p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="font-bold text-[#1b2232]">Semestral</span>
-                  <div className="text-right"><span className="text-xl font-bold text-[#1b2232]">R$ 380</span><span className="text-sm text-[#65758b]">/mês</span></div>
-                </div>
-                <p className="text-sm text-[#65758b] mb-2">6 meses de acesso com desconto. Direito a três (3) aulas com especialistas por semana.</p>
-                <div className="text-right text-xs text-[#65758b] mb-2">R$2.280,00 total</div>
-                <span className="text-xs bg-[#f0fdf4] text-[#22c55e] px-2 py-0.5 rounded-full font-medium mb-3 inline-block">Economia de R$420</span>
-                <button className="w-full bg-[#ff9500] hover:bg-orange-500 text-white font-bold py-2.5 rounded-xl text-sm transition-colors block">Trocar para Semestral</button>
-              </div>
-
-              {/* Anual */}
-              <div className="border-2 border-[#ff9500] rounded-2xl p-4 relative">
-                <div className="absolute -top-3 left-4 bg-[#ff9500] text-white text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1">
-                  🏆 Recomendado
-                </div>
-                <div className="flex items-center justify-between mb-2 mt-2">
-                  <span className="font-bold text-[#1b2232]">Anual</span>
-                  <div className="text-right"><span className="text-xl font-bold text-[#1b2232]">R$ 290</span><span className="text-sm text-[#65758b]">/mês</span></div>
-                </div>
-                <p className="text-sm text-[#65758b] mb-2">12 meses — o melhor custo-benefício para quem leva a sério o sonho de estudar fora. Direito a quatro (4) aulas com especialistas por semana.</p>
-                <div className="text-right text-xs text-[#65758b] mb-2">R$3.480,00 total</div>
-                <span className="text-xs bg-[#f0fdf4] text-[#22c55e] px-2 py-0.5 rounded-full font-medium mb-3 inline-block">Economia de R$1.920</span>
-                <button className="w-full bg-[#ff9500] hover:bg-orange-500 text-white font-bold py-2.5 rounded-xl text-sm transition-colors block">Trocar para Anual</button>
-              </div>
+              ))}
             </div>
           </div>
 
-          {/* FAQ */}
           <div className="bg-white rounded-2xl border border-[#e1e7ef] p-6">
             <h2 className="font-bold text-[#1b2232] text-lg mb-4">Perguntas frequentes</h2>
             {[
@@ -335,6 +377,132 @@ export default function ProfilePage() {
           <Link href="/cancelamento" className="block text-center text-sm text-[#65758b] hover:text-red-500 transition-colors">
             Cancelar assinatura
           </Link>
+        </div>
+      )}
+
+      {/* ── Modal: Editar Perfil ──────────────────────────────────────────────── */}
+      {editOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl w-full max-w-[480px] shadow-xl">
+            <div className="flex items-center justify-between p-6 border-b border-[#e1e7ef]">
+              <h3 className="font-bold text-[#1b2232] text-lg">Editar Perfil</h3>
+              <button onClick={() => setEditOpen(false)} className="text-[#65758b] hover:text-[#1b2232]">
+                <X size={20} />
+              </button>
+            </div>
+            <form onSubmit={handleSaveProfile} className="p-6 space-y-4">
+              <div>
+                <label className="block text-xs font-medium text-[#65758b] mb-1">Nome completo</label>
+                <input
+                  value={editForm.name}
+                  onChange={e => setEditForm(f => ({ ...f, name: e.target.value }))}
+                  placeholder="Seu nome"
+                  className="w-full border border-[#e1e7ef] rounded-xl px-4 py-2.5 text-sm text-[#1b2232] outline-none focus:border-[#0057b8] transition-colors"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-[#65758b] mb-1">Telefone</label>
+                <input
+                  value={editForm.phone}
+                  onChange={e => setEditForm(f => ({ ...f, phone: e.target.value }))}
+                  placeholder="+55 11 99999-9999"
+                  className="w-full border border-[#e1e7ef] rounded-xl px-4 py-2.5 text-sm text-[#1b2232] outline-none focus:border-[#0057b8] transition-colors"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-[#65758b] mb-1">Cidade</label>
+                <input
+                  value={editForm.city}
+                  onChange={e => setEditForm(f => ({ ...f, city: e.target.value }))}
+                  placeholder="São Paulo"
+                  className="w-full border border-[#e1e7ef] rounded-xl px-4 py-2.5 text-sm text-[#1b2232] outline-none focus:border-[#0057b8] transition-colors"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-[#65758b] mb-1">Escola atual</label>
+                <input
+                  value={editForm.school}
+                  onChange={e => setEditForm(f => ({ ...f, school: e.target.value }))}
+                  placeholder="Nome da escola"
+                  className="w-full border border-[#e1e7ef] rounded-xl px-4 py-2.5 text-sm text-[#1b2232] outline-none focus:border-[#0057b8] transition-colors"
+                />
+              </div>
+              {editError && <p className="text-red-500 text-sm">{editError}</p>}
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setEditOpen(false)}
+                  className="flex-1 border border-[#e1e7ef] text-[#65758b] font-medium py-2.5 rounded-xl text-sm hover:bg-[#f3f5f7] transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  disabled={editSaving}
+                  className="flex-1 bg-[#0057b8] hover:bg-[#0046a0] disabled:opacity-60 text-white font-bold py-2.5 rounded-xl text-sm flex items-center justify-center gap-2 transition-colors"
+                >
+                  {editSaving ? <Loader2 size={14} className="animate-spin" /> : null}
+                  Salvar
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ── Modal: Adicionar College ──────────────────────────────────────────── */}
+      {addCollegeOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl w-full max-w-[420px] shadow-xl">
+            <div className="flex items-center justify-between p-6 border-b border-[#e1e7ef]">
+              <h3 className="font-bold text-[#1b2232] text-lg">Adicionar College</h3>
+              <button onClick={() => setAddCollegeOpen(false)} className="text-[#65758b] hover:text-[#1b2232]">
+                <X size={20} />
+              </button>
+            </div>
+            <form onSubmit={handleAddCollege} className="p-6 space-y-4">
+              <div>
+                <label className="block text-xs font-medium text-[#65758b] mb-1">Nome da universidade</label>
+                <input
+                  value={collegeForm.name}
+                  onChange={e => setCollegeForm(f => ({ ...f, name: e.target.value }))}
+                  placeholder="Ex: MIT, Harvard, UCLA..."
+                  className="w-full border border-[#e1e7ef] rounded-xl px-4 py-2.5 text-sm text-[#1b2232] outline-none focus:border-[#0057b8] transition-colors"
+                  autoFocus
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-[#65758b] mb-1">Categoria</label>
+                <select
+                  value={collegeForm.category}
+                  onChange={e => setCollegeForm(f => ({ ...f, category: e.target.value as UserCollege['category'] }))}
+                  className="w-full border border-[#e1e7ef] rounded-xl px-4 py-2.5 text-sm text-[#1b2232] outline-none focus:border-[#0057b8] transition-colors bg-white"
+                >
+                  <option value="dream">🎯 Dream/Sonho — Muito competitiva</option>
+                  <option value="target">🎯 Target/Provável — Bom fit com meu perfil</option>
+                  <option value="safety">🎯 Safety/Segura — Altas chances de admissão</option>
+                </select>
+              </div>
+              {collegeError && <p className="text-red-500 text-sm">{collegeError}</p>}
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setAddCollegeOpen(false)}
+                  className="flex-1 border border-[#e1e7ef] text-[#65758b] font-medium py-2.5 rounded-xl text-sm hover:bg-[#f3f5f7] transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  disabled={collegeSaving}
+                  className="flex-1 bg-[#0057b8] hover:bg-[#0046a0] disabled:opacity-60 text-white font-bold py-2.5 rounded-xl text-sm flex items-center justify-center gap-2 transition-colors"
+                >
+                  {collegeSaving ? <Loader2 size={14} className="animate-spin" /> : null}
+                  Adicionar
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
     </div>
