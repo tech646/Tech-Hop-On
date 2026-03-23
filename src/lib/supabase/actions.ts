@@ -33,8 +33,13 @@ export async function getUserStats(userId: string) {
   ])
 
   const completedLessons = lessonsResult.count ?? 0
-  const totalSeconds = (hoursResult.data ?? []).reduce((acc, r) => acc + (r.watched_seconds ?? 0), 0)
-  const studyHours = Math.round(totalSeconds / 3600)
+  const videoSeconds = (hoursResult.data ?? []).reduce((acc, r) => acc + (r.watched_seconds ?? 0), 0)
+  const userAiMessages = (aiResult.data ?? []).reduce((acc, r) => {
+    const msgs = (r.messages as Array<{ role: string }>) ?? []
+    return acc + msgs.filter(m => m.role === 'user').length
+  }, 0)
+  const aiSeconds = userAiMessages * 2 * 60 // 2 min per user message
+  const studyHours = Math.round((videoSeconds + aiSeconds) / 3600)
   const latestSAT = satResult.data?.score ?? null
   const aiMessages = (aiResult.data ?? []).reduce((acc, r) => acc + ((r.messages as unknown[])?.length ?? 0), 0)
 
