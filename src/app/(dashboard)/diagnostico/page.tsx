@@ -59,12 +59,6 @@ const questions = [
   },
 ]
 
-const aiCharacters = [
-  { src: '/images/brighta.png', alt: 'Brighta' },
-  { src: '/images/gritty.png', alt: 'Gritty' },
-  { src: '/images/smartle.png', alt: 'Smartle' },
-  { src: '/images/wan.png', alt: 'Wan' },
-]
 
 const resultCards = [
   { src: '/images/brighta.png', alt: 'Brighta', text: 'Browse the video lessons to learn more about the English language!' },
@@ -222,17 +216,14 @@ export default function DiagnosticoPage() {
               Please fill in the information on the next form honestly and truthfully!
             </p>
 
-            <div className="flex items-center justify-center gap-4 mb-10">
-              {aiCharacters.map((char) => (
-                <Image
-                  key={char.alt}
-                  src={char.src}
-                  alt={char.alt}
-                  width={80}
-                  height={80}
-                  className="rounded-xl object-cover"
-                />
-              ))}
+            <div className="flex items-center justify-center mb-10">
+              <Image
+                src="/images/hero-illustration.png"
+                alt="Hop On characters"
+                width={248}
+                height={346}
+                className="object-contain"
+              />
             </div>
 
             <div className="flex justify-end">
