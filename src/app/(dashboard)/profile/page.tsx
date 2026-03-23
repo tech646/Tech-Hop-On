@@ -39,6 +39,26 @@ export default function ProfilePage() {
   const [editSaving, setEditSaving] = useState(false)
   const [editError, setEditError] = useState('')
 
+  // Change password modal
+  const [pwOpen, setPwOpen] = useState(false)
+  const [pwForm, setPwForm] = useState({ newPassword: '', confirm: '' })
+  const [pwSaving, setPwSaving] = useState(false)
+  const [pwError, setPwError] = useState('')
+  const [pwSuccess, setPwSuccess] = useState(false)
+
+  async function handleChangePassword(e: React.FormEvent) {
+    e.preventDefault()
+    if (pwForm.newPassword.length < 8) { setPwError('Password must be at least 8 characters.'); return }
+    if (pwForm.newPassword !== pwForm.confirm) { setPwError('Passwords do not match.'); return }
+    setPwSaving(true)
+    setPwError('')
+    const { error } = await supabase.auth.updateUser({ password: pwForm.newPassword })
+    setPwSaving(false)
+    if (error) { setPwError(error.message || 'Error updating password. Please try again.'); return }
+    setPwSuccess(true)
+    setTimeout(() => { setPwOpen(false); setPwSuccess(false); setPwForm({ newPassword: '', confirm: '' }) }, 1500)
+  }
+
   // Add college modal
   const [addCollegeOpen, setAddCollegeOpen] = useState(false)
   const [collegeForm, setCollegeForm] = useState({ name: '', category: 'dream' as UserCollege['category'] })
@@ -191,12 +211,20 @@ export default function ProfilePage() {
           <div className="bg-white rounded-2xl border border-[#e1e7ef] p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="font-bold text-[#1b2232] text-lg">Personal Information</h2>
-              <button
-                onClick={openEdit}
-                className="flex items-center gap-1.5 text-[#0057b8] text-sm font-medium hover:underline"
-              >
-                <Edit2 size={14} /> Edit my profile
-              </button>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => { setPwForm({ newPassword: '', confirm: '' }); setPwError(''); setPwSuccess(false); setPwOpen(true) }}
+                  className="flex items-center gap-1.5 text-[#65758b] text-sm font-medium hover:text-[#1b2232]"
+                >
+                  🔒 Change password
+                </button>
+                <button
+                  onClick={openEdit}
+                  className="flex items-center gap-1.5 text-[#0057b8] text-sm font-medium hover:underline"
+                >
+                  <Edit2 size={14} /> Edit my profile
+                </button>
+              </div>
             </div>
 
             <div className="flex items-center gap-4 mb-6 p-4 bg-[#f3f5f7] rounded-xl">
@@ -445,6 +473,67 @@ export default function ProfilePage() {
                   Save
                 </button>
               </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ── Modal: Change Password ───────────────────────────────────────────── */}
+      {pwOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl w-full max-w-[420px] shadow-xl">
+            <div className="flex items-center justify-between p-6 border-b border-[#e1e7ef]">
+              <h3 className="font-bold text-[#1b2232] text-lg">Change Password</h3>
+              <button onClick={() => setPwOpen(false)} className="text-[#65758b] hover:text-[#1b2232]">
+                <X size={20} />
+              </button>
+            </div>
+            <form onSubmit={handleChangePassword} className="p-6 space-y-4">
+              {pwSuccess ? (
+                <p className="text-center text-[#22c55e] font-medium py-4">✓ Password updated successfully!</p>
+              ) : (
+                <>
+                  <div>
+                    <label className="block text-xs font-medium text-[#65758b] mb-1">New password</label>
+                    <input
+                      type="password"
+                      value={pwForm.newPassword}
+                      onChange={e => setPwForm(f => ({ ...f, newPassword: e.target.value }))}
+                      placeholder="Minimum 8 characters"
+                      className="w-full border border-[#e1e7ef] rounded-xl px-4 py-2.5 text-sm text-[#1b2232] outline-none focus:border-[#0057b8] transition-colors"
+                      autoFocus
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-[#65758b] mb-1">Confirm new password</label>
+                    <input
+                      type="password"
+                      value={pwForm.confirm}
+                      onChange={e => setPwForm(f => ({ ...f, confirm: e.target.value }))}
+                      placeholder="Repeat your new password"
+                      className="w-full border border-[#e1e7ef] rounded-xl px-4 py-2.5 text-sm text-[#1b2232] outline-none focus:border-[#0057b8] transition-colors"
+                    />
+                  </div>
+                  {pwError && <p className="text-red-500 text-sm">{pwError}</p>}
+                  <div className="flex gap-3 pt-2">
+                    <button
+                      type="button"
+                      onClick={() => setPwOpen(false)}
+                      className="flex-1 border border-[#e1e7ef] text-[#65758b] font-medium py-2.5 rounded-xl text-sm hover:bg-[#f3f5f7] transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={pwSaving}
+                      className="flex-1 bg-[#0057b8] hover:bg-[#0046a0] disabled:opacity-60 text-white font-bold py-2.5 rounded-xl text-sm flex items-center justify-center gap-2 transition-colors"
+                    >
+                      {pwSaving ? <Loader2 size={14} className="animate-spin" /> : null}
+                      Update password
+                    </button>
+                  </div>
+                </>
+              )}
             </form>
           </div>
         </div>
