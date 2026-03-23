@@ -62,7 +62,7 @@ export default async function HomePage() {
           </div>
           <h1 className="text-3xl sm:text-5xl font-bold text-white mb-4">Welcome back!</h1>
           <p className="text-white/75 text-lg leading-relaxed mb-8 max-w-md">
-            Your dream of studying abroad is 12% closer today. Let&apos;s keep going!
+            Your dream of studying abroad is even closer today. Let&apos;s keep going!
           </p>
           <div className="flex gap-4">
             <Link href="/trilha-de-aulas" className="bg-white text-[#1b2232] font-bold text-sm px-6 h-11 rounded-full flex items-center hover:bg-white/90 transition-colors shadow-sm">
