@@ -41,22 +41,29 @@ export default function ProfilePage() {
 
   // Change password modal
   const [pwOpen, setPwOpen] = useState(false)
-  const [pwForm, setPwForm] = useState({ newPassword: '', confirm: '' })
+  const [pwForm, setPwForm] = useState({ current: '', newPassword: '', confirm: '' })
   const [pwSaving, setPwSaving] = useState(false)
   const [pwError, setPwError] = useState('')
   const [pwSuccess, setPwSuccess] = useState(false)
 
   async function handleChangePassword(e: React.FormEvent) {
     e.preventDefault()
-    if (pwForm.newPassword.length < 8) { setPwError('Password must be at least 8 characters.'); return }
+    if (!pwForm.current) { setPwError('Please enter your current password.'); return }
+    if (pwForm.newPassword.length < 8) { setPwError('New password must be at least 8 characters.'); return }
     if (pwForm.newPassword !== pwForm.confirm) { setPwError('Passwords do not match.'); return }
     setPwSaving(true)
     setPwError('')
+    // Verify current password by re-authenticating
+    const { error: authError } = await supabase.auth.signInWithPassword({
+      email: user?.email || '',
+      password: pwForm.current,
+    })
+    if (authError) { setPwSaving(false); setPwError('Current password is incorrect.'); return }
     const { error } = await supabase.auth.updateUser({ password: pwForm.newPassword })
     setPwSaving(false)
     if (error) { setPwError(error.message || 'Error updating password. Please try again.'); return }
     setPwSuccess(true)
-    setTimeout(() => { setPwOpen(false); setPwSuccess(false); setPwForm({ newPassword: '', confirm: '' }) }, 1500)
+    setTimeout(() => { setPwOpen(false); setPwSuccess(false); setPwForm({ current: '', newPassword: '', confirm: '' }) }, 1500)
   }
 
   // Add college modal
@@ -213,7 +220,7 @@ export default function ProfilePage() {
               <h2 className="font-bold text-[#1b2232] text-lg">Personal Information</h2>
               <div className="flex items-center gap-3">
                 <button
-                  onClick={() => { setPwForm({ newPassword: '', confirm: '' }); setPwError(''); setPwSuccess(false); setPwOpen(true) }}
+                  onClick={() => { setPwForm({ current: '', newPassword: '', confirm: '' }); setPwError(''); setPwSuccess(false); setPwOpen(true) }}
                   className="flex items-center gap-1.5 text-[#65758b] text-sm font-medium hover:text-[#1b2232]"
                 >
                   🔒 Change password
@@ -494,6 +501,17 @@ export default function ProfilePage() {
               ) : (
                 <>
                   <div>
+                    <label className="block text-xs font-medium text-[#65758b] mb-1">Current password</label>
+                    <input
+                      type="password"
+                      value={pwForm.current}
+                      onChange={e => setPwForm(f => ({ ...f, current: e.target.value }))}
+                      placeholder="Enter your current password"
+                      className="w-full border border-[#e1e7ef] rounded-xl px-4 py-2.5 text-sm text-[#1b2232] outline-none focus:border-[#0057b8] transition-colors"
+                      autoFocus
+                    />
+                  </div>
+                  <div>
                     <label className="block text-xs font-medium text-[#65758b] mb-1">New password</label>
                     <input
                       type="password"
@@ -501,7 +519,6 @@ export default function ProfilePage() {
                       onChange={e => setPwForm(f => ({ ...f, newPassword: e.target.value }))}
                       placeholder="Minimum 8 characters"
                       className="w-full border border-[#e1e7ef] rounded-xl px-4 py-2.5 text-sm text-[#1b2232] outline-none focus:border-[#0057b8] transition-colors"
-                      autoFocus
                     />
                   </div>
                   <div>
