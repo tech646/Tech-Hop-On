@@ -20,7 +20,7 @@ export function Footer() {
             <p className="text-xs font-bold text-[#1b2232] uppercase tracking-wider mb-4">Support</p>
             <ul className="space-y-2.5">
               <li><a href="/central-de-ajuda" className="text-sm text-[#65758b] hover:text-[#0057b8] transition-colors">Help Center</a></li>
-              <li><a href="#" className="text-sm text-[#65758b] hover:text-[#0057b8] transition-colors">Terms of Use</a></li>
+              <li><a href="/termos-de-uso" className="text-sm text-[#65758b] hover:text-[#0057b8] transition-colors">Terms of Use</a></li>
               <li><a href="/quem-somos" className="text-sm text-[#65758b] hover:text-[#0057b8] transition-colors">About Us</a></li>
             </ul>
           </div>
