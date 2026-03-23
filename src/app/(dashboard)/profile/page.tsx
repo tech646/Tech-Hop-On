@@ -138,7 +138,7 @@ export default function ProfilePage() {
       .select()
       .single()
     setCollegeSaving(false)
-    if (error) { setCollegeError('Error adding. Please try again.'); return }
+    if (error) { setCollegeError(error.message || 'Error adding. Please try again.'); return }
     setColleges(prev => [...prev, data as UserCollege])
     setAddCollegeOpen(false)
   }
