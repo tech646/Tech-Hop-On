@@ -62,7 +62,7 @@ export default function QuemSomosPage() {
         <Link href="/assistentes-ia" className="inline-flex items-center gap-1.5 text-xs text-[#0057b8] border border-[#0057b8]/20 bg-[#0057b8]/5 rounded-full px-3 py-1 mb-4">
           ✨ Meet our assistants
         </Link>
-        <h2 className="text-2xl font-bold text-[#1b2232] mb-4">We're AI — and we know a lot!</h2>
+        <h2 className="text-2xl font-bold text-[#1b2232] mb-4">We&apos;re AI — and we know a lot!</h2>
         <div className="flex items-center justify-center gap-4 mb-4">
           <Image src="/images/ia-gritty.png" alt="Gritty" width={70} height={70} className="object-contain" />
           <Image src="/images/ia-smartle.png" alt="Smartle" width={70} height={70} className="object-contain" />
@@ -72,7 +72,7 @@ export default function QuemSomosPage() {
           Our characters are AI assistants trained with an intensive, specialized knowledge base focused on studying abroad.
         </p>
         <p className="text-[#65758b] leading-relaxed max-w-xl mx-auto">
-          We combine the founders' expertise and track record with cutting-edge technology to deliver the best academic experience for our students.
+          We combine the founders&apos; expertise and track record with cutting-edge technology to deliver the best academic experience for our students.
         </p>
       </div>
 
