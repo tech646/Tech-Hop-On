@@ -408,7 +408,15 @@ export async function POST(req: NextRequest) {
 
     const baseInstruction = SYSTEM_INSTRUCTIONS[assistantId] || SYSTEM_INSTRUCTIONS.brighta
     const scopeRules = SCOPE_RULES[assistantId] || ''
-    const systemInstruction = baseInstruction + scopeRules
+    const globalRules = `
+
+GLOBAL RULES — MANDATORY FOR ALL RESPONSES:
+
+1. LANGUAGE: Always respond in English, regardless of the language the student uses. If the student writes in Portuguese, Spanish, or any other language, your response must still be entirely in English. Do not translate or mirror their language.
+
+2. HONESTY: Never fabricate information. If you do not have reliable data on a specific topic, say so clearly — for example: "I don't have that specific information." Do not invent statistics, dates, names, scores, or any other data. Accuracy is non-negotiable.`
+
+    const systemInstruction = baseInstruction + scopeRules + globalRules
 
     const model = genAI.getGenerativeModel({
       model: 'gemini-2.5-flash-lite',
