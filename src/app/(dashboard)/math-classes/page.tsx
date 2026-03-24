@@ -15,6 +15,20 @@ const historyClasses = [
 const DAYS_IN_MARCH = Array.from({ length: 31 }, (_, i) => i + 1)
 const START_DAY = 6 // sunday=0, march 2026 starts on sunday
 
+const PLAN_CLASSES: Record<string, number> = {
+  free: 0,
+  monthly: 1,
+  semester: 2,
+  annual: 3,
+}
+
+const PLAN_LABELS: Record<string, string> = {
+  free: 'Free',
+  monthly: 'Monthly',
+  semester: '6-Month',
+  annual: 'Annual',
+}
+
 export default function MathClassesPage() {
   const [tab, setTab] = useState<Tab>('proximas')
   const [showModal, setShowModal] = useState(false)
@@ -22,17 +36,18 @@ export default function MathClassesPage() {
   const [selectedDay, setSelectedDay] = useState<number | null>(null)
   const [cancelTarget, setCancelTarget] = useState<MathAppointment | null>(null)
   const [appointments, setAppointments] = useState<MathAppointment[]>([])
+  const [userPlan, setUserPlan] = useState<string>('free')
 
   useEffect(() => {
     const supabase = createClient()
     supabase.auth.getUser().then(async ({ data: { user } }) => {
       if (user) {
-        const { data } = await supabase
-          .from('math_appointments')
-          .select('*')
-          .eq('user_id', user.id)
-          .order('scheduled_at', { ascending: true })
-        setAppointments((data as MathAppointment[]) ?? [])
+        const [{ data: appts }, { data: profile }] = await Promise.all([
+          supabase.from('math_appointments').select('*').eq('user_id', user.id).order('scheduled_at', { ascending: true }),
+          supabase.from('profiles').select('plan').eq('id', user.id).single(),
+        ])
+        setAppointments((appts as MathAppointment[]) ?? [])
+        if (profile?.plan) setUserPlan(profile.plan)
       }
     })
   }, [])
@@ -73,17 +88,25 @@ export default function MathClassesPage() {
       </div>
 
       {/* Plan info (show in proximas) */}
-      {tab === 'proximas' && (
-        <div className="flex flex-wrap items-center gap-3 mb-4 text-sm">
-          <span className="text-[#65758b]">Plan <span className="font-bold text-[#1b2232]">Monthly</span></span>
-          <span className="text-[#65758b]">Included classes: <span className="font-bold text-[#1b2232]">3</span></span>
-          <span className="text-[#65758b]">Classes taken: <span className="font-bold text-[#1b2232]">2</span></span>
-          <span className="text-[#ff4444] font-medium">Next class: extra R$385.00</span>
-          <button className="flex items-center gap-1 bg-[#1f2c47] text-white text-xs px-3 py-1.5 rounded-xl ml-auto">
-            <ExternalLink size={12} /> Join Class
-          </button>
-        </div>
-      )}
+      {tab === 'proximas' && (() => {
+        const now = new Date()
+        const includedClasses = PLAN_CLASSES[userPlan] ?? 0
+        const usedThisMonth = appointments.filter(a => {
+          const d = new Date(a.scheduled_at)
+          return a.status !== 'cancelled' && d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()
+        }).length
+        const remaining = Math.max(0, includedClasses - usedThisMonth)
+        return (
+          <div className="flex flex-wrap items-center gap-3 mb-4 text-sm">
+            <span className="text-[#65758b]">Plan <span className="font-bold text-[#1b2232]">{PLAN_LABELS[userPlan]}</span></span>
+            <span className="text-[#65758b]">Included/month: <span className="font-bold text-[#1b2232]">{includedClasses}</span></span>
+            <span className="text-[#65758b]">Used this month: <span className="font-bold text-[#1b2232]">{usedThisMonth}</span></span>
+            <span className={`font-medium ${remaining > 0 ? 'text-[#22c55e]' : 'text-[#ff4444]'}`}>
+              {remaining > 0 ? `${remaining} class${remaining > 1 ? 'es' : ''} remaining` : 'No classes remaining this month'}
+            </span>
+          </div>
+        )
+      })()}
 
       {/* Tabs */}
       <div className="flex gap-2 sm:gap-4 mb-6 border-b border-[#e1e7ef] overflow-x-auto scrollbar-none">
