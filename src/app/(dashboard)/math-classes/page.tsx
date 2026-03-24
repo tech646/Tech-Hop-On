@@ -8,9 +8,6 @@ import type { MathAppointment } from '@/types'
 
 type Tab = 'proximas' | 'calendario' | 'historico'
 
-const historyClasses = [
-  { title: 'Statistics — Measures of Central Tendency', teacher: '🧑‍🏫 Professor Lucas', date: '03/02/2026 at 3:00 PM' },
-]
 
 const DAYS_IN_MARCH = Array.from({ length: 31 }, (_, i) => i + 1)
 const START_DAY = 6 // sunday=0, march 2026 starts on sunday
@@ -191,20 +188,37 @@ export default function MathClassesPage() {
         </div>
       )}
 
-      {tab === 'historico' && (
-        <div className="space-y-3">
-          {historyClasses.map((cls, i) => (
-            <div key={i} className="bg-white rounded-2xl border border-[#e1e7ef] p-5 flex items-center gap-4">
-              <div className="w-9 h-9 rounded-xl bg-[#ff9500]/10 flex items-center justify-center">📐</div>
-              <div className="flex-1">
-                <p className="font-bold text-[#1b2232]">{cls.title}</p>
-                <p className="text-sm text-[#65758b]">{cls.teacher} — {cls.date}</p>
+      {tab === 'historico' && (() => {
+        const completed = appointments
+          .filter(a => a.status === 'completed' || a.status === 'cancelled')
+          .sort((a, b) => new Date(b.scheduled_at).getTime() - new Date(a.scheduled_at).getTime())
+        return (
+          <div className="space-y-3">
+            {completed.length === 0 && (
+              <div className="bg-white rounded-2xl border border-[#e1e7ef] p-8 text-center text-[#65758b] text-sm">
+                No classes in your history yet.
               </div>
-              <span className="text-xs font-medium text-[#22c55e] bg-[#22c55e]/10 px-3 py-1 rounded-full">Completed</span>
-            </div>
-          ))}
-        </div>
-      )}
+            )}
+            {completed.map(a => {
+              const date = new Date(a.scheduled_at)
+              const label = date.toLocaleString('en-US', { day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+              return (
+                <div key={a.id} className="bg-white rounded-2xl border border-[#e1e7ef] p-5 flex items-center gap-4">
+                  <div className="w-9 h-9 rounded-xl bg-[#ff9500]/10 flex items-center justify-center">📐</div>
+                  <div className="flex-1">
+                    <p className="font-bold text-[#1b2232]">{a.notes || 'Math Class'}</p>
+                    <p className="text-sm text-[#65758b]">{a.teacher_name || '—'} — {label}</p>
+                  </div>
+                  {a.status === 'completed'
+                    ? <span className="text-xs font-medium text-[#22c55e] bg-[#22c55e]/10 px-3 py-1 rounded-full">Completed</span>
+                    : <span className="text-xs font-medium text-[#ff4444] bg-[#ff4444]/10 px-3 py-1 rounded-full">Cancelled</span>
+                  }
+                </div>
+              )
+            })}
+          </div>
+        )
+      })()}
 
       {/* Schedule Modal */}
       {showModal && (
