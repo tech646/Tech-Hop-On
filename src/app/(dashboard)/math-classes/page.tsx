@@ -9,7 +9,7 @@ import type { MathAppointment } from '@/types'
 type Tab = 'proximas' | 'calendario' | 'historico'
 
 const historyClasses = [
-  { title: 'Statistics — Measures of Central Tendency', teacher: 'Prof. Ricardo Lima', date: '03/02/2026 at 3:00 PM' },
+  { title: 'Statistics — Measures of Central Tendency', teacher: '🧑‍🏫 Professor Lucas', date: '03/02/2026 at 3:00 PM' },
 ]
 
 const DAYS_IN_MARCH = Array.from({ length: 31 }, (_, i) => i + 1)
@@ -195,9 +195,10 @@ export default function MathClassesPage() {
               <label className="text-sm font-medium text-[#1b2232] mb-2 block">Teacher</label>
               <select className="w-full border border-[#e1e7ef] rounded-xl px-3 py-2.5 text-sm text-[#65758b] outline-none focus:border-[#0057b8]">
                 <option value="">Choose a teacher</option>
-                <option>Prof. Carlos Mendes</option>
-                <option>Profª. Ana Oliveira</option>
-                <option>Prof. Ricardo Lima</option>
+                <option>🧑‍🏫 Professor Lucas</option>
+                <option>👩‍🏫 Professor Leticia</option>
+                <option>🧑‍🏫 Professor Jonas</option>
+                <option>🧑‍🏫 Professor Arthur</option>
               </select>
             </div>
             <div className="mb-6">
@@ -236,7 +237,7 @@ export default function MathClassesPage() {
               <button onClick={() => setShowCancel(false)} className="text-[#65758b] hover:text-[#1b2232]"><X size={18} /></button>
             </div>
             <p className="text-sm text-[#1b2232] mb-1">Class: Math Class 1</p>
-            <p className="text-sm text-[#65758b] mb-4">Teacher: Lucas</p>
+            <p className="text-sm text-[#65758b] mb-4">Teacher: 🧑‍🏫 Professor Lucas</p>
             <div className="bg-[#fff5f5] border border-[#ffcdd2] rounded-xl p-3 mb-6 text-sm text-[#c62828] space-y-1">
               <p>• You can reschedule within 5 days.</p>
               <p>• After 5 days without rescheduling, the class will be considered lost.</p>
