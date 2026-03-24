@@ -80,7 +80,7 @@ const plans = [
   {
     id: 'mensal',
     name: 'Monthly',
-    description: 'Full flexibility, no commitment. Includes 1 live class with a specialist per month.',
+    description: 'Full flexibility, no commitment. Includes 1 one-on-one Math Class with a specialist per month.',
     price: 'R$ 450/month',
     badge: null,
     active: false,
@@ -88,7 +88,7 @@ const plans = [
   {
     id: 'semestral',
     name: '6-Month',
-    description: '6 months of access at a discount. Includes 2 live classes with specialists per month.',
+    description: '6 months of access at a discount. Includes 2 one-on-one Math Classes with a specialist per month.',
     price: 'R$ 380/month',
     total: 'R$ 2,280.00 total',
     badge: 'Save R$ 420',
@@ -98,7 +98,7 @@ const plans = [
   {
     id: 'anual',
     name: 'Annual',
-    description: 'Best value on the platform. Includes 3 live classes with specialists per month.',
+    description: 'Best value on the platform. Includes 3 one-on-one Math Classes with a specialist per month.',
     price: 'R$ 290/month',
     total: 'R$ 3,480.00 total',
     badge: 'Recommended',

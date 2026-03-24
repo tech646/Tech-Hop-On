@@ -469,9 +469,9 @@ export default function ProfilePage() {
                 <span className="font-bold text-[#1b2232] text-xl ml-4 shrink-0">Grátis</span>
               </div>
               {[
-                { name: 'Monthly', price: 'R$ 450', period: '/mo', desc: 'Full flexibility, no commitment. Includes 1 live class with a specialist per month.' },
-                { name: '6-Month', price: 'R$ 380', period: '/mo', desc: '6 months at a discount. Includes 2 live classes with specialists per month.', total: 'R$2,280 total', savings: 'Save R$420' },
-                { name: 'Annual', price: 'R$ 290', period: '/mo', desc: 'Best value on the platform. Includes 3 live classes with specialists per month.', total: 'R$3,480 total', savings: 'Save R$1,920', recommended: true },
+                { name: 'Monthly', price: 'R$ 450', period: '/mo', desc: 'Full flexibility, no commitment. Includes 1 one-on-one Math Class with a specialist per month.' },
+                { name: '6-Month', price: 'R$ 380', period: '/mo', desc: '6 months at a discount. Includes 2 one-on-one Math Classes with a specialist per month.', total: 'R$2,280 total', savings: 'Save R$420' },
+                { name: 'Annual', price: 'R$ 290', period: '/mo', desc: 'Best value on the platform. Includes 3 one-on-one Math Classes with a specialist per month.', total: 'R$3,480 total', savings: 'Save R$1,920', recommended: true },
               ].map(p => (
                 <div key={p.name} className={`border-2 rounded-2xl p-4 ${p.recommended ? 'border-[#ff9500]' : 'border-[#e1e7ef]'} relative`}>
                   {p.recommended && <div className="absolute -top-3 left-4 bg-[#ff9500] text-white text-xs font-bold px-3 py-1 rounded-full">🏆 Recommended</div>}
