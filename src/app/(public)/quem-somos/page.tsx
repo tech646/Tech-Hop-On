@@ -79,20 +79,29 @@ export default function QuemSomosPage() {
       <div>
         <h2 className="text-2xl font-bold text-[#1b2232] text-center mb-2">Who has studied with Hop On</h2>
         <p className="text-[#65758b] text-center mb-6">Real stories from students who conquered the world</p>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          {testimonials.map((t, i) => (
-            <div key={i} className="bg-white rounded-2xl border border-[#e1e7ef] overflow-hidden">
-              <div className="bg-[#f3f5f7] h-40 flex items-center justify-center">
-                <button className="w-14 h-14 rounded-full bg-[#1f2c47] flex items-center justify-center">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><polygon points="5 3 19 12 5 21 5 3" /></svg>
-                </button>
+        <div className="relative">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 select-none pointer-events-none blur-sm">
+            {testimonials.map((t, i) => (
+              <div key={i} className="bg-white rounded-2xl border border-[#e1e7ef] overflow-hidden">
+                <div className="bg-[#f3f5f7] h-40 flex items-center justify-center">
+                  <button className="w-14 h-14 rounded-full bg-[#1f2c47] flex items-center justify-center">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><polygon points="5 3 19 12 5 21 5 3" /></svg>
+                  </button>
+                </div>
+                <div className="p-4">
+                  <p className="font-bold text-[#1b2232] text-sm mb-1">{t.name}</p>
+                  <p className="text-xs text-[#65758b]">{t.quote}</p>
+                </div>
               </div>
-              <div className="p-4">
-                <p className="font-bold text-[#1b2232] text-sm mb-1">{t.name}</p>
-                <p className="text-xs text-[#65758b]">{t.quote}</p>
-              </div>
+            ))}
+          </div>
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="bg-white border border-[#e1e7ef] rounded-2xl px-6 py-4 shadow-lg text-center">
+              <p className="text-2xl mb-2">⏳</p>
+              <p className="font-bold text-[#1b2232] text-sm">Content coming soon</p>
+              <p className="text-xs text-[#65758b] mt-1">Our students' stories will be here shortly.</p>
             </div>
-          ))}
+          </div>
         </div>
       </div>
     </div>
