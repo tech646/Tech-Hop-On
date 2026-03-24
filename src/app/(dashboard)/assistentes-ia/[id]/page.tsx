@@ -8,11 +8,11 @@ import { use } from 'react'
 
 const assistantData: Record<string, { name: string; subtitle: string; emoji: string; image: string; greeting: string }> = {
   brighta: {
-    name: 'Brighta',
+    name: 'Mrs Brighta',
     subtitle: 'The Storyteller',
     emoji: '👩‍💼',
     image: '/images/brighta.png',
-    greeting: '👋 Hi! I\'m Brighta, your narrative specialist for college admissions. I can help you with **essays**, **personal statements**, and **motivation letters**.\n\nType **"start"** to receive your first guidance, or ask me anything about writing impactful stories!',
+    greeting: '👋 Hi! I\'m Mrs Brighta, your narrative specialist for college admissions. I can help you with **essays**, **personal statements**, and **motivation letters**.\n\nType **"start"** to receive your first guidance, or ask me anything about writing impactful stories!',
   },
   gritty: {
     name: 'Gritty',

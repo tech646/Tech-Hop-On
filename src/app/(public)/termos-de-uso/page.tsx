@@ -29,7 +29,7 @@ export default function TermosDeUsoPage() {
           </section>
 
           <section>
-            <h3 className="font-bold text-[#1b2232] mb-2">2. Use of AI Characters (Brighta, Gritty, Smartle, Wan, Syncie)</h3>
+            <h3 className="font-bold text-[#1b2232] mb-2">2. Use of AI Characters (Mrs Brighta, Gritty, Smartle, Wan, Syncie)</h3>
             <div className="space-y-3">
               <div>
                 <p className="text-sm font-medium text-[#1b2232] mb-1">Advisory Nature</p>

@@ -1,21 +1,74 @@
-'use client'
-
+import { createClient } from '@/lib/supabase/server'
+import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, Clock, Lock, ChevronDown, ChevronUp } from 'lucide-react'
-import { use, useState } from 'react'
+import { ArrowLeft, Lock, Clock } from 'lucide-react'
 
-const playlist = [
-  { id: '1', title: 'Intro', duration: '12:30', status: 'done' },
-  { id: '2', title: 'How to preview a text', duration: '15:45', status: 'done' },
-  { id: '3', title: 'Skim and Scan', duration: '18:20', status: 'current' },
-  { id: '4', title: 'Annotate', duration: '14:10', status: 'locked' },
-  { id: '5', title: 'Find the Outline', duration: '11:55', status: 'locked' },
-]
+const sectionMeta = {
+  critical_reading: { label: 'Critical Reading', icon: '📚' },
+  grammar:          { label: 'Grammar',          icon: '✏️' },
+  vocabulary:       { label: 'Vocabulary',        icon: '📖' },
+} as const
 
-export default function VideoAulaPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = use(params)
-  const current = playlist.find(l => l.id === id) || playlist[0]
-  const [playlistOpen, setPlaylistOpen] = useState(false)
+export default async function VideoAulaPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect('/login')
+
+  const { data: lesson } = await supabase
+    .from('lessons')
+    .select('id, title, section, order_index, duration_minutes, video_url')
+    .eq('id', id)
+    .single()
+
+  if (!lesson) redirect('/trilha-de-aulas')
+
+  const [{ data: sectionLessons }, { data: progress }] = await Promise.all([
+    supabase
+      .from('lessons')
+      .select('id, title, order_index, duration_minutes')
+      .eq('section', lesson.section)
+      .order('order_index'),
+    supabase
+      .from('user_lesson_progress')
+      .select('lesson_id, completed')
+      .eq('user_id', user.id),
+  ])
+
+  const completedIds = new Set(
+    (progress ?? []).filter(p => p.completed).map(p => p.lesson_id)
+  )
+  const isCompleted = completedIds.has(id)
+  const lessons = sectionLessons ?? []
+
+  let foundCurrent = false
+  const playlist = lessons.map((l, idx) => {
+    if (completedIds.has(l.id)) return { ...l, status: 'done' as const }
+    const prevDone = idx === 0 || completedIds.has(lessons[idx - 1].id)
+    if (prevDone && !foundCurrent) {
+      foundCurrent = true
+      return { ...l, status: 'current' as const }
+    }
+    return { ...l, status: 'locked' as const }
+  })
+
+  const meta = sectionMeta[lesson.section as keyof typeof sectionMeta]
+  const doneInSection = playlist.filter(l => l.status === 'done').length
+
+  async function markComplete() {
+    'use server'
+    const supa = await createClient()
+    const { data: { user: u } } = await supa.auth.getUser()
+    if (!u) return
+    await supa.from('user_lesson_progress').upsert({
+      user_id: u.id,
+      lesson_id: id,
+      completed: true,
+      completed_at: new Date().toISOString(),
+      watched_seconds: (lesson?.duration_minutes ?? 0) * 60,
+    }, { onConflict: 'user_id,lesson_id' })
+    redirect('/trilha-de-aulas')
+  }
 
   return (
     <div className="max-w-[1400px] mx-auto px-4 lg:px-6 py-8">
@@ -24,83 +77,118 @@ export default function VideoAulaPage({ params }: { params: Promise<{ id: string
           <ArrowLeft size={18} />
         </Link>
         <div>
-          <p className="text-sm text-[#65758b]">Aulas</p>
-          <p className="text-xs text-[#65758b]">Volte para todas as vídeo aulas</p>
+          <p className="text-sm font-medium text-[#1b2232]">Lessons</p>
+          <p className="text-xs text-[#65758b]">Back to all lessons</p>
         </div>
       </div>
 
-      {/* Desktop: side-by-side | Mobile: stacked */}
       <div className="flex flex-col lg:flex-row gap-6">
         {/* Video player */}
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-4">
-            <div className="w-8 h-8 rounded-lg bg-[#f3f5f7] flex items-center justify-center text-sm">📺</div>
+            <div className="w-8 h-8 rounded-lg bg-[#f3f5f7] flex items-center justify-center text-sm">
+              {meta?.icon ?? '📺'}
+            </div>
             <div>
-              <p className="font-bold text-[#1b2232]">Critical Reading</p>
-              <p className="text-xs text-[#65758b]">{current.title}</p>
+              <p className="font-bold text-[#1b2232]">{meta?.label}</p>
+              <p className="text-xs text-[#65758b]">{lesson.title}</p>
             </div>
           </div>
 
-          {/* Video */}
           <div className="bg-[#f3f5f7] rounded-2xl aspect-video flex items-center justify-center mb-4 relative overflow-hidden border border-[#e1e7ef]">
-            <button className="w-16 h-16 rounded-full border-2 border-[#1b2232] flex items-center justify-center hover:bg-white/50 transition-colors">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="#1b2232">
-                <polygon points="5 3 19 12 5 21 5 3" />
-              </svg>
-            </button>
+            {lesson.video_url ? (
+              <iframe src={lesson.video_url} className="w-full h-full" allowFullScreen />
+            ) : (
+              <div className="text-center text-[#65758b]">
+                <div className="w-16 h-16 rounded-full border-2 border-[#1b2232]/20 flex items-center justify-center mx-auto mb-3">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="#1b2232" opacity="0.3">
+                    <polygon points="5 3 19 12 5 21 5 3" />
+                  </svg>
+                </div>
+                <p className="text-sm">Video coming soon</p>
+              </div>
+            )}
           </div>
 
-          {/* Lesson info */}
-          <div className="bg-[#0057b8]/10 text-[#0057b8] text-xs font-medium px-3 py-1 rounded-full w-fit mb-2">Critical Reading</div>
-          <h2 className="text-xl font-bold text-[#1b2232] mb-1">{current.title}</h2>
-          <p className="text-sm text-[#65758b]">Resumo da aula</p>
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <div className="inline-flex items-center gap-1 text-xs font-medium px-3 py-1 rounded-full mb-2 bg-[#0057b8]/10 text-[#0057b8]">
+                {meta?.label}
+              </div>
+              <h2 className="text-xl font-bold text-[#1b2232] mb-1">{lesson.title}</h2>
+              <p className="text-sm text-[#65758b] flex items-center gap-1">
+                <Clock size={12} /> {lesson.duration_minutes} min
+              </p>
+            </div>
+
+            {isCompleted ? (
+              <div className="flex items-center gap-1.5 text-[#22c55e] text-sm font-medium shrink-0 mt-1">
+                ✓ Completed
+              </div>
+            ) : (
+              <form action={markComplete}>
+                <button
+                  type="submit"
+                  className="bg-[#22c55e] hover:bg-green-600 text-white font-bold text-sm px-5 py-2.5 rounded-xl transition-colors shrink-0"
+                >
+                  ✓ Mark as complete
+                </button>
+              </form>
+            )}
+          </div>
         </div>
 
         {/* Playlist */}
         <div className="w-full lg:w-80 lg:shrink-0">
-          {/* Mobile toggle button */}
-          <button
-            onClick={() => setPlaylistOpen(!playlistOpen)}
-            className="lg:hidden w-full flex items-center justify-between bg-white rounded-2xl border border-[#e1e7ef] px-4 py-3 mb-2 font-bold text-[#1b2232]"
-          >
-            <span>Ver Playlist</span>
-            {playlistOpen ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
-          </button>
-
-          {/* Playlist panel — always visible on desktop, togglable on mobile */}
-          <div className={`${playlistOpen ? 'block' : 'hidden'} lg:block bg-white rounded-2xl border border-[#e1e7ef] overflow-hidden`}>
+          <div className="bg-white rounded-2xl border border-[#e1e7ef] overflow-hidden">
             <div className="p-4 border-b border-[#e1e7ef]">
-              <p className="font-bold text-[#1b2232]">Critical Reading</p>
-              <p className="text-xs text-[#65758b]">2 de 13 aulas concluídas</p>
+              <p className="font-bold text-[#1b2232]">{meta?.label}</p>
+              <p className="text-xs text-[#65758b]">{doneInSection} of {lessons.length} lessons completed</p>
             </div>
             <div className="divide-y divide-[#f3f5f7]">
-              {playlist.map((lesson) => (
-                <Link
-                  key={lesson.id}
-                  href={`/video-aula/${lesson.id}`}
-                  className={`flex items-center gap-3 px-4 py-3 hover:bg-[#f3f5f7] transition-colors ${lesson.status === 'locked' ? 'opacity-60 pointer-events-none' : ''} ${lesson.id === id ? 'bg-[#f3f5f7]' : ''}`}
-                >
-                  <div className="shrink-0">
-                    {lesson.id === id ? (
-                      <div className="w-7 h-7 rounded-full bg-[#0057b8] flex items-center justify-center">
-                        <div className="w-3 h-3 rounded-full border-2 border-white" />
-                      </div>
-                    ) : lesson.status === 'locked' ? (
-                      <div className="w-7 h-7 rounded-full bg-[#f3f5f7] flex items-center justify-center">
-                        <Lock size={12} className="text-[#65758b]" />
-                      </div>
-                    ) : (
-                      <div className="w-7 h-7 rounded-full border-2 border-[#65758b] flex items-center justify-center">
-                        <div className="w-2.5 h-2.5 rounded-full bg-[#65758b]" />
-                      </div>
-                    )}
+              {playlist.map((l) =>
+                l.status === 'locked' ? (
+                  <div key={l.id} className="flex items-center gap-3 px-4 py-3 opacity-50">
+                    <div className="w-7 h-7 rounded-full bg-[#f3f5f7] flex items-center justify-center shrink-0">
+                      <Lock size={12} className="text-[#65758b]" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-[#1b2232] truncate">{l.title}</p>
+                      <p className="text-xs text-[#65758b] flex items-center gap-1">
+                        <Clock size={10} /> {l.duration_minutes} min
+                      </p>
+                    </div>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-[#1b2232] truncate">{lesson.title}</p>
-                    <p className="text-xs text-[#65758b] flex items-center gap-1"><Clock size={10} /> {lesson.duration}</p>
-                  </div>
-                </Link>
-              ))}
+                ) : (
+                  <Link
+                    key={l.id}
+                    href={`/video-aula/${l.id}`}
+                    className={`flex items-center gap-3 px-4 py-3 hover:bg-[#f3f5f7] transition-colors ${l.id === id ? 'bg-[#f3f5f7]' : ''}`}
+                  >
+                    <div className="shrink-0">
+                      {l.id === id ? (
+                        <div className="w-7 h-7 rounded-full bg-[#0057b8] flex items-center justify-center">
+                          <div className="w-3 h-3 rounded-full border-2 border-white" />
+                        </div>
+                      ) : l.status === 'done' ? (
+                        <div className="w-7 h-7 rounded-full border-2 border-[#65758b] flex items-center justify-center">
+                          <div className="w-2.5 h-2.5 rounded-full bg-[#65758b]" />
+                        </div>
+                      ) : (
+                        <div className="w-7 h-7 rounded-full border-2 border-[#0057b8] flex items-center justify-center">
+                          <div className="w-2.5 h-2.5 rounded-full bg-[#0057b8]" />
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-[#1b2232] truncate">{l.title}</p>
+                      <p className="text-xs text-[#65758b] flex items-center gap-1">
+                        <Clock size={10} /> {l.duration_minutes} min
+                      </p>
+                    </div>
+                  </Link>
+                )
+              )}
             </div>
           </div>
         </div>

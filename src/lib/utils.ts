@@ -33,7 +33,7 @@ export function formatDateTime(date: string | Date): string {
 export const AI_ASSISTANTS = [
   {
     id: 'brighta',
-    name: 'Brighta',
+    name: 'Mrs Brighta',
     description: 'Especialista em estratégias de estudo e planejamento acadêmico',
     specialty: 'Estratégia',
     color: '#0057B8',
@@ -76,6 +76,7 @@ export const PLANS = [
       'Assistentes IA ilimitados',
       'Math Classes',
       'Diagnóstico completo',
+      '1 aula ao vivo por mês',
       'Suporte por email',
     ],
     is_popular: false,
@@ -92,6 +93,7 @@ export const PLANS = [
       'Assistentes IA ilimitados',
       'Math Classes',
       'Diagnóstico completo',
+      '2 aulas ao vivo por mês',
       'Suporte prioritário',
       'Simulados SAT',
     ],
@@ -109,6 +111,7 @@ export const PLANS = [
       'Assistentes IA ilimitados',
       'Math Classes',
       'Diagnóstico completo',
+      '3 aulas ao vivo por mês',
       'Suporte VIP',
       'Simulados SAT',
       'Mentoria individual',

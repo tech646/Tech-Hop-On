@@ -61,7 +61,7 @@ const questions = [
 
 
 const resultCards = [
-  { src: '/images/brighta.png', alt: 'Brighta', text: 'Browse the video lessons to learn more about the English language!' },
+  { src: '/images/brighta.png', alt: 'Mrs Brighta', text: 'Browse the video lessons to learn more about the English language!' },
   { src: '/images/gritty.png', alt: 'Gritty', text: 'Use our AI assistants to get answers anytime!' },
   { src: '/images/smartle.png', alt: 'Smartle', text: 'Practice your SAT!' },
   { src: '/images/wan.png', alt: 'Wan', text: 'Book a math class with our specialists!' },
@@ -80,7 +80,7 @@ const plans = [
   {
     id: 'mensal',
     name: 'Monthly',
-    description: 'Full flexibility, no commitment. Up to two (2) classes with specialists per week.',
+    description: 'Full flexibility, no commitment. Includes 1 live class with a specialist per month.',
     price: 'R$ 450/month',
     badge: null,
     active: false,
@@ -88,7 +88,7 @@ const plans = [
   {
     id: 'semestral',
     name: '6-Month',
-    description: '6 months of access at a discount so you can advance at your own pace.',
+    description: '6 months of access at a discount. Includes 2 live classes with specialists per month.',
     price: 'R$ 380/month',
     total: 'R$ 2,280.00 total',
     badge: 'Save R$ 420',
@@ -98,7 +98,7 @@ const plans = [
   {
     id: 'anual',
     name: 'Annual',
-    description: '10 months of access with the best value on the platform.',
+    description: 'Best value on the platform. Includes 3 live classes with specialists per month.',
     price: 'R$ 290/month',
     total: 'R$ 3,480.00 total',
     badge: 'Recommended',

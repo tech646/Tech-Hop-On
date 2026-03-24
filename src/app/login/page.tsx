@@ -25,18 +25,6 @@ export default function LoginPage() {
       setError('Incorrect email or password.')
       setLoading(false)
     } else {
-      // Check if diagnostic completed
-      if (data.user) {
-        const { data: diag } = await supabase
-          .from('diagnostic_results_v2')
-          .select('user_id')
-          .eq('user_id', data.user.id)
-          .single()
-        if (!diag) {
-          router.push('/diagnostico')
-          return
-        }
-      }
       router.push('/home')
     }
   }

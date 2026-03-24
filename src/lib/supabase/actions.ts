@@ -185,7 +185,7 @@ export async function getGestorStudentsData() {
   // Get all non-admin profiles
   const { data: profiles } = await supabase
     .from('profiles')
-    .select('id, full_name, email, country, sat_target_score')
+    .select('id, full_name, email, country, city, sat_target_score, avatar_url')
     .not('email', 'ilike', '%@hopon.academy')
 
   if (!profiles || profiles.length === 0) return { students: [], stats: { total: 0, avgSAT: 0, avgLessons: 0, avgAI: 0 } }
@@ -242,6 +242,8 @@ export async function getGestorStudentsData() {
       id: p.id,
       name: p.full_name || p.email?.split('@')[0] || 'Aluno',
       country: p.country || 'Brazil',
+      city: p.city || '',
+      avatarUrl: p.avatar_url || null,
       mathClasses: mathCount,
       mathMax: 40,
       onlineCourses: lessonsCount,

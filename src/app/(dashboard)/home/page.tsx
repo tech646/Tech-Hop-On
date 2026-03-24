@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { getUserStats } from '@/lib/supabase/actions'
+import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import { ArrowRight, BookOpen, Calculator, Brain, Sparkles } from 'lucide-react'
@@ -46,11 +47,17 @@ const journeyCards = [
 export default async function HomePage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  const firstName = user?.user_metadata?.full_name?.split(' ')[0] || user?.email?.split('@')[0] || 'aluno'
+  if (!user) redirect('/login')
 
-  const { completedLessons, studyHours, latestSAT, aiMessages } = user
-    ? await getUserStats(user.id)
-    : { completedLessons: 0, studyHours: 0, latestSAT: null, aiMessages: 0 }
+  const [statsResult, diagResult] = await Promise.all([
+    getUserStats(user.id),
+    supabase.from('diagnostic_results_v2').select('user_id').eq('user_id', user.id).maybeSingle(),
+  ])
+
+  if (!diagResult.data) redirect('/diagnostico')
+
+  const { completedLessons, studyHours, latestSAT, aiMessages } = statsResult
+  const firstName = user?.user_metadata?.full_name?.split(' ')[0] || user?.email?.split('@')[0] || 'aluno'
 
   return (
     <div className="max-w-[1400px] mx-auto px-6 py-8">

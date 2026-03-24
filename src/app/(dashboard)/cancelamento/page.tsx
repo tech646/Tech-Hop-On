@@ -44,7 +44,7 @@ export default function CancelamentoPage() {
           <p className="text-[#65758b] mb-6">Before you go, here&apos;s what you&apos;ll lose by cancelling:</p>
 
           <div className="bg-white rounded-2xl border border-[#e1e7ef] p-5 mb-6 space-y-3">
-            {['Access to all video lessons', 'Math Class sessions with specialists', 'Chat with AI Assistants (Brighta, Gritty, Smartle, Wan)', 'Personalized admissions support'].map(item => (
+            {['Access to all video lessons', 'Math Class sessions with specialists', 'Chat with AI Assistants (Mrs Brighta, Gritty, Smartle, Wan)', 'Personalized admissions support'].map(item => (
               <div key={item} className="flex items-center gap-3 text-sm text-[#1b2232]">
                 <span className="text-red-400">✕</span> {item}
               </div>

@@ -18,3 +18,17 @@ body {
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: #EDEFF3; border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: #D0D5DB; }
+
+/* Mascot loader */
+@keyframes mascot-hop {
+  0%, 100% { transform: translateY(0) rotate(-3deg) scaleX(1); }
+  30%       { transform: translateY(-28px) rotate(4deg) scaleX(0.95); }
+  60%       { transform: translateY(-10px) rotate(-2deg) scaleX(1.02); }
+}
+@keyframes mascot-shadow {
+  0%, 100% { transform: scaleX(1); opacity: 0.25; }
+  30%       { transform: scaleX(0.5); opacity: 0.1; }
+  60%       { transform: scaleX(0.8); opacity: 0.18; }
+}
+.mascot-hop  { animation: mascot-hop    0.9s ease-in-out infinite; }
+.mascot-shadow { animation: mascot-shadow 0.9s ease-in-out infinite; }

@@ -126,5 +126,7 @@ export type UserCollege = {
   user_id: string
   name: string
   category: 'dream' | 'target' | 'safety'
+  required_sat: number | null
+  my_sat: number | null
   created_at: string
 }

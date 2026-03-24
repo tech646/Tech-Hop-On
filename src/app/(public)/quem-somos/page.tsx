@@ -7,7 +7,7 @@ const founders = [
     name: 'Anelisa Macedo',
     role: 'Founder',
     aka: 'Also known as Mrs Brighta',
-    image: '/images/brighta.png',
+    image: '/images/brighta-face.png',
     bio: '35+ years in education. Experience with highly selective admissions processes (domestic and international, including scholarships). Specializes in developing personalized strategies to maximize students\' chances of admission to top universities. Master\'s in Education from Harvard Graduate School of Education.',
   },
   {

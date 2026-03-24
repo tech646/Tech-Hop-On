@@ -5,10 +5,10 @@ import { ArrowLeft, ArrowRight } from 'lucide-react'
 const assistants = [
   {
     id: 'brighta',
-    name: 'Brighta',
-    role: 'The Narrative Architect',
-    subtitle: 'The Storyteller',
-    description: 'Expert at crafting powerful narratives for your essays, personal statements, and motivation letters. She transforms your experiences into memorable stories.',
+    name: 'Mrs Brighta',
+    role: 'Essay & Writing Specialist',
+    subtitle: 'Your personal narrative coach',
+    description: 'Mrs Brighta helps you write college application essays that stand out. Tell her your story and she will guide you to craft a compelling, authentic personal statement — the kind that gets noticed by Ivy League admissions officers.',
     tags: ['Essays', 'Personal Statements', 'Motivation Letters'],
     image: '/images/brighta.png',
     bg: 'bg-[#fff8e7]',
@@ -17,10 +17,10 @@ const assistants = [
   {
     id: 'gritty',
     name: 'Gritty',
-    role: 'The High-Performance Coach',
-    subtitle: 'The High-Performance Coach',
-    description: 'Your personal coach for focus, discipline, and high performance in your studies. He creates study plans and keeps you motivated to achieve your goals.',
-    tags: ['Study Plan', 'Motivation', 'Time Management'],
+    role: 'SAT Coach & Performance Trainer',
+    subtitle: 'Your score-boosting strategist',
+    description: 'Gritty analyzes your practice results, identifies exactly where you\'re losing points, and gives you a direct action plan to raise your SAT score. No fluff — just focused, effective preparation for the Digital SAT.',
+    tags: ['SAT Prep', 'Study Plan', 'Score Strategy'],
     image: '/images/gritty.png',
     bg: 'bg-[#fdf2f8]',
     tagBg: 'bg-pink-100 text-pink-700',
@@ -28,10 +28,10 @@ const assistants = [
   {
     id: 'smartle',
     name: 'Smartle',
-    role: 'The Admissions Strategist',
-    subtitle: 'The Admission Officer',
-    description: 'Your consultant for understanding admissions processes at top universities. She guides you through every step, from choosing a school to submitting your application.',
-    tags: ['Admissions', 'Universities', 'Strategy'],
+    role: 'Admissions Strategist',
+    subtitle: 'Your university selection expert',
+    description: 'Smartle thinks like an admissions officer. She evaluates your profile, builds a balanced college list, and tells you honestly where you stand — so you apply to the right schools with the right strategy.',
+    tags: ['College List', 'Admissions Strategy', 'Profile Analysis'],
     image: '/images/smartle.png',
     bg: 'bg-[#f0f7ff]',
     tagBg: 'bg-blue-100 text-blue-700',
@@ -39,10 +39,10 @@ const assistants = [
   {
     id: 'wan',
     name: 'Professor Wan',
-    role: 'The Process Architect',
-    subtitle: 'The Operation Master',
-    description: 'The master of operational processes: visas, documentation, deadlines, and logistics. He ensures no detail is missed on your international journey.',
-    tags: ['Visas', 'Documentation', 'Deadlines'],
+    role: 'Deadlines & Documentation Expert',
+    subtitle: 'Your bureaucracy navigator',
+    description: 'Professor Wan keeps your application process on track. From visa paperwork and financial aid forms to apostilles and submission deadlines — he makes sure nothing slips through the cracks.',
+    tags: ['Visas', 'Deadlines', 'Financial Aid Forms'],
     image: '/images/wan.png',
     bg: 'bg-[#f0fdf4]',
     tagBg: 'bg-green-100 text-green-700',
@@ -60,7 +60,7 @@ export default function AssistentesIAPage() {
         <span className="text-2xl">⚡</span>
         <h1 className="text-3xl font-bold text-[#1b2232]">AI Assistants</h1>
       </div>
-      <p className="text-[#65758b] mb-8">Choose the ideal assistant to help you on your educational journey</p>
+      <p className="text-[#65758b] mb-8">Each assistant is a specialist. Pick the one that matches what you need right now — and chat in English to practice while you learn.</p>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
         {assistants.map((a) => (
