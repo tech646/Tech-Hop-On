@@ -99,7 +99,7 @@ export default function QuemSomosPage() {
             <div className="bg-white border border-[#e1e7ef] rounded-2xl px-6 py-4 shadow-lg text-center">
               <p className="text-2xl mb-2">⏳</p>
               <p className="font-bold text-[#1b2232] text-sm">Content coming soon</p>
-              <p className="text-xs text-[#65758b] mt-1">Our students' stories will be here shortly.</p>
+              <p className="text-xs text-[#65758b] mt-1">Our students&apos; stories will be here shortly.</p>
             </div>
           </div>
         </div>
