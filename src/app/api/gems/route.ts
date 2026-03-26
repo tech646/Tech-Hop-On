@@ -13,62 +13,73 @@ const GEM_RATES: Record<string, number> = {
 
 const ONE_TIME_TYPES = ['diagnostic_complete', 'profile_setup']
 
+// Max gem awards per minute per user (prevents abuse)
+const RATE_LIMIT_PER_MINUTE = 30
+
 export async function POST(req: NextRequest) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  try {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const { type, referenceId } = await req.json()
-  const baseAmount = GEM_RATES[type]
-  if (!baseAmount) return NextResponse.json({ error: 'Invalid type' }, { status: 400 })
+    const body = await req.json()
+    const type: string = typeof body.type === 'string' ? body.type : ''
+    // Sanitize referenceId: only allow alphanumeric + dash + underscore
+    const referenceId: string = typeof body.referenceId === 'string'
+      ? body.referenceId.replace(/[^a-zA-Z0-9\-_]/g, '').slice(0, 100)
+      : ''
 
-  // One-time awards: check if already given
-  if (ONE_TIME_TYPES.includes(type)) {
-    const { data } = await supabase
+    const baseAmount = GEM_RATES[type]
+    if (!baseAmount) return NextResponse.json({ error: 'Invalid type' }, { status: 400 })
+
+    // Rate limiting: max RATE_LIMIT_PER_MINUTE awards per minute
+    const oneMinuteAgo = new Date(Date.now() - 60_000).toISOString()
+    const { count } = await supabase
       .from('hop_gem_transactions')
-      .select('id')
+      .select('id', { count: 'exact', head: true })
       .eq('user_id', user.id)
-      .eq('type', type)
-      .limit(1)
-    if (data && data.length > 0) return NextResponse.json({ already_awarded: true })
-  }
+      .gte('created_at', oneMinuteAgo)
 
-  // Check if in top 5 for multiplier
-  let multiplier = 1
-  const { data: ranking } = await supabase.rpc('get_ranking', { current_user_id: user.id })
-  const userRank = (ranking as Array<{ is_self: boolean; rank_pos: number }> | null)?.find(r => r.is_self)
-  if (userRank && userRank.rank_pos <= 5) multiplier = 1.5
+    if ((count ?? 0) >= RATE_LIMIT_PER_MINUTE) {
+      return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 })
+    }
 
-  const finalAmount = Math.round(baseAmount * multiplier)
+    // One-time awards: check if already given
+    if (ONE_TIME_TYPES.includes(type)) {
+      const { data } = await supabase
+        .from('hop_gem_transactions')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('type', type)
+        .limit(1)
+      if (data && data.length > 0) return NextResponse.json({ already_awarded: true })
+    }
 
-  // Insert transaction
-  await supabase.from('hop_gem_transactions').insert({
-    user_id: user.id,
-    amount: finalAmount,
-    type,
-    description: referenceId ? `${type} — ${referenceId}` : type,
-  })
+    // Check if in top 5 for multiplier
+    let multiplier = 1
+    const { data: ranking } = await supabase.rpc('get_ranking', { current_user_id: user.id })
+    const userRank = (ranking as Array<{ is_self: boolean; rank_pos: number }> | null)?.find(r => r.is_self)
+    if (userRank && userRank.rank_pos <= 5) multiplier = 1.5
 
-  // Upsert balance
-  const { data: existing } = await supabase
-    .from('hop_gems')
-    .select('balance, total_earned')
-    .eq('user_id', user.id)
-    .single()
+    const finalAmount = Math.round(baseAmount * multiplier)
+    const description = referenceId ? `${type} — ${referenceId}` : type
 
-  if (existing) {
-    await supabase.from('hop_gems').update({
-      balance: (existing as { balance: number; total_earned: number }).balance + finalAmount,
-      total_earned: (existing as { balance: number; total_earned: number }).total_earned + finalAmount,
-      updated_at: new Date().toISOString(),
-    }).eq('user_id', user.id)
-  } else {
-    await supabase.from('hop_gems').insert({
+    // Insert transaction log
+    await supabase.from('hop_gem_transactions').insert({
       user_id: user.id,
-      balance: finalAmount,
-      total_earned: finalAmount,
+      amount: finalAmount,
+      type,
+      description,
     })
-  }
 
-  return NextResponse.json({ awarded: finalAmount, multiplier })
+    // Atomic balance update — no race condition
+    await supabase.rpc('award_gems_atomic', {
+      p_user_id: user.id,
+      p_amount: finalAmount,
+    })
+
+    return NextResponse.json({ awarded: finalAmount, multiplier })
+  } catch {
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  }
 }

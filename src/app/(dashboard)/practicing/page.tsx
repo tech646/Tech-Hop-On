@@ -71,7 +71,11 @@ export default function PracticingPage() {
               )}
               <div className={`max-w-[600px] rounded-2xl px-4 py-3 text-sm leading-relaxed ${msg.role === 'assistant' ? 'bg-[#f3f5f7] text-[#1b2232]' : 'bg-[#0057b8] text-white'}`}>
                 {msg.content.split('\n').map((line, j) => (
-                  <p key={j} className={j > 0 ? 'mt-2' : ''} dangerouslySetInnerHTML={{ __html: line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }} />
+                  <p key={j} className={j > 0 ? 'mt-2' : ''}>
+                    {line.split(/\*\*(.*?)\*\*/g).map((part, k) =>
+                      k % 2 === 1 ? <strong key={k}>{part}</strong> : part
+                    )}
+                  </p>
                 ))}
               </div>
             </div>

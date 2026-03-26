@@ -169,7 +169,13 @@ export async function createAppointment(userId: string, scheduledAt: string, tea
 
 export async function cancelAppointment(appointmentId: string) {
   const supabase = await createClient()
-  return supabase.from('math_appointments').update({ status: 'cancelled' }).eq('id', appointmentId)
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'Unauthorized' }
+  // Only cancel if the appointment belongs to the authenticated user
+  return supabase.from('math_appointments')
+    .update({ status: 'cancelled' })
+    .eq('id', appointmentId)
+    .eq('user_id', user.id)
 }
 
 // Save diagnostic answers
@@ -181,6 +187,8 @@ export async function saveDiagnosticResult(userId: string, answers: Record<strin
 // Gestor: get all students' performance data
 export async function getGestorStudentsData() {
   const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user?.email?.endsWith('@hopon.academy')) return { students: [], stats: { total: 0, avgSAT: 0, avgLessons: 0, avgAI: 0 } }
 
   // Get all non-admin profiles
   const { data: profiles } = await supabase

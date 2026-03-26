@@ -117,11 +117,11 @@ export default function AssistantChatPage({ params }: { params: Promise<{ id: st
                   : 'bg-[#0057b8] text-white'
               }`}>
                 {msg.content.split('\n').map((line, j) => (
-                  <p key={j} className={j > 0 ? 'mt-2' : ''}
-                    dangerouslySetInnerHTML={{
-                      __html: line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                    }}
-                  />
+                  <p key={j} className={j > 0 ? 'mt-2' : ''}>
+                    {line.split(/\*\*(.*?)\*\*/g).map((part, k) =>
+                      k % 2 === 1 ? <strong key={k}>{part}</strong> : part
+                    )}
+                  </p>
                 ))}
               </div>
             </div>
