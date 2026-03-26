@@ -3,10 +3,10 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { ArrowLeft, Trophy, Gem, Heart, Star, X, Calendar, Ticket } from 'lucide-react'
+import { ArrowLeft, Heart, X, Calendar } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 
-type Tab = 'ranking' | 'gems' | 'anelisa'
+type Tab = 'overview' | 'ranking' | 'gems' | 'anelisa'
 
 type RankEntry = {
   user_id: string
@@ -53,7 +53,8 @@ const DAYS_IN_MONTH = Array.from({ length: 31 }, (_, i) => i + 1)
 const START_DAY = 6 // March 2026 starts on Sunday
 
 export default function SocialPage() {
-  const [tab, setTab] = useState<Tab>('ranking')
+  const [tab, setTab] = useState<Tab>('overview')
+  const [userName, setUserName] = useState('Student')
   const [ranking, setRanking] = useState<RankEntry[]>([])
   const [gemBalance, setGemBalance] = useState(0)
   const [totalEarned, setTotalEarned] = useState(0)
@@ -78,6 +79,8 @@ export default function SocialPage() {
     supabase.auth.getUser().then(async ({ data: { user } }) => {
       if (!user) return
       setUserId(user.id)
+      const name = user.user_metadata?.full_name || user.email?.split('@')[0] || 'Student'
+      setUserName(name.split(' ')[0])
 
       const today = new Date()
       today.setHours(0, 0, 0, 0)
@@ -225,6 +228,7 @@ export default function SocialPage() {
       {/* Tabs */}
       <div className="flex gap-2 sm:gap-4 mb-6 border-b border-[#e1e7ef] overflow-x-auto scrollbar-none">
         {[
+          { key: 'overview', label: 'Overview', icon: '🏠' },
           { key: 'ranking', label: 'Ranking', icon: '🏆' },
           { key: 'gems', label: 'HopGems', icon: '💎' },
           { key: 'anelisa', label: 'Anelisa Class', icon: '🌟' },
@@ -241,6 +245,160 @@ export default function SocialPage() {
           </button>
         ))}
       </div>
+
+      {/* ── OVERVIEW TAB ── */}
+      {tab === 'overview' && (
+        <div className="space-y-5">
+
+          {/* Greeting + stats */}
+          <div className="bg-gradient-to-br from-[#1f2c47] to-[#0057b8] rounded-2xl p-6 text-white relative overflow-hidden">
+            <div className="absolute -right-6 -bottom-4 opacity-20 pointer-events-none select-none">
+              <Image src="/images/gritty.png" alt="" width={160} height={160} className="object-contain" />
+            </div>
+            <p className="text-sm opacity-70 mb-1">Welcome back,</p>
+            <h2 className="text-2xl font-bold mb-4">{userName}! 👋</h2>
+            <div className="grid grid-cols-3 gap-3">
+              <div className="bg-white/10 rounded-xl p-3 text-center">
+                <p className="text-2xl font-bold">{userRankPos ? `#${userRankPos}` : '—'}</p>
+                <p className="text-xs opacity-70 mt-0.5">Ranking</p>
+              </div>
+              <div className="bg-white/10 rounded-xl p-3 text-center">
+                <p className="text-2xl font-bold">💎 {gemBalance.toLocaleString()}</p>
+                <p className="text-xs opacity-70 mt-0.5">HopGems</p>
+              </div>
+              <div className="bg-white/10 rounded-xl p-3 text-center">
+                <p className="text-2xl font-bold">❤️ {heartsReceived}</p>
+                <p className="text-xs opacity-70 mt-0.5">Hearts</p>
+              </div>
+            </div>
+          </div>
+
+          {/* HopGems explanation — Gritty */}
+          <div className="bg-white rounded-2xl border border-[#e1e7ef] p-5 flex gap-4 items-start">
+            <div className="w-20 h-20 shrink-0 relative">
+              <Image src="/images/gritty.png" alt="Gritty" fill className="object-contain" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-lg">💎</span>
+                <h3 className="font-bold text-[#1b2232]">What are HopGems?</h3>
+              </div>
+              <p className="text-sm text-[#65758b] leading-relaxed">
+                HopGems are Hop On&apos;s currency — earned every time you study, use an AI assistant, attend a math class or practice your SAT. The more active you are, the more gems you collect. Top 5 students get a <strong className="text-[#a07800]">1.5× multiplier</strong> on every gem they earn!
+              </p>
+              <button onClick={() => setTab('gems')} className="mt-3 text-xs font-bold text-[#0057b8] hover:underline">
+                See my HopGems →
+              </button>
+            </div>
+          </div>
+
+          {/* Ranking explanation — Smartle */}
+          <div className="bg-white rounded-2xl border border-[#e1e7ef] p-5 flex gap-4 items-start">
+            <div className="w-20 h-20 shrink-0 relative">
+              <Image src="/images/smartle.png" alt="Smartle" fill className="object-contain" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-lg">🏆</span>
+                <h3 className="font-bold text-[#1b2232]">How does the Ranking work?</h3>
+              </div>
+              <p className="text-sm text-[#65758b] leading-relaxed">
+                Your position in the ranking is based on <strong>everything you do</strong> on the platform: lessons completed, SAT scores, AI usage, math classes and gems earned. Other students&apos; names are kept private to protect everyone&apos;s data.
+              </p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <span className="text-xs bg-[#ffd700]/20 text-[#a07800] px-2 py-1 rounded-full font-medium">⚡ Top 5 → 1.5× gems</span>
+                <span className="text-xs bg-[#22c55e]/10 text-[#15803d] px-2 py-1 rounded-full font-medium">🌟 Top 10 → Anelisa eligible</span>
+              </div>
+              <button onClick={() => setTab('ranking')} className="mt-3 text-xs font-bold text-[#0057b8] hover:underline">
+                See the ranking →
+              </button>
+            </div>
+          </div>
+
+          {/* Hearts explanation — Wan */}
+          <div className="bg-white rounded-2xl border border-[#e1e7ef] p-5 flex gap-4 items-start">
+            <div className="w-20 h-20 shrink-0 relative">
+              <Image src="/images/wan.png" alt="Professor Wan" fill className="object-contain" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-lg">❤️</span>
+                <h3 className="font-bold text-[#1b2232]">Hearts — community appreciation</h3>
+              </div>
+              <p className="text-sm text-[#65758b] leading-relaxed">
+                You can send up to <strong>2 hearts per day</strong> to other students in the ranking. When you reach <strong>100 hearts received</strong>, you automatically earn <strong className="text-[#22c55e]">+50 HopGems</strong>. Hearts are a way to celebrate your fellow students — even anonymously!
+              </p>
+              <div className="mt-3">
+                <div className="flex items-center justify-between text-xs text-[#65758b] mb-1">
+                  <span>Hearts received: {heartsReceived}</span>
+                  <span>{100 - (heartsReceived % 100)} to next +50 💎</span>
+                </div>
+                <div className="w-full bg-[#f3f5f7] rounded-full h-1.5">
+                  <div className="bg-[#ff4444] h-1.5 rounded-full" style={{ width: `${(heartsReceived % 100)}%` }} />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Anelisa — premium section */}
+          <div className="bg-gradient-to-br from-[#ffd700]/10 via-white to-[#ffb300]/10 border border-[#ffd700]/50 rounded-2xl p-6 relative overflow-hidden">
+            <div className="absolute -right-2 bottom-0 opacity-90 pointer-events-none select-none">
+              <Image src="/images/ana-paula.png" alt="Anelisa" width={130} height={130} className="object-contain" />
+            </div>
+            <div className="max-w-[60%]">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-2xl">🌟</span>
+                <h3 className="font-bold text-[#1b2232] text-lg">Class with Anelisa</h3>
+              </div>
+              <p className="text-sm text-[#65758b] leading-relaxed mb-3">
+                This is Hop On&apos;s most exclusive experience. A <strong>one-on-one session directly with Anelisa</strong> — co-founder and head strategist — to review your application, your goals, and your path to your dream university.
+              </p>
+              <div className="space-y-1.5 mb-4">
+                {[
+                  '🏆 Only for Top 10 students in the ranking',
+                  '🎟️ Or by invitation via Golden Ticket',
+                  '💎 Costs 1,000 HopGems to unlock',
+                  '💵 Class value: R$ 1,500',
+                ].map((item, i) => (
+                  <p key={i} className="text-xs text-[#1b2232] font-medium">{item}</p>
+                ))}
+              </div>
+              {goldenTicket && (
+                <div className="bg-[#ffd700] text-[#1b2232] text-xs font-bold px-3 py-1.5 rounded-xl inline-flex items-center gap-1 mb-3">
+                  🎟️ You have a Golden Ticket!
+                </div>
+              )}
+              <button
+                onClick={() => setTab('anelisa')}
+                className={`text-sm font-bold px-4 py-2 rounded-xl transition-colors ${
+                  isAnelisaEligible
+                    ? 'bg-gradient-to-r from-[#ffd700] to-[#ffb300] text-[#1b2232] hover:opacity-90'
+                    : 'bg-[#f3f5f7] text-[#65758b] cursor-default'
+                }`}
+              >
+                {isAnelisaEligible ? 'Book now →' : `Reach Top 10 to unlock${userRankPos ? ` (you are #${userRankPos})` : ''}`}
+              </button>
+            </div>
+          </div>
+
+          {/* Golden Ticket explanation — Mrs Brighta */}
+          <div className="bg-white rounded-2xl border border-[#e1e7ef] p-5 flex gap-4 items-start">
+            <div className="w-20 h-20 shrink-0 relative">
+              <Image src="/images/brighta-face.png" alt="Mrs Brighta" fill className="object-contain rounded-full" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-lg">🎟️</span>
+                <h3 className="font-bold text-[#1b2232]">What is a Golden Ticket?</h3>
+              </div>
+              <p className="text-sm text-[#65758b] leading-relaxed">
+                The Golden Ticket is a <strong>rare, personal invitation</strong> from the Hop On team. Only <strong>2 are issued per month</strong>, reserved for students who are showing exceptional dedication — lots of activity, consistent effort — but haven&apos;t yet broken into the Top 10. If you receive one, you have <strong>1 week to use it</strong>. Don&apos;t let it expire!
+              </p>
+            </div>
+          </div>
+
+        </div>
+      )}
 
       {/* ── RANKING TAB ── */}
       {tab === 'ranking' && (
