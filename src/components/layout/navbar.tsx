@@ -24,13 +24,17 @@ export function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [isGestor, setIsGestor] = useState(false)
+  const [isSocialEnabled, setIsSocialEnabled] = useState(false)
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (user) {
         const name = user.user_metadata?.full_name || user.email?.split('@')[0] || 'User'
         setUserName(name.split(' ')[0])
-        if (user.email?.endsWith('@hopon.academy')) setIsGestor(true)
+        if (user.email?.endsWith('@hopon.academy')) {
+          setIsGestor(true)
+          setIsSocialEnabled(true)
+        }
       }
     })
   }, [])
@@ -73,6 +77,19 @@ export function Navbar() {
               </Link>
             )
           })}
+          {isSocialEnabled && (
+            <Link
+              href="/social"
+              className={cn(
+                'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-colors',
+                pathname === '/social' || pathname.startsWith('/social/')
+                  ? 'bg-[#0057b8] text-white'
+                  : 'text-[#1b2232] hover:bg-[#f3f5f7]'
+              )}
+            >
+              🌐 Social
+            </Link>
+          )}
           {isGestor && (
             <Link
               href="/admin"
@@ -176,6 +193,20 @@ export function Navbar() {
                 </Link>
               )
             })}
+            {isSocialEnabled && (
+              <Link
+                href="/social"
+                onClick={() => setMobileMenuOpen(false)}
+                className={cn(
+                  'flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-medium transition-colors',
+                  pathname === '/social' || pathname.startsWith('/social/')
+                    ? 'bg-[#0057b8] text-white'
+                    : 'text-[#1b2232] hover:bg-[#f3f5f7]'
+                )}
+              >
+                🌐 Social
+              </Link>
+            )}
             {isGestor && (
               <Link
                 href="/admin"

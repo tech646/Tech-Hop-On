@@ -35,6 +35,11 @@ export default function PracticingPage() {
       })
       const data = await res.json()
       setMessages(prev => [...prev, { role: 'assistant', content: data.text || 'Error getting response.' }])
+      // Award HopGems: 2 per message; every 10 messages = bonus 150 gems session award
+      fetch('/api/gems', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ type: 'ai_message' }) })
+      if (messages.filter(m => m.role === 'user').length > 0 && messages.filter(m => m.role === 'user').length % 9 === 0) {
+        fetch('/api/gems', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ type: 'sat_practicing_session' }) })
+      }
     } catch {
       setMessages(prev => [...prev, { role: 'assistant', content: 'Error connecting to AI. Please try again.' }])
     } finally {

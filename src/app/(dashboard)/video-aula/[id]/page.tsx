@@ -67,6 +67,18 @@ export default async function VideoAulaPage({ params }: { params: Promise<{ id: 
       completed_at: new Date().toISOString(),
       watched_seconds: (lesson?.duration_minutes ?? 0) * 60,
     }, { onConflict: 'user_id,lesson_id' })
+    // Award HopGems
+    const { data: alreadyDone } = await supa.from('hop_gem_transactions')
+      .select('id').eq('user_id', u.id).eq('type', 'lesson_complete').eq('description', `lesson_complete — ${id}`).limit(1)
+    if (!alreadyDone || alreadyDone.length === 0) {
+      await supa.from('hop_gem_transactions').insert({ user_id: u.id, amount: 20, type: 'lesson_complete', description: `lesson_complete — ${id}` })
+      const { data: gems } = await supa.from('hop_gems').select('balance, total_earned').eq('user_id', u.id).single()
+      if (gems) {
+        await supa.from('hop_gems').update({ balance: (gems as {balance:number;total_earned:number}).balance + 20, total_earned: (gems as {balance:number;total_earned:number}).total_earned + 20, updated_at: new Date().toISOString() }).eq('user_id', u.id)
+      } else {
+        await supa.from('hop_gems').insert({ user_id: u.id, balance: 20, total_earned: 20 })
+      }
+    }
     redirect('/trilha-de-aulas')
   }
 

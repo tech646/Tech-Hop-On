@@ -76,6 +76,8 @@ export default function AssistantChatPage({ params }: { params: Promise<{ id: st
       })
       const data = await res.json()
       setMessages(prev => [...prev, { role: 'assistant', content: data.text || 'Error getting response.' }])
+      // Award 2 HopGems per AI message
+      fetch('/api/gems', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ type: 'ai_message' }) })
     } catch {
       setMessages(prev => [...prev, { role: 'assistant', content: 'Error connecting to AI. Please try again.' }])
     } finally {

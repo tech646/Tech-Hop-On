@@ -258,7 +258,13 @@ export default function MathClassesPage() {
                 </div>
               </div>
             </div>
-            <button onClick={() => setShowModal(false)} className="w-full bg-[#0057b8] hover:bg-[#0046a0] text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition-colors">
+            <button
+              onClick={() => {
+                setShowModal(false)
+                fetch('/api/gems', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ type: 'math_class' }) })
+              }}
+              className="w-full bg-[#0057b8] hover:bg-[#0046a0] text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition-colors"
+            >
               ✓ Confirm Booking
             </button>
           </div>
