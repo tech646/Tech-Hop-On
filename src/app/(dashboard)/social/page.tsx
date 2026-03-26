@@ -343,7 +343,7 @@ export default function SocialPage() {
           {/* Anelisa — premium section */}
           <div className="bg-gradient-to-br from-[#ffd700]/10 via-white to-[#ffb300]/10 border border-[#ffd700]/50 rounded-2xl p-6 relative overflow-hidden">
             <div className="absolute -right-2 bottom-0 opacity-90 pointer-events-none select-none">
-              <Image src="/images/ana-paula.png" alt="Anelisa" width={130} height={130} className="object-contain" />
+              <Image src="/images/brighta-face.png" alt="Anelisa" width={130} height={130} className="object-contain rounded-full" />
             </div>
             <div className="max-w-[60%]">
               <div className="flex items-center gap-2 mb-2">
@@ -384,7 +384,7 @@ export default function SocialPage() {
           {/* Golden Ticket explanation — Mrs Brighta */}
           <div className="bg-white rounded-2xl border border-[#e1e7ef] p-5 flex gap-4 items-start">
             <div className="w-20 h-20 shrink-0 relative">
-              <Image src="/images/brighta-face.png" alt="Mrs Brighta" fill className="object-contain rounded-full" />
+              <Image src="/images/ana-paula.png" alt="Mrs Brighta" fill className="object-contain" />
             </div>
             <div>
               <div className="flex items-center gap-2 mb-1">
