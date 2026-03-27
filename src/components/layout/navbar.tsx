@@ -146,6 +146,13 @@ export function Navbar() {
                   <User size={15} />
                   My Profile
                 </Link>
+                <Link
+                  href="/central-de-ajuda"
+                  onClick={() => setMenuOpen(false)}
+                  className="flex items-center gap-2 px-4 py-2 text-sm text-[#1b2232] hover:bg-[#f3f5f7]"
+                >
+                  🐛 Report a Bug
+                </Link>
                 <hr className="my-1 border-[#e1e7ef]" />
                 <button
                   onClick={handleSignOut}
