@@ -173,6 +173,13 @@ export default function SocialPage() {
       setShowAnelisaModal(false)
       setSelectedDay(null)
       setAnelisaTime('')
+      // Notify user about the booking
+      await supabase.from('notifications').insert({
+        user_id: userId,
+        type: 'anelisa_class',
+        title: '🌟 Class with Anelisa scheduled!',
+        body: `Your class is confirmed for ${date.toLocaleDateString('en-US', { month: 'long', day: 'numeric' })} at ${anelisaTime}. Don't forget!`,
+      })
     }
     setAnelisaLoading(false)
   }

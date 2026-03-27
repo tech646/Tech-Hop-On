@@ -78,6 +78,27 @@ export async function POST(req: NextRequest) {
       p_amount: finalAmount,
     })
 
+    // Create notification for notable gem awards (skip ai_message — too frequent)
+    if (type !== 'ai_message') {
+      const notifTitles: Record<string, string> = {
+        diagnostic_complete: '🎯 Diagnostic complete!',
+        profile_setup: '👤 Profile set up!',
+        lesson_complete: '📚 Lesson complete!',
+        math_class: '📐 Math Class booked!',
+        sat_practicing_session: '⭐ SAT Practice session done!',
+        hearts_milestone: '❤️ Hearts milestone reached!',
+      }
+      const title = notifTitles[type]
+      if (title) {
+        await supabase.from('notifications').insert({
+          user_id: user.id,
+          type: 'gems',
+          title,
+          body: `+${finalAmount} HopGems${multiplier > 1 ? ` (${multiplier}× multiplier!)` : ''}`,
+        })
+      }
+    }
+
     return NextResponse.json({ awarded: finalAmount, multiplier })
   } catch {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
