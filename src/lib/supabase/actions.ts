@@ -190,11 +190,12 @@ export async function getGestorStudentsData() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user?.email?.endsWith('@hopon.academy')) return { students: [], stats: { total: 0, avgSAT: 0, avgLessons: 0, avgAI: 0 } }
 
-  // Get all non-admin profiles
+  // Get all non-admin, non-teacher profiles
   const { data: profiles } = await supabase
     .from('profiles')
-    .select('id, full_name, email, country, city, sat_target_score, avatar_url')
+    .select('id, full_name, email, country, city, sat_target_score, avatar_url, role')
     .not('email', 'ilike', '%@hopon.academy')
+    .neq('role', 'teacher')
 
   if (!profiles || profiles.length === 0) return { students: [], stats: { total: 0, avgSAT: 0, avgLessons: 0, avgAI: 0 } }
 
@@ -271,6 +272,49 @@ export async function getGestorStudentsData() {
   const avgAI = total > 0 ? Math.round(students.reduce((a, s) => a + s.aiUsage, 0) / total) : 0
 
   return { students, stats: { total, avgSAT, avgLessons, avgAI } }
+}
+
+// Admin: set user role (student ↔ teacher)
+export async function setUserRole(userId: string, role: 'student' | 'teacher') {
+  'use server'
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user?.email?.endsWith('@hopon.academy')) throw new Error('Unauthorized')
+  await supabase.from('profiles').update({ role }).eq('id', userId)
+}
+
+// Admin: get all teachers with math class count
+export async function getTeachersData() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user?.email?.endsWith('@hopon.academy')) return { teachers: [] }
+
+  const { data: profiles } = await supabase
+    .from('profiles')
+    .select('id, full_name, email, country, city, avatar_url')
+    .not('email', 'ilike', '%@hopon.academy')
+    .eq('role', 'teacher')
+
+  if (!profiles || profiles.length === 0) return { teachers: [] }
+
+  const userIds = profiles.map(p => p.id)
+  const { data: mathData } = await supabase
+    .from('math_appointments')
+    .select('user_id')
+    .in('user_id', userIds)
+    .eq('status', 'confirmed')
+
+  const teachers = profiles.map(p => ({
+    id: p.id,
+    name: p.full_name || p.email?.split('@')[0] || 'Teacher',
+    email: p.email || '',
+    country: p.country || '',
+    city: p.city || '',
+    avatarUrl: p.avatar_url || null,
+    mathClasses: (mathData ?? []).filter(r => r.user_id === p.id).length,
+  }))
+
+  return { teachers }
 }
 
 // Admin: get all stats

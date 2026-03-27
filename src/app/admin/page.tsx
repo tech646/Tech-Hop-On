@@ -1,10 +1,13 @@
 import Link from 'next/link'
-import { getGestorStudentsData } from '@/lib/supabase/actions'
+import { getGestorStudentsData, getTeachersData } from '@/lib/supabase/actions'
 import { ArrowLeft } from 'lucide-react'
 import AdminDashboard from './AdminDashboard'
 
 export default async function GestorPage() {
-  const { students } = await getGestorStudentsData()
+  const [{ students }, { teachers }] = await Promise.all([
+    getGestorStudentsData(),
+    getTeachersData(),
+  ])
 
   return (
     <div className="max-w-[1200px] mx-auto px-6 py-8">
@@ -20,7 +23,7 @@ export default async function GestorPage() {
         </div>
       </div>
 
-      <AdminDashboard students={students} />
+      <AdminDashboard students={students} teachers={teachers} />
     </div>
   )
 }
