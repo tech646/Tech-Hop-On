@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { ArrowLeft, ChevronDown, ChevronUp, Search } from 'lucide-react'
+import { ArrowLeft, ChevronDown, ChevronUp, Search, X, Loader2 } from 'lucide-react'
 
 const categories = [
   {
@@ -53,6 +53,35 @@ const categories = [
 export default function CentralDeAjudaPage() {
   const [search, setSearch] = useState('')
   const [openItem, setOpenItem] = useState<string | null>('Como acesso minhas aulas?')
+  const [showBugModal, setShowBugModal] = useState(false)
+  const [bugTitle, setBugTitle] = useState('')
+  const [bugPage, setBugPage] = useState('')
+  const [bugDescription, setBugDescription] = useState('')
+  const [bugSending, setBugSending] = useState(false)
+  const [bugSent, setBugSent] = useState(false)
+  const [bugError, setBugError] = useState('')
+
+  async function handleBugSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    setBugSending(true)
+    setBugError('')
+    try {
+      const res = await fetch('/api/bug-report', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title: bugTitle, description: bugDescription, page: bugPage }),
+      })
+      if (!res.ok) throw new Error()
+      setBugSent(true)
+      setBugTitle('')
+      setBugPage('')
+      setBugDescription('')
+    } catch {
+      setBugError('Failed to send. Please try again.')
+    } finally {
+      setBugSending(false)
+    }
+  }
 
   const filtered = categories.map(cat => ({
     ...cat,
@@ -117,7 +146,10 @@ export default function CentralDeAjudaPage() {
         <div className="text-3xl mb-3">🐛</div>
         <h3 className="font-bold text-[#1b2232] text-lg mb-1">Found a problem?</h3>
         <p className="text-[#65758b] text-sm mb-4">Help us improve by reporting errors or bugs.</p>
-        <button className="flex items-center gap-2 bg-[#1f2c47] hover:bg-[#0057b8] text-white font-bold px-6 py-2.5 rounded-xl mx-auto text-sm transition-colors">
+        <button
+          onClick={() => { setShowBugModal(true); setBugSent(false); setBugError('') }}
+          className="flex items-center gap-2 bg-[#1f2c47] hover:bg-[#0057b8] text-white font-bold px-6 py-2.5 rounded-xl mx-auto text-sm transition-colors"
+        >
           🐛 Report Error or Bug
         </button>
       </div>
@@ -125,6 +157,88 @@ export default function CentralDeAjudaPage() {
       <Link href="/home" className="text-sm text-[#65758b] hover:text-[#0057b8] flex items-center justify-center gap-1">
         <ArrowLeft size={14} /> Back to Home
       </Link>
+
+      {/* Bug report modal */}
+      {showBugModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl w-full max-w-[480px] shadow-xl">
+            <div className="flex items-center justify-between p-6 border-b border-[#e1e7ef]">
+              <div className="flex items-center gap-2">
+                <span className="text-xl">🐛</span>
+                <h3 className="font-bold text-[#1b2232]">Report a Bug</h3>
+              </div>
+              <button onClick={() => setShowBugModal(false)} className="text-[#65758b] hover:text-[#1b2232]">
+                <X size={20} />
+              </button>
+            </div>
+
+            {bugSent ? (
+              <div className="p-8 text-center">
+                <div className="text-4xl mb-3">✅</div>
+                <p className="font-bold text-[#1b2232] mb-1">Report sent!</p>
+                <p className="text-sm text-[#65758b] mb-5">Our team will look into this as soon as possible.</p>
+                <button
+                  onClick={() => setShowBugModal(false)}
+                  className="bg-[#1f2c47] text-white font-bold px-6 py-2.5 rounded-xl text-sm hover:bg-[#0057b8] transition-colors"
+                >
+                  Close
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleBugSubmit} className="p-6 space-y-4">
+                <div>
+                  <label className="block text-xs font-medium text-[#65758b] mb-1">What happened? <span className="text-red-400">*</span></label>
+                  <input
+                    value={bugTitle}
+                    onChange={e => setBugTitle(e.target.value)}
+                    placeholder="Brief title of the problem"
+                    required
+                    className="w-full border border-[#e1e7ef] rounded-xl px-4 py-2.5 text-sm text-[#1b2232] outline-none focus:border-[#0057b8] transition-colors"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-[#65758b] mb-1">Where did it happen? <span className="text-[#65758b] font-normal">(optional)</span></label>
+                  <input
+                    value={bugPage}
+                    onChange={e => setBugPage(e.target.value)}
+                    placeholder="e.g. Lessons page, AI Assistants, Profile..."
+                    className="w-full border border-[#e1e7ef] rounded-xl px-4 py-2.5 text-sm text-[#1b2232] outline-none focus:border-[#0057b8] transition-colors"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-[#65758b] mb-1">Describe in detail <span className="text-red-400">*</span></label>
+                  <textarea
+                    value={bugDescription}
+                    onChange={e => setBugDescription(e.target.value)}
+                    placeholder="What were you doing? What did you expect to happen? What actually happened?"
+                    required
+                    rows={4}
+                    className="w-full border border-[#e1e7ef] rounded-xl px-4 py-2.5 text-sm text-[#1b2232] outline-none focus:border-[#0057b8] transition-colors resize-none"
+                  />
+                </div>
+                {bugError && <p className="text-red-500 text-sm">{bugError}</p>}
+                <div className="flex gap-3 pt-1">
+                  <button
+                    type="button"
+                    onClick={() => setShowBugModal(false)}
+                    className="flex-1 border border-[#e1e7ef] text-[#65758b] font-medium py-2.5 rounded-xl text-sm hover:bg-[#f3f5f7] transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={bugSending}
+                    className="flex-1 bg-[#1f2c47] hover:bg-[#0057b8] disabled:opacity-60 text-white font-bold py-2.5 rounded-xl text-sm flex items-center justify-center gap-2 transition-colors"
+                  >
+                    {bugSending ? <Loader2 size={14} className="animate-spin" /> : null}
+                    Send Report
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   )
 }
