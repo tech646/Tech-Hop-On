@@ -16,9 +16,6 @@ type TeacherOption = {
 type Tab = 'proximas' | 'calendario' | 'historico'
 
 
-const DAYS_IN_MARCH = Array.from({ length: 31 }, (_, i) => i + 1)
-const START_DAY = 6 // sunday=0, march 2026 starts on sunday
-
 const PLAN_CLASSES: Record<string, number> = {
   free: 0,
   monthly: 1,
@@ -44,6 +41,10 @@ export default function MathClassesPage() {
   const [userPlan, setUserPlan] = useState<string>('free')
   const [teachers, setTeachers] = useState<TeacherOption[]>([])
   const [selectedTeacher, setSelectedTeacher] = useState<TeacherOption | null>(null)
+  const [calendarDate, setCalendarDate] = useState(() => {
+    const now = new Date()
+    return new Date(now.getFullYear(), now.getMonth(), 1)
+  })
 
   useEffect(() => {
     const supabase = createClient()
@@ -180,40 +181,96 @@ export default function MathClassesPage() {
         </div>
       )}
 
-      {tab === 'calendario' && (
-        <div className="flex gap-6">
-          {/* Mini calendar */}
-          <div className="bg-white rounded-2xl border border-[#e1e7ef] p-5 w-56 shrink-0">
-            <div className="flex items-center justify-between mb-4">
-              <button className="text-[#65758b] hover:text-[#1b2232]">‹</button>
-              <p className="font-bold text-[#1b2232] text-sm">March 2026</p>
-              <button className="text-[#65758b] hover:text-[#1b2232]">›</button>
+      {tab === 'calendario' && (() => {
+        const today = new Date()
+        const year = calendarDate.getFullYear()
+        const month = calendarDate.getMonth()
+        const daysInMonth = new Date(year, month + 1, 0).getDate()
+        const startDay = new Date(year, month, 1).getDay()
+        const monthLabel = calendarDate.toLocaleString('en-US', { month: 'long', year: 'numeric' })
+
+        // Map appointments to day numbers for this month
+        const apptsByDay: Record<number, MathAppointment[]> = {}
+        appointments
+          .filter(a => a.status !== 'cancelled')
+          .forEach(a => {
+            const d = new Date(a.scheduled_at)
+            if (d.getFullYear() === year && d.getMonth() === month) {
+              const day = d.getDate()
+              if (!apptsByDay[day]) apptsByDay[day] = []
+              apptsByDay[day].push(a)
+            }
+          })
+
+        const selectedAppts = selectedDay ? (apptsByDay[selectedDay] ?? []) : []
+        const selectedLabel = selectedDay
+          ? new Date(year, month, selectedDay).toLocaleString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })
+          : monthLabel
+
+        return (
+          <div className="flex flex-col sm:flex-row gap-6">
+            {/* Mini calendar */}
+            <div className="bg-white rounded-2xl border border-[#e1e7ef] p-5 w-full sm:w-56 shrink-0">
+              <div className="flex items-center justify-between mb-4">
+                <button onClick={() => { setCalendarDate(new Date(year, month - 1, 1)); setSelectedDay(null) }} className="text-[#65758b] hover:text-[#1b2232] text-lg font-bold px-1">‹</button>
+                <p className="font-bold text-[#1b2232] text-sm">{monthLabel}</p>
+                <button onClick={() => { setCalendarDate(new Date(year, month + 1, 1)); setSelectedDay(null) }} className="text-[#65758b] hover:text-[#1b2232] text-lg font-bold px-1">›</button>
+              </div>
+              <div className="grid grid-cols-7 gap-1 text-xs text-center">
+                {['Su','Mo','Tu','We','Th','Fr','Sa'].map(d => (
+                  <div key={d} className="text-[#65758b] font-medium py-1">{d}</div>
+                ))}
+                {Array.from({ length: startDay }).map((_, i) => <div key={`e${i}`} />)}
+                {Array.from({ length: daysInMonth }, (_, i) => i + 1).map(d => {
+                  const isToday = d === today.getDate() && month === today.getMonth() && year === today.getFullYear()
+                  const hasAppt = !!apptsByDay[d]
+                  const isSelected = selectedDay === d
+                  return (
+                    <button key={d} onClick={() => setSelectedDay(d)}
+                      className={`py-1 rounded-full transition-colors relative ${isSelected ? 'bg-[#1f2c47] text-white font-bold' : isToday ? 'bg-[#0057b8] text-white font-bold' : 'text-[#1b2232] hover:bg-[#f3f5f7]'}`}>
+                      {d}
+                      {hasAppt && !isSelected && !isToday && (
+                        <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[#0057b8]" />
+                      )}
+                    </button>
+                  )
+                })}
+              </div>
             </div>
-            <div className="grid grid-cols-7 gap-1 text-xs text-center">
-              {['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(d => (
-                <div key={d} className="text-[#65758b] font-medium py-1">{d}</div>
-              ))}
-              {Array.from({ length: START_DAY }).map((_, i) => <div key={`e${i}`} />)}
-              {DAYS_IN_MARCH.map(d => (
-                <button key={d} onClick={() => setSelectedDay(d)}
-                  className={`py-1 rounded-full transition-colors ${d === 4 ? 'bg-[#0057b8] text-white font-bold' : selectedDay === d ? 'bg-[#f3f5f7] text-[#1b2232] font-bold' : 'text-[#1b2232] hover:bg-[#f3f5f7]'}`}>
-                  {d}
-                </button>
-              ))}
+            {/* Day content */}
+            <div className="flex-1 bg-white rounded-2xl border border-[#e1e7ef] p-6">
+              <p className="font-bold text-[#1b2232] mb-4">{selectedLabel}</p>
+              {selectedAppts.length > 0 ? (
+                <div className="space-y-3">
+                  {selectedAppts.map(a => (
+                    <div key={a.id} className="flex items-center gap-4 p-3 rounded-xl border border-[#e1e7ef]">
+                      <div className="w-9 h-9 rounded-xl bg-[#ff9500]/10 flex items-center justify-center text-base shrink-0">📐</div>
+                      <div className="flex-1">
+                        <p className="font-bold text-[#1b2232] text-sm">{a.notes || 'Math Class'}</p>
+                        <p className="text-xs text-[#65758b]">{a.teacher_name || '—'} · {new Date(a.scheduled_at).toLocaleString('en-US', { hour: '2-digit', minute: '2-digit' })}</p>
+                      </div>
+                      {a.meeting_url ? (
+                        <a href={a.meeting_url} target="_blank" rel="noopener noreferrer" className="bg-[#1f2c47] text-white text-xs px-3 py-1.5 rounded-xl flex items-center gap-1">
+                          <ExternalLink size={11} /> Join
+                        </a>
+                      ) : (
+                        <span className="text-xs font-medium px-3 py-1.5 rounded-full bg-[#22c55e]/10 text-[#22c55e]">Confirmed</span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center h-40 gap-3">
+                  <p className="text-[#65758b] text-sm">{selectedDay ? 'No classes on this day.' : 'Select a day to see classes.'}</p>
+                  <button onClick={() => setShowModal(true)} className="flex items-center gap-1 text-[#65758b] text-sm border border-[#e1e7ef] px-4 py-1.5 rounded-xl hover:border-[#0057b8] hover:text-[#0057b8] transition-colors">
+                    <Plus size={14} /> Book a class
+                  </button>
+                </div>
+              )}
             </div>
           </div>
-          {/* Day content */}
-          <div className="flex-1 bg-white rounded-2xl border border-[#e1e7ef] p-6">
-            <p className="font-bold text-[#1b2232] mb-4">March 04, 2026</p>
-            <div className="flex flex-col items-center justify-center h-40 gap-3">
-              <p className="text-[#65758b] text-sm">No classes on this day.</p>
-              <button onClick={() => setShowModal(true)} className="flex items-center gap-1 text-[#65758b] text-sm border border-[#e1e7ef] px-4 py-1.5 rounded-xl hover:border-[#0057b8] hover:text-[#0057b8] transition-colors">
-                <Plus size={14} /> Book on this day
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+        )
+      })()}
 
       {tab === 'historico' && (() => {
         const completed = appointments
