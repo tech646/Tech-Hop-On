@@ -4,7 +4,14 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { ArrowLeft, Plus, ExternalLink, X } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import { CalEmbed } from '@/components/CalEmbed'
 import type { MathAppointment } from '@/types'
+
+type TeacherOption = {
+  id: string
+  name: string
+  calComLink: string | null
+}
 
 type Tab = 'proximas' | 'calendario' | 'historico'
 
@@ -30,21 +37,30 @@ export default function MathClassesPage() {
   const [tab, setTab] = useState<Tab>('proximas')
   const [showModal, setShowModal] = useState(false)
   const [showCancel, setShowCancel] = useState(false)
+  const [showCal, setShowCal] = useState(false)
   const [selectedDay, setSelectedDay] = useState<number | null>(null)
   const [cancelTarget, setCancelTarget] = useState<MathAppointment | null>(null)
   const [appointments, setAppointments] = useState<MathAppointment[]>([])
   const [userPlan, setUserPlan] = useState<string>('free')
+  const [teachers, setTeachers] = useState<TeacherOption[]>([])
+  const [selectedTeacher, setSelectedTeacher] = useState<TeacherOption | null>(null)
 
   useEffect(() => {
     const supabase = createClient()
     supabase.auth.getUser().then(async ({ data: { user } }) => {
       if (user) {
-        const [{ data: appts }, { data: profile }] = await Promise.all([
+        const [{ data: appts }, { data: profile }, { data: teacherProfiles }] = await Promise.all([
           supabase.from('math_appointments').select('*').eq('user_id', user.id).order('scheduled_at', { ascending: true }),
           supabase.from('profiles').select('plan').eq('id', user.id).single(),
+          supabase.from('profiles').select('id, full_name, email, cal_com_link').eq('role', 'teacher'),
         ])
         setAppointments((appts as MathAppointment[]) ?? [])
         if (profile?.plan) setUserPlan(profile.plan)
+        setTeachers((teacherProfiles ?? []).map(t => ({
+          id: t.id,
+          name: t.full_name || t.email?.split('@')[0] || 'Teacher',
+          calComLink: t.cal_com_link ?? null,
+        })))
       }
     })
   }, [])
@@ -144,9 +160,20 @@ export default function MathClassesPage() {
                     Cancel class <ExternalLink size={12} />
                   </button>
                 )}
-                <button className="bg-[#1f2c47] text-white text-sm px-3 py-1.5 rounded-xl flex items-center gap-1">
-                  <ExternalLink size={12} /> Join Class
-                </button>
+                {cls.raw.meeting_url ? (
+                  <a
+                    href={cls.raw.meeting_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="bg-[#1f2c47] text-white text-sm px-3 py-1.5 rounded-xl flex items-center gap-1"
+                  >
+                    <ExternalLink size={12} /> Join Class
+                  </a>
+                ) : (
+                  <button disabled className="bg-[#e1e7ef] text-[#65758b] text-sm px-3 py-1.5 rounded-xl flex items-center gap-1 cursor-not-allowed">
+                    <ExternalLink size={12} /> Join Class
+                  </button>
+                )}
               </div>
             </div>
           ))}
@@ -226,49 +253,60 @@ export default function MathClassesPage() {
           <div className="bg-white rounded-t-2xl sm:rounded-2xl p-6 w-full sm:w-[480px] shadow-2xl max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-5">
               <h3 className="text-lg font-bold text-[#1b2232]">Book New Class</h3>
-              <button onClick={() => setShowModal(false)} className="text-[#65758b] hover:text-[#1b2232]"><X size={18} /></button>
-            </div>
-            <div className="mb-4">
-              <label className="text-sm font-medium text-[#1b2232] mb-2 block">Teacher</label>
-              <select className="w-full border border-[#e1e7ef] rounded-xl px-3 py-2.5 text-sm text-[#65758b] outline-none focus:border-[#0057b8]">
-                <option value="">Choose a teacher</option>
-                <option>🧑‍🏫 Professor Lucas</option>
-                <option>👩‍🏫 Professor Leticia</option>
-                <option>🧑‍🏫 Professor Jonas</option>
-                <option>🧑‍🏫 Professor Arthur</option>
-              </select>
+              <button onClick={() => { setShowModal(false); setSelectedTeacher(null) }} className="text-[#65758b] hover:text-[#1b2232]"><X size={18} /></button>
             </div>
             <div className="mb-6">
-              <label className="text-sm font-medium text-[#1b2232] mb-2 block">Date</label>
-              <div className="border border-[#e1e7ef] rounded-xl p-4">
-                <div className="flex items-center justify-between mb-3">
-                  <button className="text-[#65758b] hover:text-[#1b2232]">‹</button>
-                  <p className="font-bold text-[#1b2232] text-sm">March 2026</p>
-                  <button className="text-[#65758b] hover:text-[#1b2232]">›</button>
-                </div>
-                <div className="grid grid-cols-7 gap-1 text-xs text-center">
-                  {['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(d => <div key={d} className="text-[#65758b] font-medium py-1">{d}</div>)}
-                  {Array.from({ length: START_DAY }).map((_, i) => <div key={`e${i}`} />)}
-                  {DAYS_IN_MARCH.map(d => (
-                    <button key={d} onClick={() => setSelectedDay(d)}
-                      className={`py-1.5 rounded-full text-xs transition-colors ${d === 4 ? 'bg-[#0057b8] text-white font-bold' : selectedDay === d ? 'bg-[#1f2c47] text-white font-bold' : 'text-[#1b2232] hover:bg-[#f3f5f7]'}`}>
-                      {d}
+              <label className="text-sm font-medium text-[#1b2232] mb-2 block">Teacher</label>
+              {teachers.length === 0 ? (
+                <p className="text-sm text-[#65758b]">No teachers available yet.</p>
+              ) : (
+                <div className="space-y-2">
+                  {teachers.map(t => (
+                    <button
+                      key={t.id}
+                      onClick={() => setSelectedTeacher(prev => prev?.id === t.id ? null : t)}
+                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border transition-colors text-left ${selectedTeacher?.id === t.id ? 'border-[#0057b8] bg-[#0057b8]/5' : 'border-[#e1e7ef] hover:border-[#0057b8]/40'}`}
+                    >
+                      <span className="text-xl">🧑‍🏫</span>
+                      <span className="font-medium text-[#1b2232] text-sm">{t.name}</span>
+                      {t.calComLink && <span className="ml-auto text-xs text-[#0057b8] font-medium">Cal available</span>}
                     </button>
                   ))}
                 </div>
-              </div>
+              )}
             </div>
-            <button
-              onClick={() => {
-                setShowModal(false)
-                fetch('/api/gems', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ type: 'math_class' }) })
-              }}
-              className="w-full bg-[#0057b8] hover:bg-[#0046a0] text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition-colors"
-            >
-              ✓ Confirm Booking
-            </button>
+            {selectedTeacher?.calComLink ? (
+              <button
+                onClick={() => { setShowModal(false); setShowCal(true) }}
+                className="w-full bg-[#0057b8] hover:bg-[#0046a0] text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition-colors"
+              >
+                📅 Open {selectedTeacher.name}&apos;s Calendar
+              </button>
+            ) : selectedTeacher ? (
+              <p className="text-sm text-center text-[#65758b]">This teacher hasn&apos;t set up online scheduling yet. Contact them directly.</p>
+            ) : (
+              <p className="text-sm text-center text-[#65758b]">Select a teacher to continue.</p>
+            )}
           </div>
         </div>
+      )}
+
+      {/* Cal.com embed */}
+      {showCal && selectedTeacher?.calComLink && (
+        <CalEmbed
+          calLink={selectedTeacher.calComLink}
+          onClose={() => {
+            setShowCal(false)
+            setSelectedTeacher(null)
+            // Refresh appointments so the new booking appears
+            const supabase = createClient()
+            supabase.auth.getUser().then(({ data: { user } }) => {
+              if (!user) return
+              supabase.from('math_appointments').select('*').eq('user_id', user.id).order('scheduled_at', { ascending: true })
+                .then(({ data }) => { if (data) setAppointments(data as MathAppointment[]) })
+            })
+          }}
+        />
       )}
 
       {/* Cancel Modal */}

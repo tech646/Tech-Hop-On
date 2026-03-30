@@ -118,6 +118,7 @@ export type MathAppointment = {
   status: 'pending' | 'confirmed' | 'cancelled' | 'completed'
   teacher_name: string | null
   notes: string | null
+  meeting_url: string | null
   created_at: string
 }
 

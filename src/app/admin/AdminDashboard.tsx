@@ -7,8 +7,8 @@ import {
   PieChart, Pie, Cell, CartesianGrid, Legend,
 } from 'recharts'
 import * as XLSX from 'xlsx'
-import { Download, ArrowUp, ArrowDown, Users, TrendingUp, BookOpen, Sparkles, GraduationCap, Calculator } from 'lucide-react'
-import { setUserRole } from '@/lib/supabase/actions'
+import { Download, ArrowUp, ArrowDown, Users, TrendingUp, BookOpen, Sparkles, GraduationCap, Calculator, Link2, Check, X as XIcon } from 'lucide-react'
+import { setUserRole, setTeacherCalLink } from '@/lib/supabase/actions'
 
 type Student = {
   id: string
@@ -33,6 +33,7 @@ type Teacher = {
   country: string
   city: string
   avatarUrl: string | null
+  calComLink: string | null
   mathClasses: number
 }
 
@@ -150,6 +151,7 @@ export default function AdminDashboard({
         country: student.country,
         city: student.city,
         avatarUrl: student.avatarUrl,
+        calComLink: null,
         mathClasses: student.mathClasses,
       }])
       setLoadingId(null)
@@ -214,7 +216,14 @@ export default function AdminDashboard({
       </div>
 
       {tab === 'teachers' ? (
-        <TeachersTab teachers={teachers} loadingId={loadingId} onMarkAsStudent={markAsStudent} />
+        <TeachersTab
+          teachers={teachers}
+          loadingId={loadingId}
+          onMarkAsStudent={markAsStudent}
+          onCalLinkSaved={(id, link) =>
+            setTeachers(prev => prev.map(t => t.id === id ? { ...t, calComLink: link || null } : t))
+          }
+        />
       ) : (
         <>
           {/* Filters + Download */}
@@ -468,12 +477,30 @@ function TeachersTab({
   teachers,
   loadingId,
   onMarkAsStudent,
+  onCalLinkSaved,
 }: {
   teachers: Teacher[]
   loadingId: string | null
   onMarkAsStudent: (t: Teacher) => void
+  onCalLinkSaved: (id: string, link: string) => void
 }) {
   const totalMath = teachers.reduce((a, t) => a + t.mathClasses, 0)
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [editValue, setEditValue] = useState('')
+  const [savingId, setSavingId] = useState<string | null>(null)
+
+  function startEdit(t: Teacher) {
+    setEditingId(t.id)
+    setEditValue(t.calComLink ?? '')
+  }
+
+  async function saveCalLink(teacherId: string) {
+    setSavingId(teacherId)
+    await setTeacherCalLink(teacherId, editValue.trim())
+    onCalLinkSaved(teacherId, editValue.trim())
+    setEditingId(null)
+    setSavingId(null)
+  }
 
   return (
     <div className="space-y-4">
@@ -514,7 +541,7 @@ function TeachersTab({
       <div className="bg-white border border-[#e1e7ef] rounded-2xl overflow-hidden">
         <div className="px-6 py-5 border-b border-[#e1e7ef]">
           <h2 className="text-base font-bold text-[#1b2232]">Teachers</h2>
-          <p className="text-sm text-[#65758b] mt-0.5">Not counted in student engagement analytics.</p>
+          <p className="text-sm text-[#65758b] mt-0.5">Not counted in student engagement analytics. Set each teacher&apos;s Cal.com link so students can schedule classes.</p>
         </div>
 
         {teachers.length === 0 ? (
@@ -528,7 +555,7 @@ function TeachersTab({
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-[#e1e7ef]">
-                  {['Teacher', 'Country', 'Math Classes', ''].map(col => (
+                  {['Teacher', 'Country', 'Math Classes', 'Cal.com Link', ''].map(col => (
                     <th key={col} className="text-left px-4 py-3 text-xs font-semibold text-[#65758b] uppercase tracking-wider whitespace-nowrap">
                       {col}
                     </th>
@@ -560,6 +587,43 @@ function TeachersTab({
                         <span className="font-bold text-[#1b2232] text-base">{t.mathClasses}</span>
                         <span className="text-xs text-[#65758b]">classes</span>
                       </div>
+                    </td>
+                    <td className="px-4 py-3 min-w-[260px]">
+                      {editingId === t.id ? (
+                        <div className="flex items-center gap-2">
+                          <input
+                            autoFocus
+                            value={editValue}
+                            onChange={e => setEditValue(e.target.value)}
+                            placeholder="username/event-type"
+                            className="flex-1 border border-[#0057b8] rounded-lg px-3 py-1.5 text-xs text-[#1b2232] outline-none"
+                          />
+                          <button type="button" disabled={savingId === t.id} onClick={() => saveCalLink(t.id)}
+                            className="w-7 h-7 flex items-center justify-center rounded-lg bg-[#0057b8] text-white hover:bg-[#0046a0] disabled:opacity-50">
+                            {savingId === t.id ? '…' : <Check size={13} />}
+                          </button>
+                          <button type="button" onClick={() => setEditingId(null)}
+                            className="w-7 h-7 flex items-center justify-center rounded-lg border border-[#e1e7ef] text-[#65758b] hover:bg-[#f3f5f7]">
+                            <XIcon size={13} />
+                          </button>
+                        </div>
+                      ) : t.calComLink ? (
+                        <div className="flex items-center gap-2">
+                          <a href={`https://cal.com/${t.calComLink}`} target="_blank" rel="noopener noreferrer"
+                            className="flex items-center gap-1.5 text-xs text-[#0057b8] hover:underline">
+                            <Link2 size={12} />
+                            {t.calComLink}
+                          </a>
+                          <button type="button" onClick={() => startEdit(t)}
+                            className="text-xs text-[#65758b] hover:text-[#1b2232] underline">edit</button>
+                        </div>
+                      ) : (
+                        <button type="button" onClick={() => startEdit(t)}
+                          className="flex items-center gap-1.5 text-xs text-[#65758b] border border-dashed border-[#d1d5db] px-3 py-1.5 rounded-lg hover:border-[#0057b8] hover:text-[#0057b8] transition-colors">
+                          <Link2 size={12} />
+                          Add Cal.com link
+                        </button>
+                      )}
                     </td>
                     <td className="px-4 py-3">
                       <button

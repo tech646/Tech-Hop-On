@@ -291,7 +291,7 @@ export async function getTeachersData() {
 
   const { data: profiles } = await supabase
     .from('profiles')
-    .select('id, full_name, email, country, city, avatar_url')
+    .select('id, full_name, email, country, city, avatar_url, cal_com_link')
     .not('email', 'ilike', '%@hopon.academy')
     .eq('role', 'teacher')
 
@@ -311,10 +311,20 @@ export async function getTeachersData() {
     country: p.country || '',
     city: p.city || '',
     avatarUrl: p.avatar_url || null,
+    calComLink: p.cal_com_link || null,
     mathClasses: (mathData ?? []).filter(r => r.user_id === p.id).length,
   }))
 
   return { teachers }
+}
+
+// Admin: save teacher's Cal.com link
+export async function setTeacherCalLink(teacherId: string, calComLink: string) {
+  'use server'
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user?.email?.endsWith('@hopon.academy')) throw new Error('Unauthorized')
+  await supabase.from('profiles').update({ cal_com_link: calComLink || null }).eq('id', teacherId)
 }
 
 // Admin: get all stats
