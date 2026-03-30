@@ -76,7 +76,7 @@ export default function MathClassesPage() {
         label: date.toLocaleString('en-US', { day: '2-digit', month: 'long', hour: '2-digit', minute: '2-digit' }),
         title: a.notes || 'Math Class',
         teacher: a.teacher_name || '—',
-        canCancel: a.status === 'pending',
+        canCancel: a.status === 'pending' || a.status === 'confirmed',
         raw: a,
       }
     })
@@ -317,8 +317,11 @@ export default function MathClassesPage() {
               <h3 className="text-lg font-bold text-[#1b2232]">Cancel class</h3>
               <button onClick={() => setShowCancel(false)} className="text-[#65758b] hover:text-[#1b2232]"><X size={18} /></button>
             </div>
-            <p className="text-sm text-[#1b2232] mb-1">Class: Math Class 1</p>
-            <p className="text-sm text-[#65758b] mb-4">Teacher: 🧑‍🏫 Professor Lucas</p>
+            <p className="text-sm text-[#1b2232] mb-1">Class: {cancelTarget.notes || 'Math Class'}</p>
+            <p className="text-sm text-[#65758b] mb-1">Teacher: 🧑‍🏫 {cancelTarget.teacher_name || '—'}</p>
+            <p className="text-sm text-[#65758b] mb-4">
+              {new Date(cancelTarget.scheduled_at).toLocaleString('en-US', { weekday: 'long', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+            </p>
             <div className="bg-[#fff5f5] border border-[#ffcdd2] rounded-xl p-3 mb-6 text-sm text-[#c62828] space-y-1">
               <p>• You can reschedule within 5 days.</p>
               <p>• After 5 days without rescheduling, the class will be considered lost.</p>
