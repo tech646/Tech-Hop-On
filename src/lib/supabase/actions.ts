@@ -1,5 +1,13 @@
 'use server'
 import { createClient } from '@/lib/supabase/server'
+import { createClient as createSupabaseClient } from '@supabase/supabase-js'
+
+function createAdminClient() {
+  return createSupabaseClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+  )
+}
 
 // Get home page stats for a user
 export async function getUserStats(userId: string) {
@@ -280,7 +288,8 @@ export async function setUserRole(userId: string, role: 'student' | 'teacher') {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user?.email?.endsWith('@hopon.academy')) throw new Error('Unauthorized')
-  await supabase.from('profiles').update({ role }).eq('id', userId)
+  const admin = createAdminClient()
+  await admin.from('profiles').update({ role }).eq('id', userId)
 }
 
 // Admin: get all teachers with math class count
@@ -324,7 +333,8 @@ export async function setTeacherCalLink(teacherId: string, calComLink: string) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user?.email?.endsWith('@hopon.academy')) throw new Error('Unauthorized')
-  await supabase.from('profiles').update({ cal_com_link: calComLink || null }).eq('id', teacherId)
+  const admin = createAdminClient()
+  await admin.from('profiles').update({ cal_com_link: calComLink || null }).eq('id', teacherId)
 }
 
 // Admin: get all stats
