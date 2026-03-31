@@ -49,9 +49,6 @@ const TYPE_LABELS: Record<string, string> = {
   multiplier: '⚡ Top 5 multiplier bonus',
 }
 
-const DAYS_IN_MONTH = Array.from({ length: 31 }, (_, i) => i + 1)
-const START_DAY = 6 // March 2026 starts on Sunday
-
 export default function SocialPage() {
   const [tab, setTab] = useState<Tab>('overview')
   const [userName, setUserName] = useState('Student')
@@ -69,6 +66,10 @@ export default function SocialPage() {
   const [anelisaTime, setAnelisaTime] = useState('')
   const [anelisaLoading, setAnelisaLoading] = useState(false)
   const [anelisaError, setAnelisaError] = useState('')
+  const [anelisaCalDate, setAnelisaCalDate] = useState(() => {
+    const now = new Date()
+    return new Date(now.getFullYear(), now.getMonth(), 1)
+  })
   const [heartingUserId, setHeartingUserId] = useState<string | null>(null)
   const [userId, setUserId] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
@@ -142,7 +143,7 @@ export default function SocialPage() {
     setAnelisaError('')
     const supabase = createClient()
 
-    const date = new Date(2026, 2, selectedDay)
+    const date = new Date(anelisaCalDate.getFullYear(), anelisaCalDate.getMonth(), selectedDay)
     const [h, m] = anelisaTime.split(':').map(Number)
     date.setHours(h, m, 0, 0)
 
@@ -682,7 +683,7 @@ export default function SocialPage() {
           <div className="bg-white rounded-t-2xl sm:rounded-2xl p-6 w-full sm:w-[480px] shadow-2xl max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-5">
               <h3 className="text-lg font-bold text-[#1b2232]">Book class with Anelisa</h3>
-              <button onClick={() => setShowAnelisaModal(false)} className="text-[#65758b] hover:text-[#1b2232]"><X size={18} /></button>
+              <button onClick={() => { setShowAnelisaModal(false); setSelectedDay(null); setAnelisaTime(''); setAnelisaError('') }} className="text-[#65758b] hover:text-[#1b2232]"><X size={18} /></button>
             </div>
 
             <div className="bg-[#fff8e7] border border-[#ffd700]/40 rounded-xl p-3 mb-5 text-sm">
@@ -690,26 +691,52 @@ export default function SocialPage() {
             </div>
 
             {/* Calendar */}
-            <div className="mb-4">
-              <label className="text-sm font-medium text-[#1b2232] mb-2 block">Select a date</label>
-              <div className="border border-[#e1e7ef] rounded-xl p-4">
-                <div className="flex items-center justify-between mb-3">
-                  <p className="font-bold text-[#1b2232] text-sm">March 2026</p>
+            {(() => {
+              const today = new Date()
+              const year = anelisaCalDate.getFullYear()
+              const month = anelisaCalDate.getMonth()
+              const daysInMonth = new Date(year, month + 1, 0).getDate()
+              const startDay = new Date(year, month, 1).getDay()
+              const monthLabel = anelisaCalDate.toLocaleString('en-US', { month: 'long', year: 'numeric' })
+              const isPastMonth = year < today.getFullYear() || (year === today.getFullYear() && month < today.getMonth())
+              return (
+                <div className="mb-4">
+                  <label className="text-sm font-medium text-[#1b2232] mb-2 block">Select a date</label>
+                  <div className="border border-[#e1e7ef] rounded-xl p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <button
+                        onClick={() => { if (!isPastMonth) { setAnelisaCalDate(new Date(year, month - 1, 1)); setSelectedDay(null) } }}
+                        className={`text-lg font-bold px-1 ${isPastMonth ? 'text-[#d1d5dc] cursor-not-allowed' : 'text-[#65758b] hover:text-[#1b2232]'}`}
+                      >‹</button>
+                      <p className="font-bold text-[#1b2232] text-sm">{monthLabel}</p>
+                      <button
+                        onClick={() => { setAnelisaCalDate(new Date(year, month + 1, 1)); setSelectedDay(null) }}
+                        className="text-[#65758b] hover:text-[#1b2232] text-lg font-bold px-1"
+                      >›</button>
+                    </div>
+                    <div className="grid grid-cols-7 gap-1 text-xs text-center">
+                      {['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(d => (
+                        <div key={d} className="text-[#65758b] font-medium py-1">{d}</div>
+                      ))}
+                      {Array.from({ length: startDay }).map((_, i) => <div key={`e${i}`} />)}
+                      {Array.from({ length: daysInMonth }, (_, i) => i + 1).map(d => {
+                        const isPast = new Date(year, month, d) < new Date(today.getFullYear(), today.getMonth(), today.getDate())
+                        return (
+                          <button key={d} onClick={() => { if (!isPast) setSelectedDay(d) }}
+                            className={`py-1.5 rounded-full text-xs transition-colors ${
+                              selectedDay === d ? 'bg-[#ffd700] text-[#1b2232] font-bold' :
+                              isPast ? 'text-[#d1d5dc] cursor-not-allowed' :
+                              'text-[#1b2232] hover:bg-[#f3f5f7]'
+                            }`}>
+                            {d}
+                          </button>
+                        )
+                      })}
+                    </div>
+                  </div>
                 </div>
-                <div className="grid grid-cols-7 gap-1 text-xs text-center">
-                  {['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(d => (
-                    <div key={d} className="text-[#65758b] font-medium py-1">{d}</div>
-                  ))}
-                  {Array.from({ length: START_DAY }).map((_, i) => <div key={`e${i}`} />)}
-                  {DAYS_IN_MONTH.map(d => (
-                    <button key={d} onClick={() => setSelectedDay(d)}
-                      className={`py-1.5 rounded-full text-xs transition-colors ${selectedDay === d ? 'bg-[#0057b8] text-white font-bold' : 'text-[#1b2232] hover:bg-[#f3f5f7]'}`}>
-                      {d}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
+              )
+            })()}
 
             {/* Time */}
             <div className="mb-6">
