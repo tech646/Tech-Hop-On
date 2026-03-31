@@ -64,9 +64,9 @@ export function Navbar() {
       if (!user) return
       const name = user.user_metadata?.full_name || user.email?.split('@')[0] || 'User'
       setUserName(name.split(' ')[0])
+      setIsSocialEnabled(true)
       if (user.email?.endsWith('@hopon.academy')) {
         setIsGestor(true)
-        setIsSocialEnabled(true)
       }
     })
   }, [supabase])
