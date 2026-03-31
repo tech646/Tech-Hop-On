@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, Lock, RotateCcw, Play } from 'lucide-react'
+import { ArrowLeft, RotateCcw, Play } from 'lucide-react'
 
 const sectionMeta = {
   critical_reading: { label: 'Critical Reading', icon: '📚' },
@@ -20,7 +20,7 @@ export default async function TrilhaDeAulasPage() {
   const [{ data: lessons }, { data: progress }] = await Promise.all([
     supabase
       .from('lessons')
-      .select('id, title, section, order_index, duration_minutes')
+      .select('id, title, section, order_index, duration_minutes, video_url')
       .in('section', ['critical_reading', 'grammar', 'vocabulary'])
       .order('order_index'),
     supabase
@@ -38,15 +38,10 @@ export default async function TrilhaDeAulasPage() {
       .filter(l => l.section === section)
       .sort((a, b) => a.order_index - b.order_index)
 
-    let foundCurrent = false
-    const withStatus = sectionLessons.map((lesson, idx) => {
+    const withStatus = sectionLessons.map((lesson) => {
       if (completedIds.has(lesson.id)) return { ...lesson, status: 'done' as const }
-      const prevDone = idx === 0 || completedIds.has(sectionLessons[idx - 1].id)
-      if (prevDone && !foundCurrent) {
-        foundCurrent = true
-        return { ...lesson, status: 'current' as const }
-      }
-      return { ...lesson, status: 'locked' as const }
+      if (!lesson.video_url) return { ...lesson, status: 'coming_soon' as const }
+      return { ...lesson, status: 'available' as const }
     })
 
     const done = withStatus.filter(l => l.status === 'done').length
@@ -54,7 +49,7 @@ export default async function TrilhaDeAulasPage() {
   })
 
   const totalDone = sections.reduce((a, s) => a + s.done, 0)
-  const totalLessons = sections.reduce((a, s) => a + s.lessons.length, 0)
+  const totalLessons = sections.reduce((a, s) => a + s.lessons.filter(l => l.status !== 'coming_soon').length, 0)
   const progressPct = totalLessons > 0 ? Math.round((totalDone / totalLessons) * 100) : 0
 
   return (
@@ -103,46 +98,46 @@ export default async function TrilhaDeAulasPage() {
 
             <div className="divide-y divide-[#f3f5f7]">
               {sectionLessons.map((lesson) => (
-                <div
-                  key={lesson.id}
-                  className={`flex items-center gap-3 sm:gap-4 px-4 sm:px-5 py-4 ${lesson.status === 'locked' ? 'opacity-50' : ''}`}
-                >
+                <div key={lesson.id} className="flex items-center gap-3 sm:gap-4 px-4 sm:px-5 py-4">
                   <div className="shrink-0">
                     {lesson.status === 'done' ? (
                       <div className="w-8 h-8 rounded-full border-2 border-[#65758b] flex items-center justify-center">
                         <div className="w-3 h-3 rounded-full bg-[#65758b]" />
                       </div>
-                    ) : lesson.status === 'current' ? (
+                    ) : lesson.status === 'available' ? (
                       <div className="w-8 h-8 rounded-full border-2 border-[#0057b8] flex items-center justify-center">
                         <div className="w-3 h-3 rounded-full bg-[#0057b8]" />
                       </div>
                     ) : (
-                      <div className="w-8 h-8 rounded-full bg-[#f3f5f7] flex items-center justify-center">
-                        <Lock size={14} className="text-[#65758b]" />
+                      <div className="w-8 h-8 rounded-full bg-[#f3f5f7] flex items-center justify-center text-sm">
+                        🔜
                       </div>
                     )}
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-[#1b2232] truncate">{lesson.title}</p>
-                    <p className="text-xs text-[#65758b]">⏱ {lesson.duration_minutes} min</p>
+                    <p className={`text-sm font-medium truncate ${lesson.status === 'coming_soon' ? 'text-[#65758b]' : 'text-[#1b2232]'}`}>
+                      {lesson.title}
+                    </p>
+                    <p className="text-xs text-[#65758b]">
+                      {lesson.status === 'coming_soon' ? 'Coming soon' : `⏱ ${lesson.duration_minutes} min`}
+                    </p>
                   </div>
 
                   {lesson.status === 'done' && (
-                    <Link
-                      href={`/video-aula/${lesson.id}`}
-                      className="flex items-center gap-1.5 text-[#65758b] text-sm hover:text-[#1b2232] shrink-0"
-                    >
+                    <Link href={`/video-aula/${lesson.id}`} className="flex items-center gap-1.5 text-[#65758b] text-sm hover:text-[#1b2232] shrink-0">
                       <RotateCcw size={14} /> Review
                     </Link>
                   )}
-                  {lesson.status === 'current' && (
-                    <Link
-                      href={`/video-aula/${lesson.id}`}
-                      className="flex items-center gap-1.5 bg-[#0057b8] text-white text-sm px-4 py-1.5 rounded-xl font-medium hover:bg-[#0046a0] transition-colors shrink-0"
-                    >
+                  {lesson.status === 'available' && (
+                    <Link href={`/video-aula/${lesson.id}`} className="flex items-center gap-1.5 bg-[#0057b8] text-white text-sm px-4 py-1.5 rounded-xl font-medium hover:bg-[#0046a0] transition-colors shrink-0">
                       <Play size={14} /> Watch
                     </Link>
+                  )}
+                  {lesson.status === 'coming_soon' && (
+                    <span className="text-xs font-medium text-[#a07800] bg-[#ffd700]/20 px-3 py-1 rounded-full shrink-0">
+                      Coming soon
+                    </span>
                   )}
                 </div>
               ))}
