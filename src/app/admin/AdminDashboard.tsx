@@ -17,13 +17,14 @@ type Student = {
   city: string
   avatarUrl: string | null
   mathClasses: number
-  mathMax: number
-  onlineCourses: number
+  lessons: number
+  anelisaClasses: number
   aiUsage: number
   satScore: number | null
   satTarget: number
   trend: string
   colleges: string[]
+  rankPosition: number | null
 }
 
 type Teacher = {
@@ -65,7 +66,7 @@ export default function AdminDashboard({
     if (filters.country && s.country !== filters.country) return false
     if (filters.city && s.city !== filters.city) return false
     if (filters.minSAT && (s.satScore ?? 0) < Number(filters.minSAT)) return false
-    if (filters.minLessons && s.onlineCourses < Number(filters.minLessons)) return false
+    if (filters.minLessons && s.lessons < Number(filters.minLessons)) return false
     if (filters.minAI && s.aiUsage < Number(filters.minAI)) return false
     if (filters.minMath && s.mathClasses < Number(filters.minMath)) return false
     return true
@@ -81,7 +82,7 @@ export default function AdminDashboard({
         ? Math.round(withSAT.reduce((a, s) => a + (s.satScore ?? 0), 0) / withSAT.length)
         : 0,
       avgLessons: filtered.length
-        ? Math.round(filtered.reduce((a, s) => a + s.onlineCourses, 0) / filtered.length)
+        ? Math.round(filtered.reduce((a, s) => a + s.lessons, 0) / filtered.length)
         : 0,
       avgAI: filtered.length
         ? Math.round(filtered.reduce((a, s) => a + s.aiUsage, 0) / filtered.length)
@@ -105,9 +106,10 @@ export default function AdminDashboard({
   const activityBar = useMemo(() =>
     filtered.map(s => ({
       name: s.name.split(' ')[0],
-      Lessons: s.onlineCourses,
+      Lessons: s.lessons,
       'AI Messages': s.aiUsage,
       'Math Classes': s.mathClasses,
+      'Anelisa': s.anelisaClasses,
     }))
   , [filtered])
 
@@ -115,7 +117,7 @@ export default function AdminDashboard({
     const rows = filtered.map(s => ({
       Name: s.name, Country: s.country, City: s.city,
       'SAT Score': s.satScore ?? '', 'SAT Target': s.satTarget,
-      'Lessons Completed': s.onlineCourses, 'AI Usage': s.aiUsage,
+      'Lessons Completed': s.lessons, 'AI Usage': s.aiUsage,
       'Math Classes': s.mathClasses, 'College List': s.colleges.join(', '),
     }))
     const ws = XLSX.utils.json_to_sheet(rows)
@@ -128,7 +130,7 @@ export default function AdminDashboard({
     const header = ['Name', 'Country', 'City', 'SAT Score', 'SAT Target', 'Lessons', 'AI Usage', 'Math Classes', 'College List']
     const rows = filtered.map(s => [
       s.name, s.country, s.city, s.satScore ?? '', s.satTarget,
-      s.onlineCourses, s.aiUsage, s.mathClasses, s.colleges.join('; '),
+      s.lessons, s.aiUsage, s.mathClasses, s.colleges.join('; '),
     ])
     const csv = [header, ...rows].map(r => r.map(v => `"${v}"`).join(',')).join('\n')
     const blob = new Blob([csv], { type: 'text/csv' })
@@ -170,13 +172,14 @@ export default function AdminDashboard({
         city: teacher.city,
         avatarUrl: teacher.avatarUrl,
         mathClasses: teacher.mathClasses,
-        mathMax: 40,
-        onlineCourses: 0,
+        lessons: 0,
+        anelisaClasses: 0,
         aiUsage: 0,
         satScore: null,
         satTarget: 1300,
         trend: 'neutral',
         colleges: [],
+        rankPosition: null,
       }])
       setLoadingId(null)
     })
@@ -373,6 +376,7 @@ export default function AdminDashboard({
                     <Bar dataKey="Lessons"      fill="#0057b8" radius={[4, 4, 0, 0]} />
                     <Bar dataKey="AI Messages"  fill="#ff9500" radius={[4, 4, 0, 0]} />
                     <Bar dataKey="Math Classes" fill="#22c55e" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="Anelisa"      fill="#ffd700" radius={[4, 4, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               ) : <EmptyChart />}
@@ -394,7 +398,7 @@ export default function AdminDashboard({
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b border-[#e1e7ef]">
-                      {['Student', 'Country', 'Math classes', 'Online course', 'AI', 'SAT', 'College List', ''].map(col => (
+                      {['Student', 'Country', 'Ranking', 'Math Classes', 'Lessons', 'Anelisa', 'AI', 'SAT', 'College List', ''].map(col => (
                         <th key={col} className="text-left px-4 py-3 text-xs font-semibold text-[#65758b] uppercase tracking-wider whitespace-nowrap">
                           {col}
                         </th>
@@ -424,13 +428,14 @@ export default function AdminDashboard({
                           <div>{s.country}</div>
                           {s.city && <div className="text-xs">{s.city}</div>}
                         </td>
-                        <td className="px-4 py-3">
-                          <span className="text-[#1b2232] font-medium">{s.mathClasses}/{s.mathMax}</span>
-                          <div className="w-20 h-1.5 bg-[#f3f5f7] rounded-full mt-1">
-                            <div className="h-full bg-[#1f2c47] rounded-full" style={{ width: `${Math.min((s.mathClasses / s.mathMax) * 100, 100)}%` }} />
-                          </div>
+                        <td className="px-4 py-3 text-center">
+                          {s.rankPosition
+                            ? <span className={`font-bold text-sm ${s.rankPosition <= 5 ? 'text-[#ffd700]' : s.rankPosition <= 10 ? 'text-[#22c55e]' : 'text-[#1b2232]'}`}>#{s.rankPosition}</span>
+                            : <span className="text-[#65758b]">—</span>}
                         </td>
-                        <td className="px-4 py-3 text-[#1b2232] font-medium">{s.onlineCourses}</td>
+                        <td className="px-4 py-3 text-[#1b2232] font-medium">{s.mathClasses}</td>
+                        <td className="px-4 py-3 text-[#1b2232] font-medium">{s.lessons}</td>
+                        <td className="px-4 py-3 text-[#1b2232] font-medium">{s.anelisaClasses || '—'}</td>
                         <td className="px-4 py-3 text-[#1b2232] font-medium">{s.aiUsage}x</td>
                         <td className="px-4 py-3">
                           {s.satScore ? (

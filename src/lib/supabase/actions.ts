@@ -210,7 +210,7 @@ export async function getGestorStudentsData() {
   const userIds = profiles.map(p => p.id)
 
   // Fetch all needed data in parallel
-  const [mathData, lessonsData, aiData, satData, collegesData] = await Promise.all([
+  const [mathData, lessonsData, aiData, satData, collegesData, anelisaData, rankingData] = await Promise.all([
     supabase
       .from('math_appointments')
       .select('user_id')
@@ -234,11 +234,22 @@ export async function getGestorStudentsData() {
       .from('user_colleges')
       .select('user_id, name')
       .in('user_id', userIds),
+    supabase
+      .from('anelisa_appointments')
+      .select('user_id')
+      .in('user_id', userIds)
+      .neq('status', 'cancelled'),
+    supabase.rpc('get_ranking', { current_user_id: user.id }),
   ])
+
+  const rankMap: Record<string, number> = {}
+  ;((rankingData.data ?? []) as Array<{ user_id: string; rank_pos: number }>)
+    .forEach(r => { rankMap[r.user_id] = r.rank_pos })
 
   const students = profiles.map(p => {
     const mathCount = (mathData.data ?? []).filter(r => r.user_id === p.id).length
     const lessonsCount = (lessonsData.data ?? []).filter(r => r.user_id === p.id).length
+    const anelisaCount = (anelisaData.data ?? []).filter(r => r.user_id === p.id).length
     const aiMsgs = (aiData.data ?? [])
       .filter(r => r.user_id === p.id)
       .reduce((acc: number, r) => acc + ((r.messages as unknown[])?.length ?? 0), 0)
@@ -262,13 +273,14 @@ export async function getGestorStudentsData() {
       city: p.city || '',
       avatarUrl: p.avatar_url || null,
       mathClasses: mathCount,
-      mathMax: 40,
-      onlineCourses: lessonsCount,
+      lessons: lessonsCount,
+      anelisaClasses: anelisaCount,
       aiUsage: aiMsgs,
       satScore: latestSAT,
       satTarget: p.sat_target_score || 1300,
       trend,
       colleges,
+      rankPosition: rankMap[p.id] ?? null,
     }
   })
 
@@ -276,7 +288,7 @@ export async function getGestorStudentsData() {
   const avgSAT = students.filter(s => s.satScore).length > 0
     ? Math.round(students.filter(s => s.satScore).reduce((a, s) => a + (s.satScore ?? 0), 0) / students.filter(s => s.satScore).length)
     : 0
-  const avgLessons = total > 0 ? Math.round(students.reduce((a, s) => a + s.onlineCourses, 0) / total) : 0
+  const avgLessons = total > 0 ? Math.round(students.reduce((a, s) => a + s.lessons, 0) / total) : 0
   const avgAI = total > 0 ? Math.round(students.reduce((a, s) => a + s.aiUsage, 0) / total) : 0
 
   return { students, stats: { total, avgSAT, avgLessons, avgAI } }
