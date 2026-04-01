@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, Lock, Clock } from 'lucide-react'
+import { ArrowLeft, Clock } from 'lucide-react'
 
 const sectionMeta = {
   critical_reading: { label: 'Critical Reading', icon: '📚' },
@@ -26,7 +26,7 @@ export default async function VideoAulaPage({ params }: { params: Promise<{ id: 
   const [{ data: sectionLessons }, { data: progress }] = await Promise.all([
     supabase
       .from('lessons')
-      .select('id, title, order_index, duration_minutes')
+      .select('id, title, order_index, duration_minutes, video_url')
       .eq('section', lesson.section)
       .order('order_index'),
     supabase
@@ -41,15 +41,10 @@ export default async function VideoAulaPage({ params }: { params: Promise<{ id: 
   const isCompleted = completedIds.has(id)
   const lessons = sectionLessons ?? []
 
-  let foundCurrent = false
-  const playlist = lessons.map((l, idx) => {
+  const playlist = lessons.map((l) => {
     if (completedIds.has(l.id)) return { ...l, status: 'done' as const }
-    const prevDone = idx === 0 || completedIds.has(lessons[idx - 1].id)
-    if (prevDone && !foundCurrent) {
-      foundCurrent = true
-      return { ...l, status: 'current' as const }
-    }
-    return { ...l, status: 'locked' as const }
+    if (!l.video_url) return { ...l, status: 'coming_soon' as const }
+    return { ...l, status: 'available' as const }
   })
 
   const meta = sectionMeta[lesson.section as keyof typeof sectionMeta]
@@ -155,20 +150,18 @@ export default async function VideoAulaPage({ params }: { params: Promise<{ id: 
           <div className="bg-white rounded-2xl border border-[#e1e7ef] overflow-hidden">
             <div className="p-4 border-b border-[#e1e7ef]">
               <p className="font-bold text-[#1b2232]">{meta?.label}</p>
-              <p className="text-xs text-[#65758b]">{doneInSection} of {lessons.length} lessons completed</p>
+              <p className="text-xs text-[#65758b]">{doneInSection} of {playlist.filter(l => l.status !== 'coming_soon').length} lessons completed</p>
             </div>
             <div className="divide-y divide-[#f3f5f7]">
               {playlist.map((l) =>
-                l.status === 'locked' ? (
-                  <div key={l.id} className="flex items-center gap-3 px-4 py-3 opacity-50">
-                    <div className="w-7 h-7 rounded-full bg-[#f3f5f7] flex items-center justify-center shrink-0">
-                      <Lock size={12} className="text-[#65758b]" />
+                l.status === 'coming_soon' ? (
+                  <div key={l.id} className="flex items-center gap-3 px-4 py-3">
+                    <div className="w-7 h-7 rounded-full bg-[#f3f5f7] flex items-center justify-center shrink-0 text-sm">
+                      🔜
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-[#1b2232] truncate">{l.title}</p>
-                      <p className="text-xs text-[#65758b] flex items-center gap-1">
-                        <Clock size={10} /> {l.duration_minutes} min
-                      </p>
+                      <p className="text-sm font-medium text-[#65758b] truncate">{l.title}</p>
+                      <p className="text-xs text-[#65758b]">Coming soon</p>
                     </div>
                   </div>
                 ) : (
