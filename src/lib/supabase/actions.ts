@@ -242,9 +242,13 @@ export async function getGestorStudentsData() {
     supabase.rpc('get_ranking', { current_user_id: user.id }),
   ])
 
+  // Recalculate ranking positions among students only (exclude admins/teachers)
+  const studentIdSet = new Set(userIds)
   const rankMap: Record<string, number> = {}
-  ;((rankingData.data ?? []) as Array<{ user_id: string; rank_pos: number }>)
-    .forEach(r => { rankMap[r.user_id] = r.rank_pos })
+  const studentRanking = ((rankingData.data ?? []) as Array<{ user_id: string; rank_pos: number }>)
+    .filter(r => studentIdSet.has(r.user_id))
+    .sort((a, b) => a.rank_pos - b.rank_pos)
+  studentRanking.forEach((r, idx) => { rankMap[r.user_id] = idx + 1 })
 
   const students = profiles.map(p => {
     const mathCount = (mathData.data ?? []).filter(r => r.user_id === p.id).length
